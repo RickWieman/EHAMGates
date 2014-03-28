@@ -24,23 +24,26 @@ class GateFinder {
 
 	function findGate($callsign, $aircraftType, $origin) {
 		if($this->resolveSchengenOrigin($origin)) {
-			return $this->findSchengenGate($callsign, $aircraftType);
+			$allSchengenGates = array_merge(Gates_EHAM::$bravoApron, Gates_EHAM::$schengenGates,
+				Gates_EHAM::$schengenNonSchengenGates);
+
+			return $this->findGateInArray($allSchengenGates, $callsign, $aircraftType);
 		}
 		else {
-			// TODO: Assign Non-Schengen gate!
+			$allNonSchengenGates = array_merge(Gates_EHAM::$schengenNonSchengenGates, Gates_EHAM::$nonSchengenGates);
+
+			return $this->findGateInArray($allNonSchengenGates, $callsign, $aircraftType);
 		}
 	}
 
-	function findSchengenGate($callsign, $aircraftType) {
-		// TODO: Schengen range check!
-
+	function findGateInArray($allGates, $callsign, $aircraftType) {
 		$defaultGate = $this->resolveAirlineGate($callsign);
 		$cat = $this->resolveAircraftCat($aircraftType);
 
 		// First determine the available gates
 		$availableGates = array();
 
-		foreach(Gates_EHAM::$gates as $gate => $gateCat) {
+		foreach($allGates as $gate => $gateCat) {
 			if($gateCat >= $cat && !in_array($gate, $this->occupiedGates)) {
 				$availableGates[$gate] = $gateCat;
 			}

@@ -10,6 +10,12 @@ function testResult($expected, $returned) {
 
 $gf = new GateFinder;
 
+$allGates = array_merge(Gates_EHAM::$bravoApron, Gates_EHAM::$schengenGates, Gates_EHAM::$schengenNonSchengenGates,
+	Gates_EHAM::$nonSchengenGates);
+
+$schengenGates = array_merge(Gates_EHAM::$bravoApron, Gates_EHAM::$schengenGates, Gates_EHAM::$schengenNonSchengenGates);
+$nonSchengenGates = array_merge(Gates_EHAM::$schengenNonSchengenGates, Gates_EHAM::$nonSchengenGates);
+
 echo "- Aircraft to Categories -\n";
 echo 'B738' . testResult(4, $gf->resolveAircraftCat('B738'));
 echo 'MD11' . testResult(7, $gf->resolveAircraftCat('MD11'));
@@ -27,10 +33,21 @@ echo 'EBBR' . testResult(true, $gf->resolveSchengenOrigin('EBBR'));
 echo "- Find Gate -\n";
 echo "TRA123, B738, EBBR:\n";
 	$gate = $gf->findGate('TRA123', 'B738', 'EBBR');
-	echo '* cat. 4' . testResult(4, Gates_EHAM::$gates[$gate]); 
+	echo 'Assigned Gate = ' . $gate . "\n";
+	echo '* cat. 4' . testResult(4, $allGates[$gate]); 
 	echo '* preferent' . testResult(true, in_array(substr($gate, 0, 1), Gates_EHAM::$airlinesDefaultGates['TRA']));
+	echo '* Schengen' . testResult(true, array_key_exists($gate, $schengenGates));
 echo "KLM123, MD11, EDDT:\n";
 	$gate = $gf->findGate('KLM123', 'MD11', 'EDDT');
-	echo '* cat. 7' . testResult(7, Gates_EHAM::$gates[$gate]); 
+	echo 'Assigned Gate = ' . $gate . "\n";
+	echo '* cat. 7' . testResult(7, $allGates[$gate]); 
 	echo '* preferent' . testResult(true, in_array(substr($gate, 0, 1), Gates_EHAM::$airlinesDefaultGates['KLM']));
+	echo '* Schengen' . testResult(true, array_key_exists($gate, $schengenGates));
+echo "EAL123, A380, OMDB:\n";
+	$gate = $gf->findGate('EAL123', 'A380', 'OMDB');
+	echo 'Assigned Gate = ' . $gate . "\n";
+	echo '* cat. 8' . testResult(8, $allGates[$gate]); 
+	echo '* preferent' . testResult(true, in_array(substr($gate, 0, 1), Gates_EHAM::$airlinesDefaultGates['EAL']));
+	echo '* Non-Schengen' . testResult(true, array_key_exists($gate, $nonSchengenGates));
+
 ?>

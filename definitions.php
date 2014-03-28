@@ -177,7 +177,7 @@ class Gates_EHAM {
 		'D86' => 'D57'
 	);
 
-	static $gates = array(
+	static $bravoApron = array(
 		'A31' => 8,
 		'A32' => 8,
 		'A33' => 3,
@@ -224,8 +224,10 @@ class Gates_EHAM {
 		'B92' => 2, # plus F70/E135/145/170/CL60/B462/CRJ7
 		'B93' => 2, # plus F70/E135/145/170/CL60/B462/CRJ7
 		'B94' => 2, # plus F70/E135/145/170/CL60/B462/CRJ7
-		'B95' => 2, # plus F70/E135/145/170/CL60/B462/CRJ7
+		'B95' => 2  # plus F70/E135/145/170/CL60/B462/CRJ7
+	);
 
+	static $schengenGates = array(
 		'B13' => 4,
 		'B15' => 4,
 		'B17' => 4,
@@ -272,7 +274,10 @@ class Gates_EHAM {
 
 		'D23' => 4,
 		'D27' => 4,
-		'D31' => 4,
+		'D31' => 4
+	);
+
+	static $schengenNonSchengenGates = array(
 		'D46' => 4,
 		'D52' => 4,
 		'D56' => 4,
@@ -287,8 +292,10 @@ class Gates_EHAM {
 		'D51' => 6, # plus MD11
 		'D53' => 6, # plus MD11
 		'D55' => 4,
-		'D57' => 6,
+		'D57' => 6
+	);
 
+	static $nonSchengenGates = array(
 		'E02' => 6, # plus MD11/B764
 		'E04' => 6, # plus MD11/B764
 		'E06' => 6, # plus MD11

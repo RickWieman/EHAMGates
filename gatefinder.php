@@ -1,12 +1,19 @@
 <?php
 
-require('definitions.php');
+require_once('definitions.php');
+require_once('realgates.php');
 
 class GateFinder {
 
 	// For future use: one can mark gates as occupied.
 	// These gates will then not be returned by the findGate function.
 	private $occupiedGates = array('C15', 'E02');
+
+	private $realGates;
+
+	function __construct() {
+		$this->realGates = new RealGates();
+	}
 	
 	function resolveAircraftCat($aircraftType) {
 		return Gates_EHAM::$aircraftCategories[$aircraftType];
@@ -44,6 +51,18 @@ class GateFinder {
 				return $this->findCivilGate($allNonSchengenGates, $callsign, $aircraftType);
 			}
 		}
+	}
+
+	function findRealGate($callsign) {
+		// TODO: If $callsign alphanumeric, convert $callsign to numeric
+
+		preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
+
+		$airlineICAO = Gates_EHAM::$airlinesIATA[$airlineIATA[0]];
+
+		$flightnumber = preg_replace('/^[A-Z]{3}/', $airlineICAO . ' ', $callsign);
+
+		return $this->realGates->findGateByFlightnumber($flightnumber);
 	}
 
 	function findCargoGate($callsign, $aircraftType) {

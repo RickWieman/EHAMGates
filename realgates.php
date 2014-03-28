@@ -3,6 +3,8 @@
 require_once('definitions.php');
 
 class RealGates {
+	private $allRealGates;
+
 	function parseData() {
 		$data = file_get_contents('data.html'); // Data source: http://schiphol.dutchplanespotters.nl/
 
@@ -40,7 +42,27 @@ class RealGates {
 			}
 		}
 
+		$this->allRealGates = $realGates;
+
 		return $realGates;
+	}
+
+	function getAllRealGates() {
+		if(empty($this->allRealGates)) {
+			$this->parseData();
+		}
+
+		return $this->allRealGates;
+	}
+
+	function findGateByFlightnumber($flightnumber) {
+		$realGates = $this->getAllRealGates();
+
+		if(array_key_exists($flightnumber, $realGates)) {
+			return $realGates[$flightnumber];
+		}
+
+		return false;
 	}
 }
 

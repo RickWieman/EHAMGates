@@ -5,8 +5,25 @@ require_once('definitions.php');
 class RealGates {
 	private $allRealGates;
 
+	// Data source: http://schiphol.dutchplanespotters.nl/
+	function fetchData() {
+		$cacheDuration = 60 * 15;
+		$stamp = (file_exists('data.txt') ? file_get_contents('data.txt', NULL, NULL, 0, 10) : 0);
+
+		// Reload only when cache is expired
+		if(time() - $stamp > $cacheDuration) {
+			$data = file_get_contents('http://schiphol.dutchplanespotters.nl/');
+		
+			file_put_contents('data.txt', time() . $data);
+
+			return $data;
+		}
+		
+		return file_get_contents('data.txt');
+	}
+
 	function parseData() {
-		$data = file_get_contents('data.html'); // Data source: http://schiphol.dutchplanespotters.nl/
+		$data = $this->fetchData();
 
 		// Find flight table body
 		$data = explode('<table class="flights" cellpadding="2" cellspacing="0">', $data);

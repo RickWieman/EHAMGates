@@ -49,5 +49,16 @@ echo "EAL123, A380, OMDB:\n";
 	echo '* cat. 8' . testResult(8, $allGates[$gate]); 
 	echo '* preferent' . testResult(true, in_array(substr($gate, 0, 1), Gates_EHAM::$airlinesDefaultGates['EAL']));
 	echo '* Non-Schengen' . testResult(true, array_key_exists($gate, $nonSchengenGates));
-
+echo "MPH456, B744, KLAX:\n";
+	$gate = $gf->findGate('MPH456', 'B744', 'KLAX');
+	echo 'Assigned Gate = ' . $gate . "\n";
+	echo '* preferent' . testResult(true, in_array($gate, Gates_EHAM::$cargoGates['MPH']));
+echo "FDX456, B744, KLAS:\n";
+	$gate = $gf->findGate('FDX456', 'B744', 'KLAS');
+	echo 'Assigned Gate = ' . $gate . "\n";
+	echo '* preferent' . testResult(true, in_array($gate, Gates_EHAM::$cargoGates['FDX']));
+echo "ANA789, B744, KEWR:\n";
+	$gate = $gf->findGate('ANA789', 'B744', 'KEWR');
+	echo 'Assigned Gate = ' . $gate . "\n";
+	echo '* preferent' . testResult(true, in_array($gate, Gates_EHAM::$cargoGates['ANA']));
 ?>

@@ -23,20 +23,43 @@ class GateFinder {
 	}
 
 	function findGate($callsign, $aircraftType, $origin) {
-		if($this->resolveSchengenOrigin($origin)) {
-			$allSchengenGates = array_merge(Gates_EHAM::$bravoApron, Gates_EHAM::$schengenGates,
-				Gates_EHAM::$schengenNonSchengenGates);
+		preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
 
-			return $this->findGateInArray($allSchengenGates, $callsign, $aircraftType);
+		// Determine whether flight is cargo or civil
+		if(array_key_exists($airlineIATA[0], Gates_EHAM::$cargoGates)) {
+			return $this->findCargoGate($callsign, $aircraftType);
 		}
 		else {
-			$allNonSchengenGates = array_merge(Gates_EHAM::$schengenNonSchengenGates, Gates_EHAM::$nonSchengenGates);
 
-			return $this->findGateInArray($allNonSchengenGates, $callsign, $aircraftType);
+			// Determine whether flight origins from Schengen country
+			if($this->resolveSchengenOrigin($origin)) {
+				$allSchengenGates = array_merge(Gates_EHAM::$bravoApron, Gates_EHAM::$schengenGates,
+					Gates_EHAM::$schengenNonSchengenGates);
+
+				return $this->findCivilGate($allSchengenGates, $callsign, $aircraftType);
+			}
+			else {
+				$allNonSchengenGates = array_merge(Gates_EHAM::$schengenNonSchengenGates, Gates_EHAM::$nonSchengenGates);
+
+				return $this->findCivilGate($allNonSchengenGates, $callsign, $aircraftType);
+			}
 		}
 	}
 
-	function findGateInArray($allGates, $callsign, $aircraftType) {
+	function findCargoGate($callsign, $aircraftType) {
+		preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
+
+		// Find a free cargo gate
+		foreach(Gates_EHAM::$cargoGates[$airlineIATA[0]] as $gate) {
+			if(!in_array($gate, $this->occupiedGates)) {
+				return $gate;
+			}
+		}
+
+		return false;
+	}
+
+	function findCivilGate($allGates, $callsign, $aircraftType) {
 		$defaultGate = $this->resolveAirlineGate($callsign);
 		$cat = $this->resolveAircraftCat($aircraftType);
 

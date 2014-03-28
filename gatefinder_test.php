@@ -61,4 +61,13 @@ echo "ANA789, B744, KEWR:\n";
 	$gate = $gf->findGate('ANA789', 'B744', 'KEWR');
 	echo 'Assigned Gate = ' . $gate . "\n";
 	echo '* preferent' . testResult(true, in_array($gate, Gates_EHAM::$cargoGates['ANA']));
+echo "- Real Gates -\n";
+echo 'TRA404' . testResult('D51', $gf->findRealGate('TRA404'));
+echo 'KLM898' . testResult('E18', $gf->findRealGate('KLM898'));
+echo 'EZY8869' . testResult('H03', $gf->findRealGate('EZY8869'));
+echo 'KLM123' . testResult(false, $gf->findRealGate('KLM123'));
+echo "- Real Gates through findGate() -\n";
+echo 'TRA404' . testResult('D51', $gf->findGate('TRA404', 'B738', 'HEGN'));
+echo 'KLM898' . testResult('E18', $gf->findGate('KLM898', 'B744', 'ZBAA'));
+echo 'EZY8869' . testResult('H03', $gf->findGate('EZY8869', 'A320', 'EGKK'));
 ?>

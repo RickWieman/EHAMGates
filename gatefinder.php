@@ -38,6 +38,19 @@ class GateFinder {
 		}
 		else {
 
+			// Determine whether this is a real flight
+			$realGate = $this->findRealGate($callsign);
+
+			if($realGate) {
+				$allGates = array_merge(Gates_EHAM::$bravoApron, Gates_EHAM::$schengenGates, Gates_EHAM::$schengenNonSchengenGates,
+					Gates_EHAM::$nonSchengenGates);
+
+				// Only return the real gate if the actual aircraft type can use that gate!
+				if($allGates[$realGate] >= $this->resolveAircraftCat($aircraftType)) {
+					return $realGate;
+				}
+			}
+
 			// Determine whether flight origins from Schengen country
 			if($this->resolveSchengenOrigin($origin)) {
 				$allSchengenGates = array_merge(Gates_EHAM::$bravoApron, Gates_EHAM::$schengenGates,

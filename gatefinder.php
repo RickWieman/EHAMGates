@@ -53,16 +53,45 @@ class GateFinder {
 		}
 	}
 
-	function findRealGate($callsign) {
+	/* 
+	 * Finds the real gate with multiple tries:
+	 * - ICAO flight number (with up to 4 zeroes)
+	 *     TRA123 -> HV (0)123
+	 * - IATA flight number (with up to 4 zeroes)
+	 *     EZY123 -> EZY (0)123
+	*/
+	function findRealGate($callsign, $useICAO = true) {
 		// TODO: If $callsign alphanumeric, convert $callsign to numeric
 
-		preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
+		if($useICAO) {
+			preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
+			$airlineICAO = Gates_EHAM::$airlinesIATA[$airlineIATA[0]];
 
-		$airlineICAO = Gates_EHAM::$airlinesIATA[$airlineIATA[0]];
+			$flightnumber = preg_replace('/^[A-Z]{3}/', $airlineICAO . ' ', $callsign);
+		}
+		else {
+			$flightnumber = preg_replace('/^([A-Z]{3})/', '$1 ', $callsign);
+		}
 
-		$flightnumber = preg_replace('/^[A-Z]{3}/', $airlineICAO . ' ', $callsign);
+		$gate = $this->realGates->findGateByFlightnumber($flightnumber);
 
-		return $this->realGates->findGateByFlightnumber($flightnumber);
+		// If failed, try with more zeroes
+		$i = 0;
+		while(!$gate && $i <= 4) {
+			$flightnumber = explode(' ', $flightnumber);
+			$i = strlen($flightnumber[1]) + 1;
+			$flightnumber[1] = sprintf("%0" . $i . "d", $flightnumber[1]);
+			$flightnumber = implode(' ', $flightnumber);
+
+			$gate = $this->realGates->findGateByFlightnumber($flightnumber);			
+		}
+
+		// If still failed, try using original callsign
+		if(!$gate && $useICAO) {
+			return $this->findRealGate($callsign, false);
+		}
+
+		return $gate;
 	}
 
 	function findCargoGate($callsign, $aircraftType) {

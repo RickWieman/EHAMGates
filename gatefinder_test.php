@@ -68,6 +68,12 @@ echo 'EZY8869' . testResult('H03', $gf->findRealGate('EZY8869'));
 echo 'KLM123' . testResult(false, $gf->findRealGate('KLM123'));
 echo "- Real Gates through findGate() -\n";
 echo 'TRA404' . testResult('D51', $gf->findGate('TRA404', 'B738', 'HEGN'));
+echo "TRA404 (too heavy for real gate):\n";
+	$gate = $gf->findGate('TRA404', 'A380', 'HEGN');
+	echo 'Assigned Gate = ' . $gate . " (instead of D51)\n";
+	echo '* cat. 8' . testResult(8, $allGates[$gate]); 
+	echo '* preferent' . testResult(true, in_array(substr($gate, 0, 1), Gates_EHAM::$airlinesDefaultGates['TRA']));
+	echo '* Non-Schengen' . testResult(true, array_key_exists($gate, $nonSchengenGates));
 echo 'KLM898' . testResult('E18', $gf->findGate('KLM898', 'B744', 'ZBAA'));
 echo 'EZY8869' . testResult('H03', $gf->findGate('EZY8869', 'A320', 'EGKK'));
 ?>

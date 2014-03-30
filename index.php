@@ -5,8 +5,8 @@ if(!isset($_SESSION['assignedList'])) {
 	$_SESSION['assignedList'] = array();
 }
 
-require_once('definitions.php');
-require_once('gatefinder.php');
+require_once('include/definitions.php');
+require_once('include/gatefinder.php');
 
 $gf = new GateFinder();
 

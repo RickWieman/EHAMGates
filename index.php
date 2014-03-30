@@ -1,22 +1,43 @@
 <?php
 session_start();
 
+if(!isset($_SESSION['assignedList'])) {
+	$_SESSION['assignedList'] = '';
+}
+
 define('PAGE', 'search');
 require('include/tpl_header.php');
 
 $gf = new GateFinder();
 
-// Mark all assigned gates as occupied
-if(isset($_SESSION['assignedList'])) {
-	$aircraft = explode(';', $_SESSION['assignedList']);
+// Add assignment
+if(isset($_GET['add']) && isset($_GET['gate'])
+	&& preg_match('/[A-Z]+[0-9]+/', $_GET['add']) && preg_match('/[A-Z][0-9]+/', $_GET['gate'])) {
+	$_SESSION['assignedList'] .= $_GET['add'] . '=' . $_GET['gate'] . ';';
+}
+
+$aircraft = ($_SESSION['assignedList'] != '') ? explode(';', $_SESSION['assignedList']) : array();
+
+// Delete assignment
+if(isset($_GET['delete']) && preg_match('/[A-Z]+[0-9]+/', $_GET['delete'])) {
+	$i = 0;
 	foreach($aircraft as $assignment) {
 		$split = explode('=', $assignment);
 
-		$gf->occupyGate($split[1]);
+		if(preg_match($split[0], $_GET['delete'])) {
+			unset($aircraft[$i]);
+		}
+		$i++;
 	}
+
+	$_SESSION['assignedList'] = implode(';', $aircraft) . ';';
 }
-else {
-	$_SESSION['assignedList'] = '';
+
+// Mark assigned gates as occupied
+foreach($aircraft as $assignment) {
+	$split = explode('=', $assignment);
+
+	$gf->occupyGate($split[1]);
 }
 ?>
 <h1>Search</h1>
@@ -44,8 +65,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	}
 	else {
 		echo '<div class="alert alert-success">You can put <strong>' . $_POST['inputCallsign'] . '</strong> on gate <strong>' . $gate . '</strong>.';
-		if(!isset($_COOKIE['autoAssign'])) {
-			echo '<br /><a href="#">Add to list</a>';
+		if(!isset($_COOKIE['autoAssign']) || $_COOKIE['autoAssign'] != 'true') {
+			echo '<br /><a href="?add=' . $_POST['inputCallsign'] . '&gate=' . $gate . '">Add to list</a>';
 		}
 		echo '</div>';
 	}
@@ -121,18 +142,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			<tr>
 				<th>Callsign</th>
 				<th>Gate</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
 			<?php
-			if(count($aircraft == 0)) {
-				echo '<tr><td colspan="2">You have not assigned any gates yet.</td></tr>';
+			if(count($aircraft) == 0) {
+				echo '<tr><td colspan="3">You have not assigned any gates yet.</td></tr>';
 			}
 
 			foreach($aircraft as $assignment) {
 				$split = explode('=', $assignment);
 
-				echo '<tr><td>' . $split[0] . '</td><td>' . $split[1] . '</td></tr>';
+				echo '<tr><td>' . $split[0] . '</td><td>' . $split[1] . '</td>';
+				echo '<td style="text-align: right;"><a href="?delete=' . $split[0] . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a></td></tr>';
 			}
 			?>
 		</tbody>

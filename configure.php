@@ -1,6 +1,6 @@
 <?php
-if($_SERVER['HTTP_REQUEST_METHOD'] == 'POST') {
-	setcookie('schengenMethod', $_POST['schengen'], time() + 60*60*24*30);
+if($_SERVER['REQUEST_METHOD'] == 'POST') {
+	setcookie('schengenMethod', $_POST['schengen'], (time() + 60*60*24*30));
 }
 
 define('PAGE', 'config');

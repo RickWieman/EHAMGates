@@ -35,7 +35,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$gate = $gf->findGate($_POST['inputCallsign'], $_POST['inputACType'], $_POST['inputOrigin']);
 
 	if(isset($_COOKIE['autoAssign']) && $_COOKIE['autoAssign'] == 'true') {
-		$_SESSION['assignedList'] .= $_POST['callsign'] . '=' . $gate . ';';
+		$_SESSION['assignedList'] .= $_POST['inputCallsign'] . '=' . $gate . ';';
 		$gf->occupyGate($gate);
 	}
 
@@ -115,29 +115,29 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <h1>List</h1>
 <p>The list below shows all aircraft with gate assignments. These gates are also marked as occupied.</p>
+<div class="container col-sm-6">
+	<table class="table table-hover table-condensed">
+		<thead>
+			<tr>
+				<th>Callsign</th>
+				<th>Gate</th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php
+			if(count($aircraft == 0)) {
+				echo '<tr><td colspan="2">You have not assigned any gates yet.</td></tr>';
+			}
 
-<table class="table table-condensed">
-	<thead>
-		<tr>
-			<th>Callsign</th>
-			<th>Gate</th>
-		</tr>
-	</thead>
-	<tbody>
-		<?php
-		if(count($aircraft == 0)) {
-			echo '<tr><td colspan="2">You have not assigned any gates yet.</td></tr>';
-		}
+			foreach($aircraft as $assignment) {
+				$split = explode('=', $assignment);
 
-		foreach($aircraft as $assignment) {
-			$split = explode('=', $assignment);
-
-			echo '<tr><td>' . $split[0] . '</td><td>' . $split[1] . '</td></tr>';
-		}
-		?>
-	</tbody>
-</table>
-
+				echo '<tr><td>' . $split[0] . '</td><td>' . $split[1] . '</td></tr>';
+			}
+			?>
+		</tbody>
+	</table>
+</div>
 <?php
 require('include/tpl_footer.php');
 ?>

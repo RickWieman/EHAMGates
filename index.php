@@ -39,9 +39,8 @@ $stamp = (file_exists('data.txt') ? file_get_contents('data.txt', NULL, NULL, 0,
 ?>
 <h1>Search</h1>
 
-<p>Find a (free) gate by specifying the callsign and aircraft type.</p>
-
-<p>Last update of real life data: <?php echo date("H:i:s (d-m-Y)", $stamp); ?></p>
+<p>Find a (free) gate by specifying the callsign and aircraft type.<br />
+Last update of real life data: <?php echo date("H:i:s (d-m-Y)", $stamp); ?></p>
 
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -95,9 +94,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		<div class="col-sm-10">
 			<select class="form-control" name="inputACType">
 				<option disabled>--- Common types ---</option>
+				<option value="A319">A319</option>
+				<option value="A320">A320</option>
+				<option value="A321">A321</option>
 				<option value="B737">B737</option>
 				<option value="B738">B738</option>
+				<option value="B739">B739</option>
+				<option value="B744">B744</option>
+				<option value="DH8D">DH8D</option>
+				<option value="E190">E190</option>
+				<option value="F70">F70</option>
+				<option value="F100">F100</option>
 				<option value="MD11">MD11</option>
+				<option value="RJ85">RJ85</option>
 				<option disabled>--- All types ---</option>
 				<?php
 				$aircraftTypes = Gates_EHAM::$aircraftCategories;
@@ -157,17 +166,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		</thead>
 		<tbody>
 			<?php
-			if(count($_SESSION['assignedList']) == 0) {
-				echo '<tr><td colspan="3">You have not assigned any gates yet.</td></tr>';
-			}
-
 			asort($_SESSION['assignedList']);
 
+			$i = 0;
 			foreach($_SESSION['assignedList'] as $gate => $callsign) {
 				if($callsign != 'unknown') {
 					echo '<tr><td>' . $callsign . '</td><td>' . $gate . '</td>';
 					echo '<td style="text-align: right;"><a href="?delete=' . $gate . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a></td></tr>';
 				}
+				$i++;
+			}
+
+			if($i == 0) {
+				echo '<tr><td colspan="3">You have not assigned any gates yet.</td></tr>';
 			}
 			?>
 		</tbody>

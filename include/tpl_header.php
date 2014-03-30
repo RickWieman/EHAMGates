@@ -20,7 +20,7 @@ if(!defined('PAGE')) {
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="#">EHAM Gate Finder</a>
+				<a class="navbar-brand" href="index.php">EHAM Gate Finder</a>
 			</div>
 			<div class="collapse navbar-collapse" id="menu">
 				<ul class="nav navbar-nav">

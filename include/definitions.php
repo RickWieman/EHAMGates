@@ -464,6 +464,20 @@ class Gates_EHAM {
 		'MPH' => array('S72', 'S74', 'S77'),
 		'SQC' => array('R72', 'R74', 'R77', 'R80')
 	);
+
+	static function allGates() {
+		return array_merge(self::$bravoApron, self::$schengenGates,
+			self::$schengenNonSchengenGates, self::$nonSchengenGates);
+	}
+
+	static function allSchengenGates() {
+		return array_merge(self::$bravoApron, self::$schengenGates,
+			self::$schengenNonSchengenGates);
+	}
+
+	static function allNonSchengenGates() {
+		return array_merge(self::$schengenNonSchengenGates, self::$nonSchengenGates);
+	}
 }
 
 ?>

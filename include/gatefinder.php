@@ -41,6 +41,10 @@ class GateFinder {
 		$this->occupiedGates[] = $gate;
 	}
 
+	function isGateOccupied($gate) {
+		return in_array($gate, $this->occupiedGates);
+	}
+
 	function findGate($callsign, $aircraftType, $origin) {
 		preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
 

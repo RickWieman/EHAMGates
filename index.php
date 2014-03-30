@@ -10,17 +10,17 @@ require_once('include/gatefinder.php');
 
 $gf = new GateFinder();
 
-// Add assignment
-if(isset($_GET['add']) && isset($_GET['gate'])
-	&& preg_match('/[A-Z]+[0-9]+/', $_GET['add']) && preg_match('/[A-Z][0-9]+/', $_GET['gate'])) {
-	$_SESSION['assignedList'][$_GET['add']] = $_GET['gate'];
+// Add gate assignment
+if(isset($_GET['add']) && isset($_GET['gate']) && preg_match('/[A-Z]+[0-9]+/', $_GET['add'])
+	&& in_array($_GET['gate'], Gates_EHAM::allGates())) {
+	$_SESSION['assignedList'][$_GET['gate']] = $_GET['add'];
 	
 	header("Location: " . $_SERVER['PHP_SELF']);
 	exit();
 }
 
-// Delete assignment
-if(isset($_GET['delete']) && preg_match('/[A-Z]+[0-9]+/', $_GET['delete'])) {
+// Delete gate assignment
+if(isset($_GET['delete']) && in_array($_GET['delete'], Gates_EHAM::allGates())) {
 	unset($_SESSION['assignedList'][$_GET['delete']]);
 
 	header("Location: " . $_SERVER['PHP_SELF']);
@@ -28,7 +28,7 @@ if(isset($_GET['delete']) && preg_match('/[A-Z]+[0-9]+/', $_GET['delete'])) {
 }
 
 // Mark assigned gates as occupied
-foreach($_SESSION['assignedList'] as $callsign => $gate) {
+foreach($_SESSION['assignedList'] as $gate => $callsign) {
 	$gf->occupyGate($gate);
 }
 
@@ -51,19 +51,30 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$gate = $gf->findGate($_POST['inputCallsign'], $_POST['inputACType'], $_POST['inputOrigin']);
 
 	if(!$gate) {
-		echo '<div class="alert alert-danger">Sorry, no gate could be determined for that combination...</div>';
+		?>
+		<div class="alert alert-danger">
+			Sorry, no gate could be determined for that combination...
+		</div>
+		<?php
 	}
 	else {
 		if(isset($_COOKIE['autoAssign']) && $_COOKIE['autoAssign'] == 'true') {
-			$_SESSION['assignedList'][$_POST['inputCallsign']] = $gate;
+			$_SESSION['assignedList'][$gate] = $_POST['inputCallsign'];
 			$gf->occupyGate($gate);
 		}
+		?>
+		<div class="alert alert-success">
+			You can put <strong><?php echo $_POST['inputCallsign']; ?></strong>
+			on gate <strong><?php echo $gate; ?></strong>
 
-		echo '<div class="alert alert-success">You can put <strong>' . $_POST['inputCallsign'] . '</strong> on gate <strong>' . $gate . '</strong>.';
-		if(!isset($_COOKIE['autoAssign']) || $_COOKIE['autoAssign'] != 'true') {
-			echo '<br /><a href="?add=' . $_POST['inputCallsign'] . '&gate=' . $gate . '">Add to list</a>';
-		}
-		echo '</div>';
+			<?php if(!isset($_COOKIE['autoAssign']) || $_COOKIE['autoAssign'] != 'true') { ?>
+				<br />
+				<a href="?add=<?php echo $_POST['inputCallsign']; ?>&amp;gate=<?php echo $gate; ?>">
+					Add to list
+				</a>
+			<?php } ?>
+		</div>
+		<?php
 	}
 }
 ?>
@@ -146,9 +157,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 				echo '<tr><td colspan="3">You have not assigned any gates yet.</td></tr>';
 			}
 
-			foreach($_SESSION['assignedList'] as $callsign => $gate) {
+			asort($_SESSION['assignedList']);
+			
+			foreach($_SESSION['assignedList'] as $gate => $callsign) {
 				echo '<tr><td>' . $callsign . '</td><td>' . $gate . '</td>';
-				echo '<td style="text-align: right;"><a href="?delete=' . $callsign . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a></td></tr>';
+				echo '<td style="text-align: right;"><a href="?delete=' . $gate . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a></td></tr>';
 			}
 			?>
 		</tbody>

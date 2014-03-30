@@ -12,7 +12,7 @@ $gf = new GateFinder();
 
 // Add gate assignment
 if(isset($_GET['add']) && isset($_GET['gate']) && preg_match('/[A-Z]+[0-9]+/', $_GET['add'])
-	&& in_array($_GET['gate'], Gates_EHAM::allGates())) {
+	&& array_key_exists($_GET['gate'], Gates_EHAM::allGates())) {
 	$_SESSION['assignedList'][$_GET['gate']] = $_GET['add'];
 	
 	header("Location: " . $_SERVER['PHP_SELF']);
@@ -20,7 +20,7 @@ if(isset($_GET['add']) && isset($_GET['gate']) && preg_match('/[A-Z]+[0-9]+/', $
 }
 
 // Delete gate assignment
-if(isset($_GET['delete']) && in_array($_GET['delete'], Gates_EHAM::allGates())) {
+if(isset($_GET['delete']) && array_key_exists($_GET['delete'], Gates_EHAM::allGates())) {
 	unset($_SESSION['assignedList'][$_GET['delete']]);
 
 	header("Location: " . $_SERVER['PHP_SELF']);
@@ -158,10 +158,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			}
 
 			asort($_SESSION['assignedList']);
-			
+
 			foreach($_SESSION['assignedList'] as $gate => $callsign) {
-				echo '<tr><td>' . $callsign . '</td><td>' . $gate . '</td>';
-				echo '<td style="text-align: right;"><a href="?delete=' . $gate . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a></td></tr>';
+				if($callsign != 'unknown') {
+					echo '<tr><td>' . $callsign . '</td><td>' . $gate . '</td>';
+					echo '<td style="text-align: right;"><a href="?delete=' . $gate . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a></td></tr>';
+				}
 			}
 			?>
 		</tbody>

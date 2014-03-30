@@ -12,7 +12,7 @@ $allGates = Gates_EHAM::allGates();
 $gf = new GateFinder();
 
 // Occupy gate
-if(isset($_GET['occupy']) && in_array($_GET['occupy'], $allGates)) {
+if(isset($_GET['occupy']) && array_key_exists($_GET['occupy'], $allGates)) {
 	$_SESSION['assignedList'][$_GET['occupy']] = 'unknown';
 	
 	header("Location: " . $_SERVER['PHP_SELF']);
@@ -20,7 +20,7 @@ if(isset($_GET['occupy']) && in_array($_GET['occupy'], $allGates)) {
 }
 
 // Free gate
-if(isset($_GET['free']) && in_array($_GET['free'], $allGates)) {
+if(isset($_GET['free']) && array_key_exists($_GET['free'], $allGates)) {
 	unset($_SESSION['assignedList'][$_GET['free']]);
 
 	header("Location: " . $_SERVER['PHP_SELF']);

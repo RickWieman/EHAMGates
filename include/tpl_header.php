@@ -2,6 +2,8 @@
 if(!defined('PAGE')) {
 	die('Not for single use.');
 }
+require_once('definitions.php');
+require_once('gatefinder.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,9 +26,9 @@ if(!defined('PAGE')) {
 			</div>
 			<div class="collapse navbar-collapse" id="menu">
 				<ul class="nav navbar-nav">
-					<li<?php echo (PAGE == 'search') ? ' class="active"' : '' ?>><a href="#">Search</a></li>
-					<li<?php echo (PAGE == 'gates') ? ' class="active"' : '' ?>><a href="#">Occupied Gates</a></li>
-					<li<?php echo (PAGE == 'config') ? ' class="active"' : '' ?>><a href="#">Configure</a></li>
+					<li<?php echo (PAGE == 'search') ? ' class="active"' : '' ?>><a href="index.php">Search</a></li>
+					<li<?php echo (PAGE == 'gates') ? ' class="active"' : '' ?>><a href="gates.php">Occupied Gates</a></li>
+					<li<?php echo (PAGE == 'config') ? ' class="active"' : '' ?>><a href="configure.php">Configure</a></li>
 				</ul>
 			</div>
 		</div>

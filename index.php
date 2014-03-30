@@ -4,6 +4,8 @@ require('include/tpl_header.php');
 ?>
 <h1>Search</h1>
 
+<p>Find a (free) gate by specifying the callsign and aircraft type.</p>
+
 <form class="form-horizontal" role="form">
 	<div class="form-group">
 		<label for="inputCallsign" class="col-sm-2 control-label">Callsign</label>
@@ -15,22 +17,24 @@ require('include/tpl_header.php');
 		<label for="inputACType" class="col-sm-2 control-label">Aircraft type</label>
 		<div class="col-sm-10">
 			<select class="form-control">
+				<option disabled>--- Common types ---</option>
 				<option>B737</option>
 				<option>B738</option>
 				<option>MD11</option>
 				<option disabled>--- All types ---</option>
-				<!-- LOOP for all aircraft types, sorted! -->
+				<?php
+				$aircraft = Gates_EHAM::$aircraftCategories;
+				ksort($aircraft);
+
+				foreach($aircraft as $type => $cat) {
+					echo '<option>' . $type . '</option>';
+				}
+				?>
 			</select>
 		</div>
 	</div>
-	<!-- IF configured as Origin entering -->
-	<div class="form-group">
-		<label for="inputOrigin" class="col-sm-2 control-label">Origin</label>
-		<div class="col-sm-10">
-			<input type="password" class="form-control" id="inputOrigin" placeholder="ICAO code">
-		</div>
-	</div>
-	<!-- IF configured as Schengen boolean -->
+
+	<?php if(isset($_COOKIE['schengen']) && $_COOKIE['schengen'] == 'checkbox') { ?>
 	<div class="form-group">
 		<label for="inputOrigin" class="col-sm-2 control-label">Schengen?</label>
 		<div class="col-sm-10">
@@ -42,6 +46,17 @@ require('include/tpl_header.php');
 			</div>
 		</div>
 	</div>
+
+	<?php } else { ?>
+
+	<div class="form-group">
+		<label for="inputOrigin" class="col-sm-2 control-label">Origin</label>
+		<div class="col-sm-10">
+			<input type="password" class="form-control" id="inputOrigin" placeholder="ICAO code">
+		</div>
+	</div>
+
+	<?php } ?>	
 
 	<div class="form-group">
 		<div class="col-sm-offset-2 col-sm-10">

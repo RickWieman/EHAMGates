@@ -26,6 +26,14 @@ class GateFinder {
 	}
 
 	function resolveSchengenOrigin($origin) {
+		// To allow non-specified origin
+		if($origin == "schengen") {
+			return true;
+		}
+		if($origin == "nonschengen") {
+			return false;
+		}
+
 		return in_array(substr($origin, 0, 2), Gates_EHAM::$schengen);
 	}
 

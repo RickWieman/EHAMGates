@@ -2,7 +2,7 @@
 session_start();
 
 if(!isset($_SESSION['assignedList'])) {
-	$_SESSION['assignedList'] = '';
+	$_SESSION['assignedList'] = array();
 }
 
 define('PAGE', 'search');
@@ -13,31 +13,17 @@ $gf = new GateFinder();
 // Add assignment
 if(isset($_GET['add']) && isset($_GET['gate'])
 	&& preg_match('/[A-Z]+[0-9]+/', $_GET['add']) && preg_match('/[A-Z][0-9]+/', $_GET['gate'])) {
-	$_SESSION['assignedList'] .= $_GET['add'] . '=' . $_GET['gate'] . ';';
+	$_SESSION['assignedList'][$_GET['add']] = $_GET['gate'];
 }
-
-$aircraft = ($_SESSION['assignedList'] != '') ? explode(';', $_SESSION['assignedList']) : array();
 
 // Delete assignment
 if(isset($_GET['delete']) && preg_match('/[A-Z]+[0-9]+/', $_GET['delete'])) {
-	$i = 0;
-	foreach($aircraft as $assignment) {
-		$split = explode('=', $assignment);
-
-		if(preg_match($split[0], $_GET['delete'])) {
-			unset($aircraft[$i]);
-		}
-		$i++;
-	}
-
-	$_SESSION['assignedList'] = implode(';', $aircraft) . ';';
+	unset($_SESSION['assignedList'][$_GET['delete']]);
 }
 
 // Mark assigned gates as occupied
-foreach($aircraft as $assignment) {
-	$split = explode('=', $assignment);
-
-	$gf->occupyGate($split[1]);
+foreach($_SESSION['assignedList'] as $callsign => $gate) {
+	$gf->occupyGate($gate);
 }
 ?>
 <h1>Search</h1>
@@ -55,15 +41,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	
 	$gate = $gf->findGate($_POST['inputCallsign'], $_POST['inputACType'], $_POST['inputOrigin']);
 
-	if(isset($_COOKIE['autoAssign']) && $_COOKIE['autoAssign'] == 'true') {
-		$_SESSION['assignedList'] .= $_POST['inputCallsign'] . '=' . $gate . ';';
-		$gf->occupyGate($gate);
-	}
-
 	if(!$gate) {
 		echo '<div class="alert alert-danger">Sorry, no gate could be determined for that combination...</div>';
 	}
 	else {
+		if(isset($_COOKIE['autoAssign']) && $_COOKIE['autoAssign'] == 'true') {
+			$_SESSION['assignedList'][$_POST['inputCallsign']] = $gate;
+			$gf->occupyGate($gate);
+		}
+
 		echo '<div class="alert alert-success">You can put <strong>' . $_POST['inputCallsign'] . '</strong> on gate <strong>' . $gate . '</strong>.';
 		if(!isset($_COOKIE['autoAssign']) || $_COOKIE['autoAssign'] != 'true') {
 			echo '<br /><a href="?add=' . $_POST['inputCallsign'] . '&gate=' . $gate . '">Add to list</a>';
@@ -147,15 +133,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		</thead>
 		<tbody>
 			<?php
-			if(count($aircraft) == 0) {
+			if(count($_SESSION['assignedList']) == 0) {
 				echo '<tr><td colspan="3">You have not assigned any gates yet.</td></tr>';
 			}
 
-			foreach($aircraft as $assignment) {
-				$split = explode('=', $assignment);
-
-				echo '<tr><td>' . $split[0] . '</td><td>' . $split[1] . '</td>';
-				echo '<td style="text-align: right;"><a href="?delete=' . $split[0] . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a></td></tr>';
+			foreach($_SESSION['assignedList'] as $callsign => $gate) {
+				echo '<tr><td>' . $callsign . '</td><td>' . $gate . '</td>';
+				echo '<td style="text-align: right;"><a href="?delete=' . $callsign . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a></td></tr>';
 			}
 			?>
 		</tbody>

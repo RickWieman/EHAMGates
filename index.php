@@ -1,33 +1,55 @@
 <?php
 define('PAGE', 'search');
 require('include/tpl_header.php');
+
+$gf = new GateFinder();
 ?>
 <h1>Search</h1>
 
 <p>Find a (free) gate by specifying the callsign and aircraft type.</p>
 
-<form class="form-horizontal" role="form">
+<?php
+if($_SERVER['REQUEST_METHOD'] == 'POST') {
+	if($_POST['inputOriginMethod'] == 'checkbox') {
+		$origin = (isset($_POST['inputOrigin']) && $_POST['inputOrigin'] == 'schengen') ? 'schengen' : 'nonschengen';
+	}
+	else {
+		$origin = $_POST['inputOrigin'];
+	}
+	
+	$gate = $gf->findGate($_POST['inputCallsign'], $_POST['inputACType'], $_POST['inputOrigin']);
+
+	if(!$gate) {
+		echo '<p class="bg-danger">Sorry, no gate could be determined for that combination...</p>';
+	}
+	else {
+		echo '<p class="bg-success">You can put ' . $_POST['inputCallsign'] . ' on gate ' . $gate . '.';
+	}
+}
+?>
+
+<form class="form-horizontal" role="form" method="post">
 	<div class="form-group">
 		<label for="inputCallsign" class="col-sm-2 control-label">Callsign</label>
 		<div class="col-sm-10">
-			<input type="email" class="form-control" id="inputCallsign" placeholder="As filed">
+			<input type="text" class="form-control" id="inputCallsign" name="inputCallsign" placeholder="As filed">
 		</div>
 	</div>
 	<div class="form-group">
 		<label for="inputACType" class="col-sm-2 control-label">Aircraft type</label>
 		<div class="col-sm-10">
-			<select class="form-control">
+			<select class="form-control" name="inputACType">
 				<option disabled>--- Common types ---</option>
-				<option>B737</option>
-				<option>B738</option>
-				<option>MD11</option>
+				<option value="B737">B737</option>
+				<option value="B738">B738</option>
+				<option value="MD11">MD11</option>
 				<option disabled>--- All types ---</option>
 				<?php
 				$aircraft = Gates_EHAM::$aircraftCategories;
 				ksort($aircraft);
 
 				foreach($aircraft as $type => $cat) {
-					echo '<option>' . $type . '</option>';
+					echo '<option value="'. $type .'">' . $type . '</option>';
 				}
 				?>
 			</select>
@@ -40,7 +62,8 @@ require('include/tpl_header.php');
 		<div class="col-sm-10">
 			<div class="checkbox">
 				<label>
-					<input type="checkbox" value="">
+					<input type="hidden" name="inputOriginMethod" value="checkbox" />
+					<input type="checkbox" name="inputOrigin" value="schengen" />
 					Flight originates from a Schengen country
 				</label>
 			</div>
@@ -52,7 +75,8 @@ require('include/tpl_header.php');
 	<div class="form-group">
 		<label for="inputOrigin" class="col-sm-2 control-label">Origin</label>
 		<div class="col-sm-10">
-			<input type="password" class="form-control" id="inputOrigin" placeholder="ICAO code">
+			<input type="hidden" name="inputOriginMethod" value="text" />
+			<input type="text" class="form-control" id="inputOrigin" name="inputOrigin" placeholder="ICAO code">
 		</div>
 	</div>
 

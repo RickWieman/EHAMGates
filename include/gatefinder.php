@@ -38,7 +38,7 @@ class GateFinder {
 	}
 
 	function occupyGate($gate) {
-		$occupiedGates[] = $gate;
+		$this->occupiedGates[] = $gate;
 	}
 
 	function findGate($callsign, $aircraftType, $origin) {

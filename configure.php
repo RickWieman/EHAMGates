@@ -2,6 +2,9 @@
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	setcookie('schengenMethod', $_POST['schengen'], (time() + 60*60*24*30));
 	setcookie('autoAssign', $_POST['autoAssign'], (time() + 60*60*24*30));
+	
+	header("Location: " . $_SERVER['PHP_SELF']);
+	exit();
 }
 
 define('PAGE', 'config');

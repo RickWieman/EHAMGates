@@ -5,8 +5,8 @@ if(!isset($_SESSION['assignedList'])) {
 	$_SESSION['assignedList'] = array();
 }
 
-define('PAGE', 'search');
-require('include/tpl_header.php');
+require_once('definitions.php');
+require_once('gatefinder.php');
 
 $gf = new GateFinder();
 
@@ -14,17 +14,26 @@ $gf = new GateFinder();
 if(isset($_GET['add']) && isset($_GET['gate'])
 	&& preg_match('/[A-Z]+[0-9]+/', $_GET['add']) && preg_match('/[A-Z][0-9]+/', $_GET['gate'])) {
 	$_SESSION['assignedList'][$_GET['add']] = $_GET['gate'];
+	
+	header("Location: " . $_SERVER['PHP_SELF']);
+	exit();
 }
 
 // Delete assignment
 if(isset($_GET['delete']) && preg_match('/[A-Z]+[0-9]+/', $_GET['delete'])) {
 	unset($_SESSION['assignedList'][$_GET['delete']]);
+
+	header("Location: " . $_SERVER['PHP_SELF']);
+	exit();
 }
 
 // Mark assigned gates as occupied
 foreach($_SESSION['assignedList'] as $callsign => $gate) {
 	$gf->occupyGate($gate);
 }
+
+define('PAGE', 'search');
+require_once('include/tpl_header.php');
 ?>
 <h1>Search</h1>
 

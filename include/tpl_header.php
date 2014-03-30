@@ -2,8 +2,6 @@
 if(!defined('PAGE')) {
 	die('Not for single use.');
 }
-require_once('definitions.php');
-require_once('gatefinder.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">

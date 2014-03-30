@@ -34,10 +34,14 @@ foreach($_SESSION['assignedList'] as $gate => $callsign) {
 
 define('PAGE', 'search');
 require_once('include/tpl_header.php');
+
+$stamp = (file_exists('data.txt') ? file_get_contents('data.txt', NULL, NULL, 0, 10) : time());
 ?>
 <h1>Search</h1>
 
 <p>Find a (free) gate by specifying the callsign and aircraft type.</p>
+
+<p>Last update of real life data: <?php echo date("H:i:s (d-m-Y)", $stamp); ?></p>
 
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST') {

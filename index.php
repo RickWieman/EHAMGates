@@ -20,10 +20,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$gate = $gf->findGate($_POST['inputCallsign'], $_POST['inputACType'], $_POST['inputOrigin']);
 
 	if(!$gate) {
-		echo '<p class="bg-danger">Sorry, no gate could be determined for that combination...</p>';
+		echo '<div class="alert alert-danger">Sorry, no gate could be determined for that combination...</div>';
 	}
 	else {
-		echo '<p class="bg-success">You can put ' . $_POST['inputCallsign'] . ' on gate ' . $gate . '.';
+		echo '<div class="alert alert-success">You can put <strong>' . $_POST['inputCallsign'] . '</strong> on gate <strong>' . $gate . '</strong>.</div>';
 	}
 }
 ?>

@@ -36,6 +36,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 	if(isset($_COOKIE['autoAssign']) && $_COOKIE['autoAssign'] == 'true') {
 		$_SESSION['assignedList'] .= $_POST['callsign'] . '=' . $gate . ';';
+		$gf->occupyGate($gate);
 	}
 
 	if(!$gate) {
@@ -68,10 +69,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 				<option value="MD11">MD11</option>
 				<option disabled>--- All types ---</option>
 				<?php
-				$aircraft = Gates_EHAM::$aircraftCategories;
-				ksort($aircraft);
+				$aircraftTypes = Gates_EHAM::$aircraftCategories;
+				ksort($aircraftTypes);
 
-				foreach($aircraft as $type => $cat) {
+				foreach($aircraftTypes as $type => $cat) {
 					echo '<option value="'. $type .'">' . $type . '</option>';
 				}
 				?>
@@ -127,12 +128,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		if(count($aircraft == 0)) {
 			echo '<tr><td colspan="2">You have not assigned any gates yet.</td></tr>';
 		}
-		else {
-			foreach($aircraft as $assignment) {
-				$split = explode('=', $assignment);
 
-				echo '<tr><td>' . $split[0] . '</td><td>' . $split[1] . '</td></tr>';
-			}
+		foreach($aircraft as $assignment) {
+			$split = explode('=', $assignment);
+
+			echo '<tr><td>' . $split[0] . '</td><td>' . $split[1] . '</td></tr>';
 		}
 		?>
 	</tbody>

@@ -1,5 +1,5 @@
 <?php
-require('gatefinder.php');
+require('../include/gatefinder.php');
 
 function testResult($expected, $returned) {
 	if($expected == $returned) {

@@ -16,13 +16,13 @@ require('include/tpl_header.php');
 		<div class="col-sm-10">
 			<div class="radio">
 				<label>
-					<input type="radio" name="schengen" id="schengen1" value="origin"<?php echo (!isset($_COOKIE['schengen']) || $_COOKIE['schengen'] != 'checkbox') ? ' checked' : '' ?>>
+					<input type="radio" name="schengen" id="schengen1" value="origin"<?php echo (!isset($_COOKIE['schengenMethod']) || $_COOKIE['schengenMethod'] != 'checkbox') ? ' checked' : '' ?>>
 					Determine by origin (default)
 				</label>
 			</div>
 			<div class="radio">
 				<label>
-					<input type="radio" name="schengen" id="schengen2" value="checkbox"<?php echo (isset($_COOKIE['schengen']) && $_COOKIE['schengen'] == 'checkbox') ? ' checked' : '' ?>>
+					<input type="radio" name="schengen" id="schengen2" value="checkbox"<?php echo (isset($_COOKIE['schengenMethod']) && $_COOKIE['schengenMethod'] == 'checkbox') ? ' checked' : '' ?>>
 					Determine by checkbox
 				</label>
 			</div>

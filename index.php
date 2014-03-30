@@ -34,7 +34,7 @@ require('include/tpl_header.php');
 		</div>
 	</div>
 
-	<?php if(isset($_COOKIE['schengen']) && $_COOKIE['schengen'] == 'checkbox') { ?>
+	<?php if(isset($_COOKIE['schengenMethod']) && $_COOKIE['schengenMethod'] == 'checkbox') { ?>
 	<div class="form-group">
 		<label for="inputOrigin" class="col-sm-2 control-label">Schengen?</label>
 		<div class="col-sm-10">

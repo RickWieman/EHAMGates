@@ -1,8 +1,23 @@
 <?php
+session_start();
+
 define('PAGE', 'search');
 require('include/tpl_header.php');
 
 $gf = new GateFinder();
+
+// Mark all assigned gates as occupied
+if(isset($_SESSION['assignedList'])) {
+	$aircraft = explode(';', $_SESSION['assignedList']);
+	foreach($aircraft as $assignment) {
+		$split = explode('=', $assignment);
+
+		$gf->occupyGate($split[1]);
+	}
+}
+else {
+	$_SESSION['assignedList'] = '';
+}
 ?>
 <h1>Search</h1>
 
@@ -19,11 +34,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	
 	$gate = $gf->findGate($_POST['inputCallsign'], $_POST['inputACType'], $_POST['inputOrigin']);
 
+	if(isset($_COOKIE['autoAssign']) && $_COOKIE['autoAssign'] == 'true') {
+		$_SESSION['assignedList'] .= $_POST['callsign'] . '=' . $gate . ';';
+	}
+
 	if(!$gate) {
 		echo '<div class="alert alert-danger">Sorry, no gate could be determined for that combination...</div>';
 	}
 	else {
-		echo '<div class="alert alert-success">You can put <strong>' . $_POST['inputCallsign'] . '</strong> on gate <strong>' . $gate . '</strong>.</div>';
+		echo '<div class="alert alert-success">You can put <strong>' . $_POST['inputCallsign'] . '</strong> on gate <strong>' . $gate . '</strong>.';
+		if(!isset($_COOKIE['autoAssign'])) {
+			echo '<br /><a href="#">Add to list</a>';
+		}
+		echo '</div>';
 	}
 }
 ?>
@@ -88,6 +111,33 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		</div>
 	</div>
 </form>
+
+<h1>List</h1>
+<p>The list below shows all aircraft with gate assignments. These gates are also marked as occupied.</p>
+
+<table class="table table-condensed">
+	<thead>
+		<tr>
+			<th>Callsign</th>
+			<th>Gate</th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php
+		if(count($aircraft == 0)) {
+			echo '<tr><td colspan="2">You have not assigned any gates yet.</td></tr>';
+		}
+		else {
+			foreach($aircraft as $assignment) {
+				$split = explode('=', $assignment);
+
+				echo '<tr><td>' . $split[0] . '</td><td>' . $split[1] . '</td></tr>';
+			}
+		}
+		?>
+	</tbody>
+</table>
+
 <?php
 require('include/tpl_footer.php');
 ?>

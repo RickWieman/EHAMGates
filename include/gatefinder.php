@@ -7,7 +7,7 @@ class GateFinder {
 
 	// For future use: one can mark gates as occupied.
 	// These gates will then not be returned by the findGate function.
-	private $occupiedGates = array('C15', 'E02');
+	private $occupiedGates = array();
 
 	private $realGates;
 
@@ -35,6 +35,10 @@ class GateFinder {
 		}
 
 		return in_array(substr($origin, 0, 2), Gates_EHAM::$schengen);
+	}
+
+	function occupyGate($gate) {
+		$occupiedGates[] = $gate;
 	}
 
 	function findGate($callsign, $aircraftType, $origin) {

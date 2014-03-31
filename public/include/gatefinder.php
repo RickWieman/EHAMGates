@@ -165,7 +165,8 @@ class GateFinder {
 
 		// Return the first of the available gates
 		if(count($matches) > 0) {
-			return array_keys($matches)[0];
+			$foundGates = array_keys($matches);
+			return $foundGates[0];
 		}
 
 		return false;

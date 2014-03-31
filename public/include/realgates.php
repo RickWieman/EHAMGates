@@ -3,7 +3,14 @@
 require_once('definitions.php');
 
 class RealGates {
+	private $dataSource = 'http://schiphol.dutchplanespotters.nl/';
 	private $allRealGates;
+
+	function __construct($useData) {
+		if($useData != null) {
+			$this->dataSource = $useData;	
+		}
+	}
 
 	// Data source: http://schiphol.dutchplanespotters.nl/
 	function fetchData() {
@@ -12,7 +19,7 @@ class RealGates {
 
 		// Reload only when cache is expired
 		if(time() - $stamp > $cacheDuration) {
-			$data = file_get_contents('http://schiphol.dutchplanespotters.nl/');
+			$data = file_get_contents($this->dataSource);
 		
 			file_put_contents('data.txt', time() . $data);
 

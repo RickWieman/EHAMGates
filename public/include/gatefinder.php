@@ -11,18 +11,26 @@ class GateFinder {
 
 	private $realGates;
 
-	function __construct() {
-		$this->realGates = new RealGates();
+	function __construct($useData = null) {
+		$this->realGates = new RealGates($useData);
 	}
 	
 	function resolveAircraftCat($aircraftType) {
-		return Gates_EHAM::$aircraftCategories[$aircraftType];
+		if(array_key_exists($aircraftType, Gates_EHAM::$aircraftCategories)) {
+			return Gates_EHAM::$aircraftCategories[$aircraftType];
+		}
+
+		return false;
 	}
 
 	function resolveAirlineGate($callsign) {
 		preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
 
-		return Gates_EHAM::$airlinesDefaultGates[$airlineIATA[0]];
+		if(array_key_exists($airlineIATA[0], Gates_EHAM::$airlinesDefaultGates)) {
+			return Gates_EHAM::$airlinesDefaultGates[$airlineIATA[0]];
+		}
+
+		return false;
 	}
 
 	function resolveSchengenOrigin($origin) {

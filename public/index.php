@@ -44,111 +44,111 @@ Last update of real life data: <?php echo date("H:i:s (d-m-Y)", $stamp); ?></p>
 
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
-	if($_POST['inputOriginMethod'] == 'checkbox') {
-		$origin = (isset($_POST['inputOrigin']) && $_POST['inputOrigin'] == 'schengen') ? 'schengen' : 'nonschengen';
+	if(!empty($_POST['inputCallsign']) && !empty($_POST['inputACType'])
+		&& ($_POST['inputOriginMethod'] == 'checkbox' || ($_POST['inputOriginMethod'] == 'text' && !empty($_POST['inputOrigin'])))) {
+
+		if($_POST['inputOriginMethod'] == 'checkbox') {
+			$origin = (isset($_POST['inputOrigin']) && $_POST['inputOrigin'] == 'schengen') ? 'schengen' : 'nonschengen';
+		}
+		else {
+			$origin = $_POST['inputOrigin'];
+		}
+		
+		$gate = $gf->findGate($_POST['inputCallsign'], $_POST['inputACType'], $origin);
+
+		if(!$gate) {
+			?>
+			<div class="alert alert-danger">
+				Sorry, no gate could be determined for that combination...
+			</div>
+			<?php
+		}
+		else {
+			if(isset($_COOKIE['autoAssign']) && $_COOKIE['autoAssign'] == 'true') {
+				$_SESSION['assignedList'][$gate] = $_POST['inputCallsign'];
+				$gf->occupyGate($gate);
+			}
+			?>
+			<div class="alert alert-success">
+				You can put <strong><?php echo $_POST['inputCallsign']; ?></strong>
+				on gate <strong><?php echo $gate; ?></strong>
+
+				<?php if(!isset($_COOKIE['autoAssign']) || $_COOKIE['autoAssign'] != 'true') { ?>
+					<br />
+					<a href="?add=<?php echo $_POST['inputCallsign']; ?>&amp;gate=<?php echo $gate; ?>">
+						Add to list
+					</a>
+				<?php } ?>
+			</div>
+			<?php
+		}
 	}
 	else {
-		$origin = $_POST['inputOrigin'];
-	}
-	
-	$gate = $gf->findGate($_POST['inputCallsign'], $_POST['inputACType'], $_POST['inputOrigin']);
-
-	if(!$gate) {
 		?>
 		<div class="alert alert-danger">
-			Sorry, no gate could be determined for that combination...
-		</div>
-		<?php
-	}
-	else {
-		if(isset($_COOKIE['autoAssign']) && $_COOKIE['autoAssign'] == 'true') {
-			$_SESSION['assignedList'][$gate] = $_POST['inputCallsign'];
-			$gf->occupyGate($gate);
-		}
-		?>
-		<div class="alert alert-success">
-			You can put <strong><?php echo $_POST['inputCallsign']; ?></strong>
-			on gate <strong><?php echo $gate; ?></strong>
-
-			<?php if(!isset($_COOKIE['autoAssign']) || $_COOKIE['autoAssign'] != 'true') { ?>
-				<br />
-				<a href="?add=<?php echo $_POST['inputCallsign']; ?>&amp;gate=<?php echo $gate; ?>">
-					Add to list
-				</a>
-			<?php } ?>
+			Controleer of je alle velden wel hebt ingevuld...
 		</div>
 		<?php
 	}
 }
 ?>
 
-<form class="form-horizontal" role="form" method="post">
+<form class="form-inline" role="form" method="post">
 	<div class="form-group">
-		<label for="inputCallsign" class="col-sm-2 control-label">Callsign</label>
-		<div class="col-sm-10">
-			<input type="text" class="form-control" id="inputCallsign" name="inputCallsign" placeholder="As filed">
-		</div>
+		<label for="inputCallsign" class="sr-only">Callsign</label>
+		<input type="text" class="form-control" id="inputCallsign" name="inputCallsign" placeholder="Filed Callsign">
 	</div>
 	<div class="form-group">
-		<label for="inputACType" class="col-sm-2 control-label">Aircraft type</label>
-		<div class="col-sm-10">
-			<select class="form-control" name="inputACType">
-				<option disabled>--- Common types ---</option>
-				<option value="A319">A319</option>
-				<option value="A320">A320</option>
-				<option value="A321">A321</option>
-				<option value="B737">B737</option>
-				<option value="B738">B738</option>
-				<option value="B739">B739</option>
-				<option value="B744">B744</option>
-				<option value="DH8D">DH8D</option>
-				<option value="E190">E190</option>
-				<option value="F70">F70</option>
-				<option value="F100">F100</option>
-				<option value="MD11">MD11</option>
-				<option value="RJ85">RJ85</option>
-				<option disabled>--- All types ---</option>
-				<?php
-				$aircraftTypes = Gates_EHAM::$aircraftCategories;
-				ksort($aircraftTypes);
+		<label for="inputACType" class="sr-only">Aircraft type</label>
+		<select class="form-control" name="inputACType">
+			<option disabled>--- Common types ---</option>
+			<option value="A319">A319</option>
+			<option value="A320">A320</option>
+			<option value="A321">A321</option>
+			<option value="B737">B737</option>
+			<option value="B738">B738</option>
+			<option value="B739">B739</option>
+			<option value="B744">B744</option>
+			<option value="DH8D">DH8D</option>
+			<option value="E190">E190</option>
+			<option value="F70">F70</option>
+			<option value="F100">F100</option>
+			<option value="MD11">MD11</option>
+			<option value="RJ85">RJ85</option>
+			<option disabled>--- All types ---</option>
+			<?php
+			$aircraftTypes = Gates_EHAM::$aircraftCategories;
+			ksort($aircraftTypes);
 
-				foreach($aircraftTypes as $type => $cat) {
-					echo '<option value="'. $type .'">' . $type . '</option>';
-				}
-				?>
-			</select>
-		</div>
+			foreach($aircraftTypes as $type => $cat) {
+				echo '<option value="'. $type .'">' . $type . '</option>';
+			}
+			?>
+		</select>
 	</div>
 
 	<?php if(isset($_COOKIE['schengenMethod']) && $_COOKIE['schengenMethod'] == 'checkbox') { ?>
-	<div class="form-group">
-		<label for="inputOrigin" class="col-sm-2 control-label">Schengen?</label>
-		<div class="col-sm-10">
-			<div class="checkbox">
-				<label>
-					<input type="hidden" name="inputOriginMethod" value="checkbox" />
-					<input type="checkbox" name="inputOrigin" value="schengen" />
-					Flight originates from a Schengen country
-				</label>
-			</div>
-		</div>
+	<div class="checkbox">
+		<label class="checkbox-inline">
+			<input type="hidden" name="inputOriginMethod" value="checkbox" />
+			<input type="checkbox" name="inputOrigin" value="schengen" />
+			Schengen flight
+		</label>
 	</div>
 
 	<?php } else { ?>
 
 	<div class="form-group">
-		<label for="inputOrigin" class="col-sm-2 control-label">Origin</label>
-		<div class="col-sm-10">
-			<input type="hidden" name="inputOriginMethod" value="text" />
-			<input type="text" class="form-control" id="inputOrigin" name="inputOrigin" placeholder="ICAO code">
-		</div>
+		<label for="inputOrigin" class="sr-only">Origin</label>
+		<input type="hidden" name="inputOriginMethod" value="text" />
+		<input type="text" class="form-control" id="inputOrigin" name="inputOrigin" placeholder="Origin (ICAO code)">
 	</div>
 
 	<?php } ?>	
 
 	<div class="form-group">
 		<div class="col-sm-offset-2 col-sm-10">
-			<button type="submit" class="btn btn-default">Find Gate</button>
+			<button type="submit" class="btn btn-primary">Find Gate</button>
 		</div>
 	</div>
 </form>

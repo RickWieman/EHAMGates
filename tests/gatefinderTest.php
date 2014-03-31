@@ -160,6 +160,23 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(in_array(substr($gate, 0, 1), Gates_EHAM::$airlinesDefaultGates['TRA']));
 		$this->assertTrue(array_key_exists($gate, Gates_EHAM::allSchengenGates()));
 	}
+
+	public function testOccupied() {
+		$gf = new GateFinder('testdata.txt');
+		$gate1 = $gf->findGate('TRA123', 'B738', 'EBBR');
+
+		$gf->occupyGate($gate1);
+		$this->assertTrue($gf->isGateOccupied($gate1));
+
+		$gate = $gf->findGate('TRA123', 'B738', 'EBBR');
+		$this->assertNotEquals($gate1, $gate);
+
+		$allGates = Gates_EHAM::allGates();
+
+		$this->assertEquals(4, $allGates[$gate]);
+		$this->assertTrue(in_array(substr($gate, 0, 1), Gates_EHAM::$airlinesDefaultGates['TRA']));
+		$this->assertTrue(array_key_exists($gate, Gates_EHAM::allSchengenGates()));
+	}
 }
 
 ?>

@@ -5,8 +5,6 @@ require_once('realgates.php');
 
 class GateFinder {
 
-	// For future use: one can mark gates as occupied.
-	// These gates will then not be returned by the findGate function.
 	private $occupiedGates = array();
 
 	private $realGates;
@@ -66,8 +64,7 @@ class GateFinder {
 			$realGate = $this->findRealGate($callsign);
 
 			if($realGate) {
-				$allGates = array_merge(Gates_EHAM::$bravoApron, Gates_EHAM::$schengenGates, Gates_EHAM::$schengenNonSchengenGates,
-					Gates_EHAM::$nonSchengenGates);
+				$allGates = Gates_EHAM::allGates();
 
 				// Only return the real gate if the actual aircraft type can use that gate!
 				if($allGates[$realGate] >= $this->resolveAircraftCat($aircraftType)) {
@@ -77,13 +74,12 @@ class GateFinder {
 
 			// Determine whether flight origins from Schengen country
 			if($this->resolveSchengenOrigin($origin)) {
-				$allSchengenGates = array_merge(Gates_EHAM::$bravoApron, Gates_EHAM::$schengenGates,
-					Gates_EHAM::$schengenNonSchengenGates);
+				$allSchengenGates = Gates_EHAM::allSchengenGates();
 
 				return $this->findCivilGate($allSchengenGates, $callsign, $aircraftType);
 			}
 			else {
-				$allNonSchengenGates = array_merge(Gates_EHAM::$schengenNonSchengenGates, Gates_EHAM::$nonSchengenGates);
+				$allNonSchengenGates = Gates_EHAM::allNonSchengenGates();
 
 				return $this->findCivilGate($allNonSchengenGates, $callsign, $aircraftType);
 			}
@@ -102,9 +98,12 @@ class GateFinder {
 
 		if($useICAO) {
 			preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
-			$airlineICAO = Gates_EHAM::$airlinesIATA[$airlineIATA[0]];
 
-			$flightnumber = preg_replace('/^[A-Z]{3}/', $airlineICAO . ' ', $callsign);
+			if(array_key_exists($airlineIATA[0], Gates_EHAM::$airlinesIATA)) {
+				$airlineICAO = Gates_EHAM::$airlinesIATA[$airlineIATA[0]];
+
+				$flightnumber = preg_replace('/^[A-Z]{3}/', $airlineICAO . ' ', $callsign);
+			}
 		}
 		else {
 			$flightnumber = preg_replace('/^([A-Z]{3})/', '$1 ', $callsign);
@@ -134,10 +133,11 @@ class GateFinder {
 	function findCargoGate($callsign, $aircraftType) {
 		preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
 
-		// Find a free cargo gate
-		foreach(Gates_EHAM::$cargoGates[$airlineIATA[0]] as $gate) {
-			if(!in_array($gate, $this->occupiedGates)) {
-				return $gate;
+		if(array_key_exists($airlineIATA[0], Gates_EHAM::$cargoGates)) {
+			foreach(Gates_EHAM::$cargoGates[$airlineIATA[0]] as $gate) {
+				if(!in_array($gate, $this->occupiedGates)) {
+					return $gate;
+				}
 			}
 		}
 

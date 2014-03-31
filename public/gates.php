@@ -39,7 +39,7 @@ require('include/tpl_header.php');
 		<thead>
 			<tr>
 				<th>Gate</th>
-				<th>Categorie</th>
+				<th>Category</th>
 				<th>Occupant</th>
 				<th></th>
 			</tr>

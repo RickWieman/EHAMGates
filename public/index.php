@@ -51,10 +51,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$origin = (isset($_POST['inputOrigin']) && $_POST['inputOrigin'] == 'schengen') ? 'schengen' : 'nonschengen';
 		}
 		else {
-			$origin = $_POST['inputOrigin'];
+			$origin = strtoupper($_POST['inputOrigin']);
 		}
 		
-		$gate = $gf->findGate($_POST['inputCallsign'], $_POST['inputACType'], $origin);
+		$callsign = strtoupper($_POST['inputCallsign']);
+
+		$gate = $gf->findGate($callsign, $_POST['inputACType'], $origin);
 
 		if(!$gate) {
 			?>
@@ -65,17 +67,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		}
 		else {
 			if(isset($_COOKIE['autoAssign']) && $_COOKIE['autoAssign'] == 'true') {
-				$_SESSION['assignedList'][$gate] = $_POST['inputCallsign'];
+				$_SESSION['assignedList'][$gate] = $callsign;
 				$gf->occupyGate($gate);
 			}
 			?>
 			<div class="alert alert-success">
-				You can put <strong><?php echo $_POST['inputCallsign']; ?></strong>
+				You can put <strong><?php echo $callsign; ?></strong>
 				on gate <strong><?php echo $gate; ?></strong>
 
 				<?php if(!isset($_COOKIE['autoAssign']) || $_COOKIE['autoAssign'] != 'true') { ?>
 					<br />
-					<a href="?add=<?php echo $_POST['inputCallsign']; ?>&amp;gate=<?php echo $gate; ?>">
+					<a href="?add=<?php echo $callsign; ?>&amp;gate=<?php echo $gate; ?>">
 						Add to list
 					</a>
 				<?php } ?>
@@ -101,7 +103,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	<div class="form-group">
 		<label for="inputACType" class="sr-only">Aircraft type</label>
 		<select class="form-control" name="inputACType">
-			<option disabled>--- Common types ---</option>
+			<option disabled>--- Common ---</option>
 			<option value="A319">A319</option>
 			<option value="A320">A320</option>
 			<option value="A321">A321</option>
@@ -115,7 +117,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			<option value="F100">F100</option>
 			<option value="MD11">MD11</option>
 			<option value="RJ85">RJ85</option>
-			<option disabled>--- All types ---</option>
+			<option disabled>--- All ---</option>
 			<?php
 			$aircraftTypes = Gates_EHAM::$aircraftCategories;
 			ksort($aircraftTypes);
@@ -128,7 +130,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	</div>
 
 	<?php if(isset($_COOKIE['schengenMethod']) && $_COOKIE['schengenMethod'] == 'checkbox') { ?>
-	<div class="checkbox">
+	<div class="form-group">
 		<label class="checkbox-inline">
 			<input type="hidden" name="inputOriginMethod" value="checkbox" />
 			<input type="checkbox" name="inputOrigin" value="schengen" />
@@ -146,11 +148,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 	<?php } ?>	
 
-	<div class="form-group">
-		<div class="col-sm-offset-2 col-sm-10">
-			<button type="submit" class="btn btn-primary">Find Gate</button>
-		</div>
-	</div>
+	<button type="submit" class="btn btn-primary">Find Gate</button>
 </form>
 
 <h1>List</h1>

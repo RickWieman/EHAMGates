@@ -52,6 +52,19 @@ class GateFinder {
 	}
 
 	function getFreeGates($aircraftType, $origin) {
+		// If there are extra gates for the specified aircraft, load the array
+		$extraGates = array();
+		if(array_key_exists($aircraftType, Gates_EHAM::$aircraftExtraGates)) {
+			$extraGates = Gates_EHAM::$aircraftExtraGates[$aircraftType];
+		}
+
+		// If there are gates the specified aircraft cannot use, load the array
+		$withoutGates = array();
+		if(array_key_exists($aircraftType, Gates_EHAM::$aircraftNotOnGates)) {
+			$withoutGates = Gates_EHAM::$aircraftNotOnGates[$aircraftType];
+		}
+
+		// Get gates based on Schengen/Non-Schengen
 		if($this->resolveSchengenOrigin($origin)) {
 			$gates = Gates_EHAM::allSchengenGates();
 		}
@@ -64,7 +77,8 @@ class GateFinder {
 		$freeGates = array();
 
 		foreach($gates as $gate => $cat) {
-			if(!$this->isGateOccupied($gate) && $cat >= $aircraftCat) {
+			if(!$this->isGateOccupied($gate) && !in_array($gate, $withoutGates) 
+				&& (($cat >= $aircraftCat) || in_array($gate, $extraGates))) {
 				$freeGates[$gate] = $cat;
 			}
 		}

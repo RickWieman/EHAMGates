@@ -90,15 +90,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			}
 			?>
 			<div class="alert alert-success">
-				You can put <strong><?php echo $callsign; ?></strong>
-				on gate <strong><?php echo $gate; ?></strong>
+				<p>You can put <strong><?php echo $callsign; ?></strong>
+				on gate <strong><?php echo $gate; ?></strong>.</p>
 
 				<?php if(!isset($_COOKIE['autoAssign']) || $_COOKIE['autoAssign'] != 'true') { ?>
 					<br />
-					<a href="?add=<?php echo $callsign; ?>&amp;gate=<?php echo $gate; ?>">
+					<a href="?add=<?php echo $callsign; ?>&amp;gate=<?php echo $gate; ?>" class="btn btn-primary">
 						Add to list
 					</a>
 				<?php } ?>
+				<a href="#" class="btn btn-danger">
+					This gate is occupied
+				</a>
 			</div>
 			<?php
 		}

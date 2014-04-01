@@ -11,10 +11,15 @@ require_once('include/gatefinder.php');
 $gf = new GateFinder();
 
 // Add gate assignment
-if(isset($_GET['add']) && isset($_GET['gate']) && preg_match('/[A-Z]+[0-9]+/', $_GET['add'])
+if(isset($_GET['add']) && isset($_GET['gate'])
+	&& (preg_match('/[A-Z]+[0-9]+/', $_GET['add']) || $_GET['add'] == 'unknown')
 	&& array_key_exists($_GET['gate'], Gates_EHAM::allGates())) {
 	$_SESSION['assignedList'][$_GET['gate']] = $_GET['add'];
 	
+	if($_GET['add'] != 'unknown') {
+		unset($_SESSION['lastRequest']);
+	}
+
 	header("Location: " . $_SERVER['PHP_SELF']);
 	exit();
 }
@@ -43,7 +48,7 @@ $stamp = (file_exists('data.txt') ? file_get_contents('data.txt', NULL, NULL, 0,
 Last update of real life data: <?php echo date("H:i:s (d-m-Y)", $stamp); ?></p>
 
 <?php
-if($_SERVER['REQUEST_METHOD'] == 'POST') {
+if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 	if(!empty($_POST['inputCallsign']) && !empty($_POST['inputACType'])
 		&& ($_POST['inputOriginMethod'] == 'checkbox' || ($_POST['inputOriginMethod'] == 'text' && !empty($_POST['inputOrigin'])))) {
 
@@ -56,20 +61,37 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		
 		$callsign = strtoupper($_POST['inputCallsign']);
 
-		$gate = $gf->findGate($callsign, $_POST['inputACType'], $origin);
+		$_SESSION['lastRequest']['callsign'] = $callsign;
+		$_SESSION['lastRequest']['ACtype'] = $_POST['inputACType'];
+		$_SESSION['lastRequest']['origin'] = $origin;
+	}
+	elseif($_SERVER['REQUEST_METHOD'] == 'POST') {
+		?>
+		<div class="alert alert-danger">
+			Controleer of je alle velden wel hebt ingevuld...
+		</div>
+		<?php
+	}
+	
+	if(isset($_SESSION['lastRequest'])) {
+		$callsign = $_SESSION['lastRequest']['callsign'];
+		$actype = $_SESSION['lastRequest']['ACtype'];
+		$origin = $_SESSION['lastRequest']['origin'];
+
+		$gate = $gf->findGate($callsign, $actype, $origin);
 
 		if(!$gate) {
 			?>
 			<div class="alert alert-danger">
 				<p>Sorry, no gate could be determined for that combination...</p>
-				<p>You can choose a gate for <strong><?php echo $_POST['inputCallsign'] ?></strong> manually:</p>
+				<p>You can choose a gate for <strong><?php echo $callsign ?></strong> manually:</p>
 				<form class="form-inline" method="get">
-					<input type="hidden" name="add" value="<?php echo $_POST['inputCallsign'] ?>" />
+					<input type="hidden" name="add" value="<?php echo $callsign ?>" />
 					<div class="form-group">
 						<label for="inputGate" class="sr-only">Aircraft type</label>
 						<select class="form-control" name="gate">
 							<?php
-							$freeGates = $gf->getFreeGates($_POST['inputACType'], $_POST['inputOrigin']);
+							$freeGates = $gf->getFreeGates($actype, $origin);
 
 							foreach($freeGates as $gate => $cat) {
 								echo '<option value="'. $gate .'">' . $gate . ' (cat. ' . $cat . ')</option>';
@@ -87,6 +109,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			if(isset($_COOKIE['autoAssign']) && $_COOKIE['autoAssign'] == 'true') {
 				$_SESSION['assignedList'][$gate] = $callsign;
 				$gf->occupyGate($gate);
+
+				unset($_SESSION['lastRequest']);
 			}
 			?>
 			<div class="alert alert-success">
@@ -99,19 +123,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 						Add to list
 					</a>
 				<?php } ?>
-				<a href="#" class="btn btn-danger">
+				<a href="?add=unknown&amp;gate=<?php echo $gate; ?>" class="btn btn-danger">
 					This gate is occupied
 				</a>
 			</div>
 			<?php
 		}
-	}
-	else {
-		?>
-		<div class="alert alert-danger">
-			Controleer of je alle velden wel hebt ingevuld...
-		</div>
-		<?php
 	}
 }
 ?>

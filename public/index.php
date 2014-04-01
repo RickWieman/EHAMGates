@@ -127,6 +127,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 
 				<?php
 				switch($matchType) {
+					case 'CARGO':
+						echo '<p><span class="glyphicon glyphicon-shopping-cart"></span> This is a cargo flight (based on callsign).</p>';
+						break;
 					case 'RL':
 						echo '<p><span class="glyphicon glyphicon-eye-open"></span> Real life flight!</p>';
 						break;

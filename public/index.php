@@ -13,7 +13,8 @@ $gf = new GateFinder();
 // Add gate assignment
 if(isset($_GET['add']) && isset($_GET['gate'])
 	&& (preg_match('/[A-Z]+[0-9]+/', $_GET['add']) || $_GET['add'] == 'unknown')
-	&& array_key_exists($_GET['gate'], Gates_EHAM::allGates())) {
+	&& (array_key_exists($_GET['gate'], Gates_EHAM::allGates())
+		|| in_array($_GET['gate'], Gates_EHAM::allCargoGates()))) {
 	$_SESSION['assignedList'][$_GET['gate']] = $_GET['add'];
 	
 	if($_GET['add'] != 'unknown') {
@@ -25,7 +26,8 @@ if(isset($_GET['add']) && isset($_GET['gate'])
 }
 
 // Delete gate assignment
-if(isset($_GET['delete']) && array_key_exists($_GET['delete'], Gates_EHAM::allGates())) {
+if(isset($_GET['delete']) && (array_key_exists($_GET['delete'], Gates_EHAM::allGates())
+	|| in_array($_GET['delete'], Gates_EHAM::allCargoGates()))) {
 	unset($_SESSION['assignedList'][$_GET['delete']]);
 
 	header("Location: " . $_SERVER['PHP_SELF']);

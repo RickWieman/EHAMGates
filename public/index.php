@@ -66,6 +66,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 		$_SESSION['lastRequest']['origin'] = $origin;
 	}
 	elseif($_SERVER['REQUEST_METHOD'] == 'POST') {
+		unset($_SESSION['lastRequest']);
 		?>
 		<div class="alert alert-danger">
 			Controleer of je alle velden wel hebt ingevuld...
@@ -80,11 +81,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 
 		$gate = $gf->findGate($callsign, $actype, $origin);
 
+		$matchType = $gate['match'];
+		$gate = $gate['gate'];
+
 		if(!$gate) {
 			?>
 			<div class="alert alert-danger">
-				<p>Sorry, no gate could be determined for that combination...</p>
-				<p>You can choose a gate for <strong><?php echo $callsign ?></strong> manually:</p>
+				<p>
+					<span class="glyphicon glyphicon-warning-sign"></span>
+					The gate for <strong><?php echo $callsign ?></strong> could not be determined.
+					Choose one manually...<br /><br />
+				</p>
+
 				<form class="form-inline" method="get">
 					<input type="hidden" name="add" value="<?php echo $callsign ?>" />
 					<div class="form-group">
@@ -114,17 +122,33 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 			}
 			?>
 			<div class="alert alert-success">
-				<p><strong><?php echo $callsign; ?></strong> can be put
-				on gate <strong><?php echo $gate; ?></strong>.</p>
+				<p><strong><?php echo $callsign; ?></strong> can be put	on gate <strong><?php echo $gate; ?></strong>.</p>
 
-				<?php if(!isset($_COOKIE['autoAssign']) || $_COOKIE['autoAssign'] != 'true') { ?>
-					<br />
+				<?php
+				switch($matchType) {
+					case 'RL':
+						echo '<p><span class="glyphicon glyphicon-eye-open"></span> Real life flight!</p>';
+						break;
+					case 'RL_HEAVY':
+						echo '<p><span class="glyphicon glyphicon-plane"></span> Real life flight, but the aircraft type is too heavy for actual gate.</p>';
+						break;
+					case 'RL_NOTYET':
+						echo '<p><span class="glyphicon glyphicon-eye-close"></span> Real life flight, but no real life gate available yet.</p>';
+						break;
+					case 'RANDOM':
+						echo '<p><span class="glyphicon glyphicon-list-alt"></span> Based on airline defaults and aircraft category.</p>';
+						break;
+				}
+				
+				if(!isset($_COOKIE['autoAssign']) || $_COOKIE['autoAssign'] != 'true') { ?>
+					<p>
 					<a href="?add=<?php echo $callsign; ?>&amp;gate=<?php echo $gate; ?>" class="btn btn-primary">
 						Add to list
 					</a>
 					<a href="?add=unknown&amp;gate=<?php echo $gate; ?>" class="btn btn-danger">
 						This gate is occupied
 					</a>
+				</p>
 				<?php } ?>
 			</div>
 			<?php

@@ -22,7 +22,7 @@ class GateFinder {
 	}
 
 	function resolveAirlineGate($callsign) {
-		preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
+		preg_match('/^[A-Z]{2,3}/', $callsign, $airlineIATA);
 
 		if(array_key_exists($airlineIATA[0], Gates_EHAM::$airlinesDefaultGates)) {
 			return Gates_EHAM::$airlinesDefaultGates[$airlineIATA[0]];
@@ -87,7 +87,7 @@ class GateFinder {
 	}
 
 	function findGate($callsign, $aircraftType, $origin) {
-		preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
+		preg_match('/^[A-Z]{2,3}/', $callsign, $airlineIATA);
 
 		// Determine whether flight is cargo or civil
 		if(array_key_exists($airlineIATA[0], Gates_EHAM::$cargoGates)) {
@@ -123,19 +123,19 @@ class GateFinder {
 		// TODO: If $callsign alphanumeric, convert $callsign to numeric
 
 		if($useICAO) {
-			preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
+			preg_match('/^[A-Z]{2,3}/', $callsign, $airlineIATA);
 
 			if(array_key_exists($airlineIATA[0], Gates_EHAM::$airlinesIATA)) {
 				$airlineICAO = Gates_EHAM::$airlinesIATA[$airlineIATA[0]];
 
-				$flightnumber = preg_replace('/^[A-Z]{3}/', $airlineICAO . ' ', $callsign);
+				$flightnumber = preg_replace('/^[A-Z]{2,3}/', $airlineICAO . ' ', $callsign);
 			}
 			else {
-				$flightnumber = preg_replace('/^([A-Z]{3})/', '$1 ', $callsign);
+				$flightnumber = preg_replace('/^([A-Z]{2,3})/', '$1 ', $callsign);
 			}
 		}
 		else {
-			$flightnumber = preg_replace('/^([A-Z]{3})/', '$1 ', $callsign);
+			$flightnumber = preg_replace('/^([A-Z]{2,3})/', '$1 ', $callsign);
 		}
 
 		$gate = $this->realGates->findGateByFlightnumber($flightnumber);
@@ -160,7 +160,7 @@ class GateFinder {
 	}
 
 	function findCargoGate($callsign, $aircraftType) {
-		preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
+		preg_match('/^[A-Z]{2,3}/', $callsign, $airlineIATA);
 
 		if(array_key_exists($airlineIATA[0], Gates_EHAM::$cargoGates)) {
 			foreach(Gates_EHAM::$cargoGates[$airlineIATA[0]] as $gate) {

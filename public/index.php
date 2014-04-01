@@ -69,7 +69,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 		unset($_SESSION['lastRequest']);
 		?>
 		<div class="alert alert-danger">
-			Controleer of je alle velden wel hebt ingevuld...
+			<span class="glyphicon glyphicon-warning-sign"></span>
+			Please fill in all the fields...
 		</div>
 		<?php
 	}

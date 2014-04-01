@@ -93,17 +93,8 @@ class GateFinder {
 				}
 			}
 
-			// Determine whether flight origins from Schengen country
-			if($this->resolveSchengenOrigin($origin)) {
-				$allSchengenGates = Gates_EHAM::allSchengenGates();
-
-				return $this->findCivilGate($allSchengenGates, $callsign, $aircraftType);
-			}
-			else {
-				$allNonSchengenGates = Gates_EHAM::allNonSchengenGates();
-
-				return $this->findCivilGate($allNonSchengenGates, $callsign, $aircraftType);
-			}
+			// Find a plausible civil gate
+			return $this->findCivilGate($callsign, $aircraftType, $origin);
 		}
 	}
 
@@ -168,19 +159,12 @@ class GateFinder {
 		return false;
 	}
 
-	function findCivilGate($allGates, $callsign, $aircraftType) {
+	function findCivilGate($callsign, $aircraftType, $origin) {
 		$defaultGate = $this->resolveAirlineGate($callsign);
 		$cat = $this->resolveAircraftCat($aircraftType);
 
 		if($defaultGate) {
-			// First determine the available gates
-			$availableGates = array();
-
-			foreach($allGates as $gate => $gateCat) {
-				if($gateCat >= $cat && !in_array($gate, $this->occupiedGates)) {
-					$availableGates[$gate] = $gateCat;
-				}
-			}
+			$availableGates = $this->getFreeGates($aircraftType, $origin);
 
 			// Determine which gates are available for the airline
 			$matches = array();

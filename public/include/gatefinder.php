@@ -51,6 +51,27 @@ class GateFinder {
 		return in_array($gate, $this->occupiedGates);
 	}
 
+	function getFreeGates($aircraftType, $origin) {
+		if($this->resolveSchengenOrigin($origin)) {
+			$gates = Gates_EHAM::allSchengenGates();
+		}
+		else {
+			$gates = Gates_EHAM::allNonSchengenGates();
+		}
+
+		$aircraftCat = $this->resolveAircraftCat($aircraftType);
+
+		$freeGates = array();
+
+		foreach($gates as $gate => $cat) {
+			if(!$this->isGateOccupied($gate) && $cat >= $aircraftCat) {
+				$freeGates[$gate] = $cat;
+			}
+		}
+
+		return $freeGates;
+	}
+
 	function findGate($callsign, $aircraftType, $origin) {
 		preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
 
@@ -104,6 +125,9 @@ class GateFinder {
 
 				$flightnumber = preg_replace('/^[A-Z]{3}/', $airlineICAO . ' ', $callsign);
 			}
+			else {
+				$flightnumber = preg_replace('/^([A-Z]{3})/', '$1 ', $callsign);
+			}
 		}
 		else {
 			$flightnumber = preg_replace('/^([A-Z]{3})/', '$1 ', $callsign);
@@ -148,33 +172,35 @@ class GateFinder {
 		$defaultGate = $this->resolveAirlineGate($callsign);
 		$cat = $this->resolveAircraftCat($aircraftType);
 
-		// First determine the available gates
-		$availableGates = array();
+		if($defaultGate) {
+			// First determine the available gates
+			$availableGates = array();
 
-		foreach($allGates as $gate => $gateCat) {
-			if($gateCat >= $cat && !in_array($gate, $this->occupiedGates)) {
-				$availableGates[$gate] = $gateCat;
-			}
-		}
-
-		// Determine which gates are available for the airline
-		$matches = array();
-		foreach($defaultGate as $pier) {
-			foreach($availableGates as $gate => $gateCat) {
-				if(substr($gate, 0, 1) == $pier) {
-					$matches[$gate] = $gateCat;
+			foreach($allGates as $gate => $gateCat) {
+				if($gateCat >= $cat && !in_array($gate, $this->occupiedGates)) {
+					$availableGates[$gate] = $gateCat;
 				}
 			}
-		}
 
-		// Sort the available gates, based on their category
-		// We do not want to use cat. 8 gates for cat. 2 aircraft if lower cat. gates are available
-		asort($matches);
+			// Determine which gates are available for the airline
+			$matches = array();
+			foreach($defaultGate as $pier) {
+				foreach($availableGates as $gate => $gateCat) {
+					if(substr($gate, 0, 1) == $pier) {
+						$matches[$gate] = $gateCat;
+					}
+				}
+			}
 
-		// Return the first of the available gates
-		if(count($matches) > 0) {
-			$foundGates = array_keys($matches);
-			return $foundGates[0];
+			// Sort the available gates, based on their category
+			// We do not want to use cat. 8 gates for cat. 2 aircraft if lower cat. gates are available
+			asort($matches);
+
+			// Return the first of the available gates
+			if(count($matches) > 0) {
+				$foundGates = array_keys($matches);
+				return $foundGates[0];
+			}
 		}
 
 		return false;

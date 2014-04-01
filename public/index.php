@@ -61,7 +61,25 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		if(!$gate) {
 			?>
 			<div class="alert alert-danger">
-				Sorry, no gate could be determined for that combination...
+				<p>Sorry, no gate could be determined for that combination...</p>
+				<p>You can choose a gate for <strong><?php echo $_POST['inputCallsign'] ?></strong> manually:</p>
+				<form class="form-inline" method="get">
+					<input type="hidden" name="add" value="<?php echo $_POST['inputCallsign'] ?>" />
+					<div class="form-group">
+						<label for="inputGate" class="sr-only">Aircraft type</label>
+						<select class="form-control" name="gate">
+							<?php
+							$freeGates = $gf->getFreeGates($_POST['inputACType'], $_POST['origin']);
+
+							foreach($freeGates as $gate => $cat) {
+								echo '<option value="'. $gate .'">' . $gate . ' (cat. ' . $cat . ')</option>';
+							}
+							?>
+						</select>
+					</div>
+
+					<button type="submit" class="btn btn-primary">Assign Gate</button>
+				</form>
 			</div>
 			<?php
 		}

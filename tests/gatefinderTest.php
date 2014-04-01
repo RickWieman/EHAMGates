@@ -51,9 +51,11 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 
 		$allGates = Gates_EHAM::allGates();
 
-		$this->assertEquals(4, $allGates[$gate]);
-		$this->assertTrue(in_array(substr($gate, 0, 1), Gates_EHAM::$airlinesDefaultGates['TRA']));
-		$this->assertTrue(array_key_exists($gate, Gates_EHAM::allSchengenGates()));
+		$this->assertEquals('RANDOM', $gate['match']);
+
+		$this->assertEquals(4, $allGates[$gate['gate']]);
+		$this->assertTrue(in_array(substr($gate['gate'], 0, 1), Gates_EHAM::$airlinesDefaultGates['TRA']));
+		$this->assertTrue(array_key_exists($gate['gate'], Gates_EHAM::allSchengenGates()));
 	}
 
 	public function testFindGate2() {
@@ -63,9 +65,11 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$allGates = Gates_EHAM::allGates();
 		$extraGates = Gates_EHAM::$aircraftExtraGates['MD11'];
 
-		$this->assertTrue($allGates[$gate] == 7 || in_array($gate, $extraGates));
-		$this->assertTrue(in_array(substr($gate, 0, 1), Gates_EHAM::$airlinesDefaultGates['KLM']));
-		$this->assertTrue(array_key_exists($gate, Gates_EHAM::allSchengenGates()));
+		$this->assertEquals('RANDOM', $gate['match']);
+
+		$this->assertTrue($allGates[$gate['gate']] == 7 || in_array($gate['gate'], $extraGates));
+		$this->assertTrue(in_array(substr($gate['gate'], 0, 1), Gates_EHAM::$airlinesDefaultGates['KLM']));
+		$this->assertTrue(array_key_exists($gate['gate'], Gates_EHAM::allSchengenGates()));
 	}
 
 	public function testFindGate3() {
@@ -74,30 +78,35 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 
 		$allGates = Gates_EHAM::allGates();
 
-		$this->assertEquals(8, $allGates[$gate]);
-		$this->assertTrue(in_array(substr($gate, 0, 1), Gates_EHAM::$airlinesDefaultGates['EAL']));
-		$this->assertTrue(array_key_exists($gate, Gates_EHAM::allNonSchengenGates()));
+		$this->assertEquals('RANDOM', $gate['match']);
+
+		$this->assertEquals(8, $allGates[$gate['gate']]);
+		$this->assertTrue(in_array(substr($gate['gate'], 0, 1), Gates_EHAM::$airlinesDefaultGates['EAL']));
+		$this->assertTrue(array_key_exists($gate['gate'], Gates_EHAM::allNonSchengenGates()));
 	}
 
 	public function testFindGateCargo1() {
 		$gf = new GateFinder('testdata.txt');
 		$gate = $gf->findGate('MPH456', 'B744', 'KLAX');
 
-		$this->assertTrue(in_array($gate, Gates_EHAM::$cargoGates['MPH']));
+		$this->assertTrue(in_array($gate['gate'], Gates_EHAM::$cargoGates['MPH']));
+		$this->assertEquals('CARGO', $gate['match']);
 	}
 
 	public function testFindGateCargo2() {
 		$gf = new GateFinder('testdata.txt');
 		$gate = $gf->findGate('FDX456', 'B744', 'KLAS');
 
-		$this->assertTrue(in_array($gate, Gates_EHAM::$cargoGates['FDX']));
+		$this->assertTrue(in_array($gate['gate'], Gates_EHAM::$cargoGates['FDX']));
+		$this->assertEquals('CARGO', $gate['match']);
 	}
 
 	public function testFindGateCargo3() {
 		$gf = new GateFinder('testdata.txt');
 		$gate = $gf->findGate('ANA789', 'B744', 'KEWR');
 
-		$this->assertTrue(in_array($gate, Gates_EHAM::$cargoGates['ANA']));
+		$this->assertTrue(in_array($gate['gate'], Gates_EHAM::$cargoGates['ANA']));
+		$this->assertEquals('CARGO', $gate['match']);
 	}
 
 	public function testFindRealGate1() {
@@ -132,21 +141,24 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$gf = new GateFinder('testdata.txt');
 		$gate = $gf->findGate('TRA6868', 'B738', 'LGAV');
 
-		$this->assertEquals('D51', $gate);
+		$this->assertEquals('D51', $gate['gate']);
+		$this->assertEquals('RL', $gate['match']);
 	}
 
 	public function testFindGateReal2() {
 		$gf = new GateFinder('testdata.txt');
 		$gate = $gf->findGate('KLM894', 'B744', 'ZSPD');
 
-		$this->assertEquals('F07', $gate);
+		$this->assertEquals('F07', $gate['gate']);
+		$this->assertEquals('RL', $gate['match']);
 	}
 
 	public function testFindGateReal3() {
 		$gf = new GateFinder('testdata.txt');
 		$gate = $gf->findGate('EZY2723', 'A319', 'LIMC');
 
-		$this->assertEquals('H01', $gate);
+		$this->assertEquals('H01', $gate['gate']);
+		$this->assertEquals('RL', $gate['match']);
 	}
 
 	public function testFindGateRealTooHeavy() {
@@ -156,28 +168,29 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$allGates = Gates_EHAM::allGates();
 		$extraGates = Gates_EHAM::$aircraftExtraGates['MD11'];
 
-		$this->assertNotEquals('D51', $gate);
+		$this->assertNotEquals('D51', $gate['gate']);
+		$this->assertEquals('RL_HEAVY', $gate['match']);
 
-		$this->assertTrue($allGates[$gate] == 7 || in_array($gate, $extraGates));
-		$this->assertTrue(in_array(substr($gate, 0, 1), Gates_EHAM::$airlinesDefaultGates['TRA']));
-		$this->assertTrue(array_key_exists($gate, Gates_EHAM::allSchengenGates()));
+		$this->assertTrue($allGates[$gate['gate']] == 7 || in_array($gate['gate'], $extraGates));
+		$this->assertTrue(in_array(substr($gate['gate'], 0, 1), Gates_EHAM::$airlinesDefaultGates['TRA']));
+		$this->assertTrue(array_key_exists($gate['gate'], Gates_EHAM::allSchengenGates()));
 	}
 
 	public function testOccupied() {
 		$gf = new GateFinder('testdata.txt');
 		$gate1 = $gf->findGate('TRA123', 'B738', 'EBBR');
 
-		$gf->occupyGate($gate1);
-		$this->assertTrue($gf->isGateOccupied($gate1));
+		$gf->occupyGate($gate1['gate']);
+		$this->assertTrue($gf->isGateOccupied($gate1['gate']));
 
 		$gate = $gf->findGate('TRA123', 'B738', 'EBBR');
-		$this->assertNotEquals($gate1, $gate);
+		$this->assertNotEquals($gate1['gate'], $gate['gate']);
 
 		$allGates = Gates_EHAM::allGates();
 
-		$this->assertEquals(4, $allGates[$gate]);
-		$this->assertTrue(in_array(substr($gate, 0, 1), Gates_EHAM::$airlinesDefaultGates['TRA']));
-		$this->assertTrue(array_key_exists($gate, Gates_EHAM::allSchengenGates()));
+		$this->assertEquals(4, $allGates[$gate['gate']]);
+		$this->assertTrue(in_array(substr($gate['gate'], 0, 1), Gates_EHAM::$airlinesDefaultGates['TRA']));
+		$this->assertTrue(array_key_exists($gate['gate'], Gates_EHAM::allSchengenGates()));
 	}
 }
 

@@ -114,7 +114,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 			}
 			?>
 			<div class="alert alert-success">
-				<p>You can put <strong><?php echo $callsign; ?></strong>
+				<p><strong><?php echo $callsign; ?></strong> can be put
 				on gate <strong><?php echo $gate; ?></strong>.</p>
 
 				<?php if(!isset($_COOKIE['autoAssign']) || $_COOKIE['autoAssign'] != 'true') { ?>
@@ -122,10 +122,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 					<a href="?add=<?php echo $callsign; ?>&amp;gate=<?php echo $gate; ?>" class="btn btn-primary">
 						Add to list
 					</a>
+					<a href="?add=unknown&amp;gate=<?php echo $gate; ?>" class="btn btn-danger">
+						This gate is occupied
+					</a>
 				<?php } ?>
-				<a href="?add=unknown&amp;gate=<?php echo $gate; ?>" class="btn btn-danger">
-					This gate is occupied
-				</a>
 			</div>
 			<?php
 		}
@@ -209,8 +209,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 				if($callsign != 'unknown') {
 					echo '<tr><td>' . $callsign . '</td><td>' . $gate . '</td>';
 					echo '<td style="text-align: right;"><a href="?delete=' . $gate . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a></td></tr>';
+					$i++;
 				}
-				$i++;
 			}
 
 			if($i == 0) {

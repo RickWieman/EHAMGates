@@ -13,7 +13,8 @@ $gf = new GateFinder();
 // Add gate assignment
 if(isset($_GET['add']) && isset($_GET['gate'])
 	&& (preg_match('/[A-Z]+[0-9]+/', $_GET['add']) || $_GET['add'] == 'unknown')
-	&& array_key_exists($_GET['gate'], Gates_EHAM::allGates())) {
+	&& (array_key_exists($_GET['gate'], Gates_EHAM::allGates())
+		|| in_array($_GET['gate'], Gates_EHAM::allCargoGates()))) {
 	$_SESSION['assignedList'][$_GET['gate']] = $_GET['add'];
 	
 	if($_GET['add'] != 'unknown') {
@@ -25,7 +26,8 @@ if(isset($_GET['add']) && isset($_GET['gate'])
 }
 
 // Delete gate assignment
-if(isset($_GET['delete']) && array_key_exists($_GET['delete'], Gates_EHAM::allGates())) {
+if(isset($_GET['delete']) && (array_key_exists($_GET['delete'], Gates_EHAM::allGates())
+	|| in_array($_GET['delete'], Gates_EHAM::allCargoGates()))) {
 	unset($_SESSION['assignedList'][$_GET['delete']]);
 
 	header("Location: " . $_SERVER['PHP_SELF']);
@@ -66,9 +68,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 		$_SESSION['lastRequest']['origin'] = $origin;
 	}
 	elseif($_SERVER['REQUEST_METHOD'] == 'POST') {
+		unset($_SESSION['lastRequest']);
 		?>
 		<div class="alert alert-danger">
-			Controleer of je alle velden wel hebt ingevuld...
+			<span class="glyphicon glyphicon-warning-sign"></span>
+			Please fill in all the fields...
 		</div>
 		<?php
 	}
@@ -80,11 +84,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 
 		$gate = $gf->findGate($callsign, $actype, $origin);
 
+		$matchType = $gate['match'];
+		$gate = $gate['gate'];
+
 		if(!$gate) {
 			?>
 			<div class="alert alert-danger">
-				<p>Sorry, no gate could be determined for that combination...</p>
-				<p>You can choose a gate for <strong><?php echo $callsign ?></strong> manually:</p>
+				<p>
+					<span class="glyphicon glyphicon-warning-sign"></span>
+					The gate for <strong><?php echo $callsign ?></strong> could not be determined.
+					Choose one manually...<br /><br />
+				</p>
+
 				<form class="form-inline" method="get">
 					<input type="hidden" name="add" value="<?php echo $callsign ?>" />
 					<div class="form-group">
@@ -114,17 +125,36 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 			}
 			?>
 			<div class="alert alert-success">
-				<p><strong><?php echo $callsign; ?></strong> can be put
-				on gate <strong><?php echo $gate; ?></strong>.</p>
+				<p><strong><?php echo $callsign; ?></strong> can be put	on gate <strong><?php echo $gate; ?></strong>.</p>
 
-				<?php if(!isset($_COOKIE['autoAssign']) || $_COOKIE['autoAssign'] != 'true') { ?>
-					<br />
+				<?php
+				switch($matchType) {
+					case 'CARGO':
+						echo '<p><span class="glyphicon glyphicon-shopping-cart"></span> This is a cargo flight (based on callsign).</p>';
+						break;
+					case 'RL':
+						echo '<p><span class="glyphicon glyphicon-eye-open"></span> Real life flight!</p>';
+						break;
+					case 'RL_HEAVY':
+						echo '<p><span class="glyphicon glyphicon-plane"></span> Real life flight, but the aircraft type is too heavy for actual gate.</p>';
+						break;
+					case 'RL_NOTYET':
+						echo '<p><span class="glyphicon glyphicon-eye-close"></span> Real life flight, but no real life gate available yet.</p>';
+						break;
+					case 'RANDOM':
+						echo '<p><span class="glyphicon glyphicon-list-alt"></span> Based on airline defaults and aircraft category.</p>';
+						break;
+				}
+				
+				if(!isset($_COOKIE['autoAssign']) || $_COOKIE['autoAssign'] != 'true') { ?>
+					<p>
 					<a href="?add=<?php echo $callsign; ?>&amp;gate=<?php echo $gate; ?>" class="btn btn-primary">
 						Add to list
 					</a>
 					<a href="?add=unknown&amp;gate=<?php echo $gate; ?>" class="btn btn-danger">
 						This gate is occupied
 					</a>
+				</p>
 				<?php } ?>
 			</div>
 			<?php

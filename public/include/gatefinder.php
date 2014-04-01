@@ -91,24 +91,40 @@ class GateFinder {
 
 		// Determine whether flight is cargo or civil
 		if(array_key_exists($airlineIATA[0], Gates_EHAM::$cargoGates)) {
-			return $this->findCargoGate($callsign, $aircraftType);
+			$gate = $this->findCargoGate($callsign, $aircraftType);
+
+			return array('gate' => $gate, 'match' => 'CARGO');
 		}
 		else {
+			$match = 'RANDOM';
 
 			// Determine whether this is a real flight
 			$realGate = $this->findRealGate($callsign);
 
 			if($realGate) {
-				$allGates = Gates_EHAM::allGates();
+				if($realGate == 'UNKNOWN') {
+					$match = 'RL_NOTYET';
+				}
+				else {
+					$allGates = Gates_EHAM::allGates();
 
-				// Only return the real gate if the actual aircraft type can use that gate!
-				if($allGates[$realGate] >= $this->resolveAircraftCat($aircraftType)) {
-					return $realGate;
+					// Only return the real gate if the actual aircraft type can use that gate!
+					if($allGates[$realGate] >= $this->resolveAircraftCat($aircraftType)) {
+						return array('gate' => $realGate, 'match' => 'RL');
+					}
+
+					$match = 'RL_HEAVY';
 				}
 			}
 
 			// Find a plausible civil gate
-			return $this->findCivilGate($callsign, $aircraftType, $origin);
+			$gate = $this->findCivilGate($callsign, $aircraftType, $origin);
+
+			if(!$gate) {
+				$match = 'NONE';
+			}
+
+			return array('gate' => $gate, 'match' => $match);
 		}
 	}
 

@@ -527,6 +527,16 @@ class Gates_EHAM {
 	static function allNonSchengenGates() {
 		return array_merge(self::$schengenNonSchengenGates, self::$nonSchengenGates);
 	}
+
+	static function allCargoGates() {
+		$cargoGates = array();
+
+		foreach(self::$cargoGates as $gateArray) {
+			$cargoGates = array_merge($cargoGates, $gateArray);
+		}
+
+		return $cargoGates;
+	}
 }
 
 ?>

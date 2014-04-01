@@ -39,6 +39,7 @@ class RealGates {
 
 		// One flight per row
 		$flights = explode('</tr>', $data[1]);
+		array_pop($flights);
 
 		$realGates = array();
 
@@ -63,6 +64,9 @@ class RealGates {
 				}
 				
 				$realGates[$info[6]] = $gate;
+			}
+			else {
+				$realGates[$info[6]] = 'UNKNOWN';
 			}
 		}
 

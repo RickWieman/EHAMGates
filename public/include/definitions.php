@@ -136,26 +136,24 @@ class Gates_EHAM {
 						'B71','B72','B73','B74','B75','B76',
 						'B81','B82','B83','B84','B85',
 						'B91','B92','B93','B94','B95'),
-		
+		'F100' => array('B91','B92','B93','B94','B95'),
+
 		// Other gates	
 		'A330' => array('E05'),
 		'A340' => array('E05'),
+		'B744' => array('D43'),
 		'B752' => array('C05','C07','C09'),
 		'B764' => array('E02','E04','E05'),
 		'B772' => array('D43','D47','E05'),
-		'B774' => array('D43'),
 		'MD11' => array('D02','D51','D53','E02','E04','E06','E03','E05'),
 		'MD90' => array('D16','D18','D22','D24','D26','D28')
 	);
 
 	static $aircraftNotOnGates = array(
-		// Bravo Apron
 		'E190' => array('B51','B52','B53','B54','B55',
 						'B61','B62','B63','B64','B65','B66',
 						'B71','B72','B73','B74','B75','B76',
 						'B81','B82','B83','B84','B85')
-
-		// TODO: B56 is max F50!
 	);
 
 	static $airlinesIATA = array(
@@ -362,7 +360,7 @@ class Gates_EHAM {
 		'B53' => 2,
 		'B54' => 2,
 		'B55' => 2,
-		'B56' => 2, # max F50
+		'B56' => 2,
 
 		'B61' => 2,
 		'B62' => 2,

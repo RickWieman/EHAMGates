@@ -69,7 +69,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 						<label for="inputGate" class="sr-only">Aircraft type</label>
 						<select class="form-control" name="gate">
 							<?php
-							$freeGates = $gf->getFreeGates($_POST['inputACType'], $_POST['origin']);
+							$freeGates = $gf->getFreeGates($_POST['inputACType'], $_POST['inputOrigin']);
 
 							foreach($freeGates as $gate => $cat) {
 								echo '<option value="'. $gate .'">' . $gate . ' (cat. ' . $cat . ')</option>';

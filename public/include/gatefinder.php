@@ -113,10 +113,16 @@ class GateFinder {
 
 					// Only return the real gate if the actual aircraft type can use that gate!
 					if($allGates[$realGate] >= $this->resolveAircraftCat($aircraftType)) {
-						return array('gate' => $realGate, 'match' => 'RL');
+						if($this->isGateOccupied($realGate)) {
+							$match = 'RL_OCCUPIED';
+						}
+						else {
+							return array('gate' => $realGate, 'match' => 'RL');
+						}
 					}
-
-					$match = 'RL_HEAVY';
+					else {
+						$match = 'RL_HEAVY';
+					}
 				}
 			}
 

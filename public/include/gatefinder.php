@@ -74,6 +74,9 @@ class GateFinder {
 
 		$aircraftCat = $this->resolveAircraftCat($aircraftType);
 
+		$cargoGates = array_fill_keys(Gates_EHAM::allCargoGates(), 8);
+		$gates = array_merge($gates, $cargoGates);
+
 		$freeGates = array();
 
 		foreach($gates as $gate => $cat) {

@@ -455,7 +455,7 @@ class Gates_EHAM {
 		'D53' => 6,
 		'D55' => 4,
 		'D57' => 6,
-		
+
 		'H01' => 4,
 		'H02' => 4,
 		'H03' => 4,
@@ -534,6 +534,7 @@ class Gates_EHAM {
 		foreach(self::$cargoGates as $gateArray) {
 			$cargoGates = array_merge($cargoGates, $gateArray);
 		}
+		sort($cargoGates);
 
 		return $cargoGates;
 	}

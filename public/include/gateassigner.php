@@ -47,6 +47,7 @@ class GateAssigner {
 	function releaseGate($gate) {
 		if(array_key_exists($gate, $this->assignedGates)) {
 			unset($this->assignedGates[$gate]);
+			$this->gateFinder->releaseGate($gate);
 
 			return true;
 		}
@@ -69,6 +70,10 @@ class GateAssigner {
 			$this->lastRequest['gate'] = $gate['gate'];
 			$this->lastRequest['matchType'] = $gate['match'];
 		}
+		else {
+			$this->lastRequest['gate'] = null;
+			$this->lastRequest['matchType'] = 'NONE';
+		}
 	}
 
 	function alreadyOccupied() {
@@ -76,7 +81,11 @@ class GateAssigner {
 			$this->assignGate($this->lastRequest['gate'], 'OCCUPIED');
 
 			$this->findGate($this->lastRequest['callsign'], $this->lastRequest['aircraftType'], $this->lastRequest['origin']);
+
+			return true;
 		}
+
+		return false;
 	}
 
 	function result() {
@@ -104,6 +113,57 @@ class GateAssigner {
 	function isGateAssigned($gate) {
 		if(array_key_exists($gate, $this->assignedGates)) {
 			return $this->assignedGates[$gate];
+		}
+
+		return false;
+	}
+
+	function isCallsignAssigned($callsign) {
+		foreach($this->assignedGates as $gate => $data) {
+			if($data['callsign'] == $callsign) {
+				$data['gate'] = $gate;
+				return $data;
+			}
+		}
+
+		return false;
+	}
+
+	function handleAssign() {
+		if(isset($_GET['assign']) && $this->result()) {
+			return $this->assignFoundGate();
+		}
+
+		return false;
+	}
+
+	function handleAssignManual() {
+		if(isset($_GET['manual']) && $this->result()) {
+			return $this->assignManualGate($_GET['manual']);
+		}
+
+		return false;
+	}
+
+	function handleOccupied() {
+		if(isset($_GET['occupied']) && $this->result()) {
+			return $this->alreadyOccupied();
+		}
+
+		return false;
+	}
+
+	function handleOccupy() {
+		if(isset($_GET['occupy'])) {
+			return $this->assignGate($_GET['occupy'], 'OCCUPIED');
+		}
+
+		return false;
+	}
+
+	function handleRelease() {
+		if(isset($_GET['release'])) {
+			return $this->releaseGate($_GET['release']);
 		}
 
 		return false;

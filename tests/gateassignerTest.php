@@ -35,5 +35,15 @@ class GateAssignerTest extends PHPUnit_Framework_TestCase {
 		$this->ga->releaseGate($result['gate']);
 		$this->assertArrayNotHasKey($result['gate'], $this->ga->getAssignedGates());
 	}
+
+	public function testAssignedCallsign() {
+		$result = $this->ga->result();
+
+		$this->ga->assignFoundGate();
+
+		$assigned = $this->ga->isCallsignAssigned('TRA6868');
+
+		$this->assertEquals('TRA6868', $assigned['callsign']);
+	}
 }
 ?>

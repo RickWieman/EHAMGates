@@ -1,4 +1,5 @@
 <?php
+require_once('definitions_global.php');
 
 class Gates_EHAM {
 	
@@ -354,20 +355,20 @@ class Gates_EHAM {
 	}
 
 	static function resolveAirlineGate($callsign) {
-		preg_match('/^[A-Z]{3}/', $callsign, $airlineICAO);
+		$airlineCode = Definitions::resolveAirlineCode($callsign);
 
-		if(array_key_exists($airlineICAO[0], self::$airlinesDefaultGates)) {
-			return self::$airlinesDefaultGates[$airlineICAO[0]];
+		if($airlineCode && array_key_exists($airlineCode, self::$airlinesDefaultGates)) {
+			return self::$airlinesDefaultGates[$airlineCode];
 		}
 
 		return false;
 	}
 
 	static function resolveCargoAirlineGate($callsign) {
-		preg_match('/^[A-Z]{3}/', $callsign, $airlineICAO);
+		$airlineCode = Definitions::resolveAirlineCode($callsign);
 
-		if(array_key_exists($airlineICAO[0], self::$cargoGates)) {
-			return self::$cargoGates[$airlineICAO[0]];
+		if($airlineCode && array_key_exists($airlineCode, self::$cargoGates)) {
+			return self::$cargoGates[$airlineCode];
 		}
 
 		return false;

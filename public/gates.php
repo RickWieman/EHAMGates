@@ -13,24 +13,8 @@ if(!isset($_SESSION['gateAssigner']) || !$gateAssigner instanceof GateAssigner) 
 	$gateAssigner = new GateAssigner();
 }
 
-// Handle GET requests
-if(isset($_GET['occupy'])) {
-	if($gateAssigner->assignGate($_GET['occupy'], 'OCCUPIED')) {
-		$_SESSION['gateAssigner'] = serialize($gateAssigner);
-
-		header("Location: " . $_SERVER['PHP_SELF']);
-		exit();
-	}
-}
-
-if(isset($_GET['release'])) {
-	if($gateAssigner->releaseGate($_GET['release'])) {
-		$_SESSION['gateAssigner'] = serialize($gateAssigner);
-
-		header("Location: " . $_SERVER['PHP_SELF']);
-		exit();
-	}
-}
+$gateAssigner->handleOccupy();
+$gateAssigner->handleRelease();
 
 define('PAGE', 'gates');
 require('include/tpl_header.php');
@@ -87,4 +71,6 @@ require('include/tpl_header.php');
 
 <?php
 require('include/tpl_footer.php');
+
+$_SESSION['gateAssigner'] = serialize($gateAssigner);
 ?>

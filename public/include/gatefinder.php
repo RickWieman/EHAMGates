@@ -114,7 +114,7 @@ class GateFinder {
 	*/
 	function findRealGate($callsign, $useIATA = true) {
 		// TODO: If $callsign alphanumeric, convert $callsign to numeric
-		$flightnumber = preg_replace('/^([A-Z]{3})/', '$1 ', $callsign);
+		$flightnumber = preg_replace('/^([A-Z]{2,3})/', '$1 ', $callsign);
 
 		if($useIATA) {
 			if(preg_match('/^[A-Z]{3}/', $callsign, $airlineICAO)) {

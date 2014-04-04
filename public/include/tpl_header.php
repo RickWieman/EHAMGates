@@ -2,6 +2,8 @@
 if(!defined('PAGE')) {
 	die('Not for single use.');
 }
+
+ob_start();
 ?>
 <!DOCTYPE html>
 <html lang="en">

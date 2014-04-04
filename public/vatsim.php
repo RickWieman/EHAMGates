@@ -51,9 +51,12 @@ $stamp = (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', 
 					$result = $gateAssigner->result();
 
 					if(isset($_GET['callsign']) && $_GET['callsign'] == $callsign) {
-						$gateAssigner->handleAssign();
-						$gateAssigner->handleAssignManual();
-						$gateAssigner->handleOccupied();
+						if($gateAssigner->handleAssign() || $gateAssigner->handleAssignManual() || $gateAssigner->handleOccupied()) {
+							$_SESSION['gateAssigner'] = serialize($gateAssigner);
+
+							header("Location: " . $_SERVER['PHP_SELF']);
+							exit();
+						}
 					}
 					$assigned = false;
 				}

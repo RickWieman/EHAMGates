@@ -244,6 +244,25 @@ class Definitions {
 		return $airline;
 	}
 
+	static function convertAirlineIATAtoICAO($airline) {
+		if(in_array($airline, self::$airlinesICAOtoIATA)) {
+			return array_search($airline, self::$airlinesICAOtoIATA);
+		}
+
+		return $airline;
+	}
+	
+	static function resolveAirlineCode($callsign) {
+		if(!preg_match('/^[A-Z]{3}/', $callsign, $airlineCode)) {
+			if(!preg_match('/^[A-Z]{2}/', $callsign, $airlineCode)) {
+				return false;
+			}
+			return Definitions::convertAirlineIATAtoICAO($airlineCode[0]);
+		}
+		
+		return $airlineCode[0];
+	}
+
 	static function resolveMatchTypeIcon($matchType) {
 		if(array_key_exists($matchType, self::$matchTypes)) {
 			return self::$matchTypes[$matchType]['icon'];

@@ -8,3 +8,6 @@ if(!defined('PAGE')) {
 	<script src="js/bootstrap.min.js"></script>
 </body>
 </html>
+<?php
+ob_end_flush();
+?>

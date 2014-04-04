@@ -11,6 +11,10 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('C', 'D', 'E'), Gates_EHAM::resolveAirlineGate('TRA 06R'));
 	}
 
+	public function testResolveGate3() {
+		$this->assertEquals(array('B', 'C', 'D', 'E', 'F', 'G'), Gates_EHAM::resolveAirlineGate('KL1009'));
+	}
+
 	public function testFindGate1() {
 		$gf = new GateFinder('testdata.txt');
 		$gate = $gf->findGate('TRA123', 'B738', 'EBBR');

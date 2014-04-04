@@ -81,7 +81,11 @@ class GateAssigner {
 			$this->assignGate($this->lastRequest['gate'], 'OCCUPIED');
 
 			$this->findGate($this->lastRequest['callsign'], $this->lastRequest['aircraftType'], $this->lastRequest['origin']);
+
+			return true;
 		}
+
+		return false;
 	}
 
 	function result() {

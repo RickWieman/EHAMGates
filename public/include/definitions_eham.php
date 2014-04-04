@@ -350,7 +350,33 @@ class Gates_EHAM {
 		}
 		sort($cargoGates);
 
-		return $cargoGates;
+		return array_fill_keys($cargoGates, 8);
+	}
+
+	static function resolveAirlineGate($callsign) {
+		preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
+
+		if(array_key_exists($airlineIATA[0], self::$airlinesDefaultGates)) {
+			return self::$airlinesDefaultGates[$airlineIATA[0]];
+		}
+
+		return false;
+	}
+
+	static function getExtraGates($aircraftType) {
+		if(array_key_exists($aircraftType, self::$aircraftExtraGates)) {
+			return self::$aircraftExtraGates[$aircraftType];
+		}
+
+		return array();
+	}
+
+	static function getExcludedGates($aircraftType) {
+		if(array_key_exists($aircraftType, self::$aircraftNotOnGates)) {
+			return self::$aircraftNotOnGates[$aircraftType];
+		}
+
+		return array();
 	}
 }
 

@@ -1,6 +1,6 @@
 <?php
 
-require_once('definitions.php');
+require_once('definitions_eham.php');
 
 class RealGates {
 	private $dataSource = 'http://schiphol.dutchplanespotters.nl/';

@@ -196,4 +196,24 @@ class Definitions {
 		'LM', # Malta
 		'LS'  # Switzerland
 	);
+
+	static function resolveAircraftCat($aircraftType) {
+		if(array_key_exists($aircraftType, self::$aircraftCategories)) {
+			return self::$aircraftCategories[$aircraftType];
+		}
+
+		return false;
+	}
+
+	static function resolveSchengenOrigin($origin) {
+		// To allow non-specified origin
+		if($origin == "schengen") {
+			return true;
+		}
+		if($origin == "nonschengen") {
+			return false;
+		}
+
+		return in_array(substr($origin, 0, 2), self::$schengen);
+	}
 }

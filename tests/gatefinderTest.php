@@ -3,47 +3,18 @@ require_once('../public/include/gatefinder.php');
 
 class GateFinderTest extends PHPUnit_Framework_TestCase {
 	
-	public function testAircraftToCat1() {
-		$gf = new GateFinder();
-
-		$this->assertEquals(4, $gf->resolveAircraftCat('B738'));
-	}
-
-	public function testAircraftToCat2() {
-		$gf = new GateFinder();
-
-		$this->assertEquals(8, $gf->resolveAircraftCat('A380'));
-	}
-
-	public function testAircraftToCatUnknown() {
-		$gf = new GateFinder();
-
-		$this->assertFalse($gf->resolveAircraftCat('FOO1'));
-	}
-
 	public function testResolveGate1() {
 		$gf = new GateFinder();
 
-		$this->assertEquals(array('B', 'C', 'D', 'E', 'F', 'G'), $gf->resolveAirlineGate('KLM123'));
+		$this->assertEquals(array('B', 'C', 'D', 'E', 'F', 'G'), Gates_EHAM::resolveAirlineGate('KLM123'));
 	}
 
 	public function testResolveGate2() {
 		$gf = new GateFinder();
 
-		$this->assertEquals(array('C', 'D', 'E'), $gf->resolveAirlineGate('TRA 06R'));
+		$this->assertEquals(array('C', 'D', 'E'), Gates_EHAM::resolveAirlineGate('TRA 06R'));
 	}
 
-	public function testSchengen1() {
-		$gf = new GateFinder();
-
-		$this->assertTrue($gf->resolveSchengenOrigin('EBBR'));
-	}
-
-	public function testSchengen2() {
-		$gf = new GateFinder();
-
-		$this->assertFalse($gf->resolveSchengenOrigin('KLAX'));
-	}
 
 	public function testFindGate1() {
 		$gf = new GateFinder('testdata.txt');

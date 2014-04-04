@@ -1,6 +1,7 @@
 <?php
 
-require_once('definitions.php');
+require_once('definitions_global.php');
+require_once('definitions_eham.php');
 require_once('realgates.php');
 
 class GateFinder {
@@ -13,36 +14,6 @@ class GateFinder {
 		$this->realGates = new RealGates($useData);
 	}
 	
-	function resolveAircraftCat($aircraftType) {
-		if(array_key_exists($aircraftType, Gates_EHAM::$aircraftCategories)) {
-			return Gates_EHAM::$aircraftCategories[$aircraftType];
-		}
-
-		return false;
-	}
-
-	function resolveAirlineGate($callsign) {
-		preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
-
-		if(array_key_exists($airlineIATA[0], Gates_EHAM::$airlinesDefaultGates)) {
-			return Gates_EHAM::$airlinesDefaultGates[$airlineIATA[0]];
-		}
-
-		return false;
-	}
-
-	function resolveSchengenOrigin($origin) {
-		// To allow non-specified origin
-		if($origin == "schengen") {
-			return true;
-		}
-		if($origin == "nonschengen") {
-			return false;
-		}
-
-		return in_array(substr($origin, 0, 2), Gates_EHAM::$schengen);
-	}
-
 	function occupyGate($gate) {
 		$this->occupiedGates[] = $gate;
 	}
@@ -52,35 +23,25 @@ class GateFinder {
 	}
 
 	function getFreeGates($aircraftType, $origin) {
-		// If there are extra gates for the specified aircraft, load the array
-		$extraGates = array();
-		if(array_key_exists($aircraftType, Gates_EHAM::$aircraftExtraGates)) {
-			$extraGates = Gates_EHAM::$aircraftExtraGates[$aircraftType];
-		}
-
-		// If there are gates the specified aircraft cannot use, load the array
-		$withoutGates = array();
-		if(array_key_exists($aircraftType, Gates_EHAM::$aircraftNotOnGates)) {
-			$withoutGates = Gates_EHAM::$aircraftNotOnGates[$aircraftType];
-		}
-
-		// Get gates based on Schengen/Non-Schengen
-		if($this->resolveSchengenOrigin($origin)) {
+		if(Definitions::resolveSchengenOrigin($origin)) {
 			$gates = Gates_EHAM::allSchengenGates();
 		}
 		else {
 			$gates = Gates_EHAM::allNonSchengenGates();
 		}
 
-		$aircraftCat = $this->resolveAircraftCat($aircraftType);
-
-		$cargoGates = array_fill_keys(Gates_EHAM::allCargoGates(), 8);
+		$cargoGates = Gates_EHAM::allCargoGates();
 		$gates = array_merge($gates, $cargoGates);
 
+		$extraGates = Gates_EHAM::getExtraGates($aircraftType);
+		$excludedGates = Gates_EHAM::getExcludedGates($aircraftType);
+
+		$aircraftCat = Definitions::resolveAircraftCat($aircraftType);
+		
 		$freeGates = array();
 
 		foreach($gates as $gate => $cat) {
-			if(!$this->isGateOccupied($gate) && !in_array($gate, $withoutGates) 
+			if(!$this->isGateOccupied($gate) && !in_array($gate, $excludedGates) 
 				&& (($cat >= $aircraftCat) || in_array($gate, $extraGates))) {
 				$freeGates[$gate] = $cat;
 			}
@@ -112,7 +73,7 @@ class GateFinder {
 					$allGates = Gates_EHAM::allGates();
 
 					// Only return the real gate if the actual aircraft type can use that gate!
-					if($allGates[$realGate] >= $this->resolveAircraftCat($aircraftType)) {
+					if($allGates[$realGate] >= Definitions::resolveAircraftCat($aircraftType)) {
 						if($this->isGateOccupied($realGate)) {
 							$match = 'RL_OCCUPIED';
 						}
@@ -150,8 +111,8 @@ class GateFinder {
 		if($useICAO) {
 			preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
 
-			if(array_key_exists($airlineIATA[0], Gates_EHAM::$airlinesIATA)) {
-				$airlineICAO = Gates_EHAM::$airlinesIATA[$airlineIATA[0]];
+			if(array_key_exists($airlineIATA[0], Definitions::$airlinesIATA)) {
+				$airlineICAO = Definitions::$airlinesIATA[$airlineIATA[0]];
 
 				$flightnumber = preg_replace('/^[A-Z]{3}/', $airlineICAO . ' ', $callsign);
 			}
@@ -199,8 +160,8 @@ class GateFinder {
 	}
 
 	function findCivilGate($callsign, $aircraftType, $origin) {
-		$defaultGate = $this->resolveAirlineGate($callsign);
-		$cat = $this->resolveAircraftCat($aircraftType);
+		$defaultGate = Gates_EHAM::resolveAirlineGate($callsign);
+		$cat = Definitions::resolveAircraftCat($aircraftType);
 
 		if($defaultGate) {
 			$availableGates = $this->getFreeGates($aircraftType, $origin);

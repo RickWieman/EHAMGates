@@ -50,29 +50,32 @@ $stamp = (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', 
 				<th>Origin</th>
 				<th>Gate</th>
 				<th></th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
 			<?php
 			foreach ($vp->parseData() as $callsign => $data) {
 				if(in_array($callsign, $_SESSION['assignedList'])) {
-					$gate = array_search($callsign, $_SESSION['assignedList']);
+					$gate['gate'] = array_search($callsign, $_SESSION['assignedList']);
+					$gate['match'] = 'ASSIGNED';
 					$assigned = true;
 				}
 				else {
 					$gate = $gf->findGate($callsign, $data['actype'], $data['origin']);
-					$gate = $gate['gate'];
+					//$gate = $gate['gate'];
 					$assigned = false;
 				}
 
 				echo '<tr><td>' . $callsign . '</td><td>' . $data['actype'] . '</td><td>' . $data['origin'] . '</td>';
-				echo '<td>' . $gate . '</td>';
+				echo '<td>' . $gate['gate'] . '</td>';
+				echo '<td><span class="glyphicon glyphicon-' . $gf->gateMatchIcon($gate['match']) . '"></span></td>';
 				echo '<td>';
 				if($assigned) {
-					echo '<a href="?delete='. $gate .'" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-log-out"></span> Release</a>';
+					echo '<a href="?delete='. $gate['gate'] .'" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-log-out"></span> Release</a>';
 				}
-				elseif($gate) {
-					echo '<a href="?add='. $callsign .'&amp;gate='. $gate . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</a>';
+				elseif($gate['gate']) {
+					echo '<a href="?add='. $callsign .'&amp;gate='. $gate['gate'] . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</a>';
 				}
 				echo '</td></tr>';
 			}

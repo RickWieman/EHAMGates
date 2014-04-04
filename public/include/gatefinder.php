@@ -99,8 +99,31 @@ class GateFinder {
 				return 'plane';
 			case 'RL_NOTYET':
 				return 'eye-close';
+			case 'RL_OCCUPIED':
+				return 'flash';
 			case 'RANDOM':
-				return 'glyphicon-list-alt';
+				return 'list-alt';
+			default:
+				return 'warning-sign';
+		}
+	}
+
+	function gateMatchText($matchText) {
+		switch($matchText) {
+			case 'CARGO':
+				return 'This is a cargo flight (based on callsign).';
+			case 'RL':
+				return 'Real life flight!';
+			case 'RL_HEAVY':
+				return 'Real life flight, but the aircraft type is too heavy for actual gate.';
+			case 'RL_NOTYET':
+				return 'Real life flight, but no real life gate available yet.';
+			case 'RL_OCCUPIED':
+				return 'Real life flight, but the actual gate is occupied.';
+			case 'RANDOM':
+				return 'Based on airline defaults and aircraft category.';
+			default:
+				return 'The gate could not be determined.';
 		}
 	}
 

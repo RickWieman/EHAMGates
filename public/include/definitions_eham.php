@@ -2,7 +2,7 @@
 
 class Gates_EHAM {
 	
-	static $aircraftExtraGates = array(
+	private static $aircraftExtraGates = array(
 		// Bravo Apron
 		'B462' => array('B91','B92','B93','B94','B95'),
 		'CL60' => array('B51','B52','B53','B54','B55',
@@ -53,14 +53,14 @@ class Gates_EHAM {
 		'MD90' => array('D16','D18','D22','D24','D26','D28')
 	);
 
-	static $aircraftNotOnGates = array(
+	private static $aircraftNotOnGates = array(
 		'E190' => array('B51','B52','B53','B54','B55',
 						'B61','B62','B63','B64','B65','B66',
 						'B71','B72','B73','B74','B75','B76',
 						'B81','B82','B83','B84','B85')
 	);
 
-	static $airlinesDefaultGates = array(
+	private static $airlinesDefaultGates = array(
 		'ADR' => array('B'),
 		'AEA' => array('C'),
 		'AFL' => array('G'),
@@ -121,7 +121,7 @@ class Gates_EHAM {
 		'VLG' => array('B')
 	);
 
-	static $schengenGatesToApron = array(
+	private static $schengenGatesToApron = array(
 		'Z02' => 'D02',
 		'D60' => 'D04',
 		'D62' => 'D08',
@@ -153,7 +153,7 @@ class Gates_EHAM {
 		'M07' => 'H07'
 	);
 
-	static $bravoApron = array(
+	private static $bravoApron = array(
 		'A31' => 8,
 		'A32' => 8,
 		'A33' => 3,
@@ -203,7 +203,7 @@ class Gates_EHAM {
 		'B95' => 2 
 	);
 
-	static $schengenGates = array(
+	private static $schengenGates = array(
 		'B13' => 4,
 		'B15' => 4,
 		'B17' => 4,
@@ -253,7 +253,7 @@ class Gates_EHAM {
 		'D31' => 4
 	);
 
-	static $schengenNonSchengenGates = array(
+	private static $schengenNonSchengenGates = array(
 		'D46' => 4,
 		'D52' => 4,
 		'D56' => 4,
@@ -279,7 +279,7 @@ class Gates_EHAM {
 		'H07' => 4
 	);
 
-	static $nonSchengenGates = array(
+	private static $nonSchengenGates = array(
 		'E02' => 6,
 		'E04' => 6,
 		'E06' => 6,
@@ -317,7 +317,7 @@ class Gates_EHAM {
 		'G09' => 8,
 	);
 
-	static $cargoGates = array(
+	private static $cargoGates = array(
 		'ABW' => array('S94', 'S95'),
 		'ANA' => array('R72', 'R74', 'R77', 'R80', 'R81', 'R82', 'R83', 'R84', 'R85', 'R86', 'R87'),
 		'CCA' => array('R72', 'R74', 'R77', 'R80', 'R81', 'R82', 'R83', 'R84', 'R85', 'R86', 'R87'),

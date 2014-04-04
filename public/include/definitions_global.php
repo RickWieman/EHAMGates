@@ -1,7 +1,7 @@
 <?php
 
 class Definitions {
-	static $airlinesICAOtoIATA = array(
+private 	static $airlinesICAOtoIATA = array(
 		'ADR' => 'JP', # Adria Airways
 		'AEA' => 'UX', # Air Europa
 		'AFL' => 'SU', # Aeroflot
@@ -62,7 +62,7 @@ class Definitions {
 		'VLG' => 'VY'  # Vueling Airlines
 	);
 
-	static $aircraftCategories = array(
+	private static $aircraftCategories = array(
 		'BE40' => 1,
 		'H25B' => 1,
 		'BA11' => 1,
@@ -168,7 +168,7 @@ class Definitions {
 		'A388' => 8
 	);
 
-	static $schengen = array(
+	private static $schengen = array(
 		'EB', # Belgium
 		'EK', # Denmark
 		'ED', # Germany (Civil)

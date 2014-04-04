@@ -226,10 +226,10 @@ class Definitions {
 
 	static function resolveSchengenOrigin($origin) {
 		// To allow non-specified origin
-		if($origin == "schengen") {
+		if(strtolower($origin) == 'schengen') {
 			return true;
 		}
-		if($origin == "nonschengen") {
+		if(strtolower($origin) == 'nonschengen') {
 			return false;
 		}
 

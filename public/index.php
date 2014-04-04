@@ -1,41 +1,53 @@
 <?php
 session_start();
 
-if(!isset($_SESSION['assignedList'])) {
-	$_SESSION['assignedList'] = array();
+require_once('include/definitions_global.php');
+require_once('include/gateassigner.php');
+
+// Initialize GateAssigner: Either get it from the SESSION or create a new instance.
+if(isset($_SESSION['gateAssigner'])) {
+	$gateAssigner = unserialize($_SESSION['gateAssigner']);
 }
 
-require_once('include/gatefinder.php');
+if(!isset($_SESSION['gateAssigner']) || !$gateAssigner instanceof GateAssigner) {
+	$gateAssigner = new GateAssigner();
+}
 
-$gf = new GateFinder();
+// Handle GET requests
+if(isset($_GET['assign'])) {
+	if($gateAssigner->assignFoundGate()) {
+		$_SESSION['gateAssigner'] = serialize($gateAssigner);
 
-// Add gate assignment
-if(isset($_GET['add']) && isset($_GET['gate'])
-	&& (preg_match('/[A-Z]+[0-9]+/', $_GET['add']) || $_GET['add'] == 'unknown')
-	&& (array_key_exists($_GET['gate'], Gates_EHAM::allGates())
-		|| in_array($_GET['gate'], Gates_EHAM::allCargoGates()))) {
-	$_SESSION['assignedList'][$_GET['gate']] = $_GET['add'];
-	
-	if($_GET['add'] != 'unknown') {
-		unset($_SESSION['lastRequest']);
+		header("Location: " . $_SERVER['PHP_SELF']);
+		exit();
 	}
-
-	header("Location: " . $_SERVER['PHP_SELF']);
-	exit();
 }
 
-// Delete gate assignment
-if(isset($_GET['delete']) && (array_key_exists($_GET['delete'], Gates_EHAM::allGates())
-	|| in_array($_GET['delete'], Gates_EHAM::allCargoGates()))) {
-	unset($_SESSION['assignedList'][$_GET['delete']]);
+if(isset($_GET['manual'])) {
+	if($gateAssigner->assignManualGate($_GET['manual'])) {
+		$_SESSION['gateAssigner'] = serialize($gateAssigner);
 
-	header("Location: " . $_SERVER['PHP_SELF']);
-	exit();
+		header("Location: " . $_SERVER['PHP_SELF']);
+		exit();
+	}
 }
 
-// Mark assigned gates as occupied
-foreach($_SESSION['assignedList'] as $gate => $callsign) {
-	$gf->occupyGate($gate);
+if(isset($_GET['occupied'])) {
+	if($gateAssigner->alreadyOccupied()) {
+		$_SESSION['gateAssigner'] = serialize($gateAssigner);
+
+		header("Location: " . $_SERVER['PHP_SELF']);
+		exit();
+	}
+}
+
+if(isset($_GET['release'])) {
+	if($gateAssigner->releaseGate($_GET['release'])) {
+		$_SESSION['gateAssigner'] = serialize($gateAssigner);
+
+		header("Location: " . $_SERVER['PHP_SELF']);
+		exit();
+	}
 }
 
 define('PAGE', 'search');
@@ -49,7 +61,7 @@ $stamp = (file_exists('data.txt') ? file_get_contents('data.txt', NULL, NULL, 0,
 Last update of real life data: <?php echo date("H:i:s (d-m-Y)", $stamp); ?></p>
 
 <?php
-if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
+if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if(!empty($_POST['inputCallsign']) && !empty($_POST['inputACType'])
 		&& ($_POST['inputOriginMethod'] == 'checkbox' || ($_POST['inputOriginMethod'] == 'text' && !empty($_POST['inputOrigin'])))) {
 
@@ -59,15 +71,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 		else {
 			$origin = strtoupper($_POST['inputOrigin']);
 		}
-		
-		$callsign = strtoupper($_POST['inputCallsign']);
 
-		$_SESSION['lastRequest']['callsign'] = $callsign;
-		$_SESSION['lastRequest']['ACtype'] = $_POST['inputACType'];
-		$_SESSION['lastRequest']['origin'] = $origin;
+		$gateAssigner->findGate($_POST['inputCallsign'], $_POST['inputACType'], $origin);
 	}
-	elseif($_SERVER['REQUEST_METHOD'] == 'POST') {
-		unset($_SESSION['lastRequest']);
+	else {
+		$gateAssigner->resetSearch();
 		?>
 		<div class="alert alert-danger">
 			<span class="glyphicon glyphicon-warning-sign"></span>
@@ -75,92 +83,64 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 		</div>
 		<?php
 	}
-	
-	if(isset($_SESSION['lastRequest'])) {
-		$callsign = $_SESSION['lastRequest']['callsign'];
-		$actype = $_SESSION['lastRequest']['ACtype'];
-		$origin = $_SESSION['lastRequest']['origin'];
+}
 
-		$gate = $gf->findGate($callsign, $actype, $origin);
+if($gateAssigner->result()) {
+	$result = $gateAssigner->result();
 
-		$matchType = $gate['match'];
-		$gate = $gate['gate'];
+	if($result['matchType'] == 'NONE') {
+		?>
+		<div class="alert alert-danger">
+			<p>
+				<span class="glyphicon glyphicon-warning-sign"></span>
+				The gate for <strong><?php echo $result['callsign']; ?></strong> could not be determined.
+				Choose one manually...<br /><br />
+			</p>
 
-		if(!$gate) {
-			?>
-			<div class="alert alert-danger">
+			<form class="form-inline" method="get">
+				<div class="form-group">
+					<label for="manual" class="sr-only">Aircraft type</label>
+					<select class="form-control" name="manual">
+						<?php
+						$freeGates = $gateAssigner->getFreeGates();
+
+						foreach($freeGates as $gate => $cat) {
+							echo '<option value="'. $gate .'">' . $gate . ' (cat. ' . $cat . ')</option>';
+						}
+						?>
+					</select>
+				</div>
+
+				<button type="submit" class="btn btn-primary">Assign Gate</button>
+			</form>
+		</div>
+		<?php
+	}
+	else {
+		if(isset($_COOKIE['autoAssign']) && $_COOKIE['autoAssign'] == 'true') {
+			$gateAssigner->assignFoundGate();
+		}
+		?>
+		<div class="alert alert-success">
+			<p><strong><?php echo $result['callsign']; ?></strong> can be put on gate <strong><?php echo $result['gate']; ?></strong>.</p>
+
+			<?php
+			$matchTypeIcon = Definitions::resolveMatchTypeIcon($result['matchType']);
+			$matchTypeText = Definitions::resolveMatchTypeText($result['matchType']);
+			echo '<p><span class="glyphicon glyphicon-' . $matchTypeIcon . '"></span> '. $matchTypeText .'</p>';
+			
+			if(!isset($_COOKIE['autoAssign']) || $_COOKIE['autoAssign'] != 'true') { ?>
 				<p>
-					<span class="glyphicon glyphicon-warning-sign"></span>
-					The gate for <strong><?php echo $callsign ?></strong> could not be determined.
-					Choose one manually...<br /><br />
-				</p>
-
-				<form class="form-inline" method="get">
-					<input type="hidden" name="add" value="<?php echo $callsign ?>" />
-					<div class="form-group">
-						<label for="inputGate" class="sr-only">Aircraft type</label>
-						<select class="form-control" name="gate">
-							<?php
-							$freeGates = $gf->getFreeGates($actype, $origin);
-
-							foreach($freeGates as $gate => $cat) {
-								echo '<option value="'. $gate .'">' . $gate . ' (cat. ' . $cat . ')</option>';
-							}
-							?>
-						</select>
-					</div>
-
-					<button type="submit" class="btn btn-primary">Assign Gate</button>
-				</form>
-			</div>
-			<?php
-		}
-		else {
-			if(isset($_COOKIE['autoAssign']) && $_COOKIE['autoAssign'] == 'true') {
-				$_SESSION['assignedList'][$gate] = $callsign;
-				$gf->occupyGate($gate);
-
-				unset($_SESSION['lastRequest']);
-			}
-			?>
-			<div class="alert alert-success">
-				<p><strong><?php echo $callsign; ?></strong> can be put	on gate <strong><?php echo $gate; ?></strong>.</p>
-
-				<?php
-				switch($matchType) {
-					case 'CARGO':
-						echo '<p><span class="glyphicon glyphicon-shopping-cart"></span> This is a cargo flight (based on callsign).</p>';
-						break;
-					case 'RL':
-						echo '<p><span class="glyphicon glyphicon-eye-open"></span> Real life flight!</p>';
-						break;
-					case 'RL_HEAVY':
-						echo '<p><span class="glyphicon glyphicon-plane"></span> Real life flight, but the aircraft type is too heavy for actual gate.</p>';
-						break;
-					case 'RL_NOTYET':
-						echo '<p><span class="glyphicon glyphicon-eye-close"></span> Real life flight, but no real life gate available yet.</p>';
-						break;
-					case 'RL_OCCUPIED':
-						echo '<p><span class="glyphicon glyphicon-flash"></span> Real life flight, but the actual gate is occupied.</p>';
-						break;
-					case 'RANDOM':
-						echo '<p><span class="glyphicon glyphicon-list-alt"></span> Based on airline defaults and aircraft category.</p>';
-						break;
-				}
-				
-				if(!isset($_COOKIE['autoAssign']) || $_COOKIE['autoAssign'] != 'true') { ?>
-					<p>
-					<a href="?add=<?php echo $callsign; ?>&amp;gate=<?php echo $gate; ?>" class="btn btn-primary">
-						Add to list
-					</a>
-					<a href="?add=unknown&amp;gate=<?php echo $gate; ?>" class="btn btn-danger">
-						This gate is occupied
-					</a>
-				</p>
-				<?php } ?>
-			</div>
-			<?php
-		}
+				<a href="?assign" class="btn btn-primary">
+					Add to list
+				</a>
+				<a href="?occupied" class="btn btn-danger">
+					This gate is occupied
+				</a>
+			</p>
+			<?php } ?>
+		</div>
+		<?php
 	}
 }
 ?>
@@ -234,13 +214,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 		</thead>
 		<tbody>
 			<?php
-			asort($_SESSION['assignedList']);
-
 			$i = 0;
-			foreach($_SESSION['assignedList'] as $gate => $callsign) {
-				if($callsign != 'unknown') {
-					echo '<tr><td>' . $callsign . '</td><td>' . $gate . '</td>';
-					echo '<td style="text-align: right;"><a href="?delete=' . $gate . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a></td></tr>';
+			foreach($gateAssigner->getAssignedGates() as $gate => $data) {
+				if($data['callsign'] != 'unknown') {
+					echo '<tr><td>' . $data['callsign'] . '</td><td>' . $gate . '</td>';
+					echo '<td style="text-align: right;"><a href="?release=' . $gate . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a></td></tr>';
 					$i++;
 				}
 			}
@@ -252,6 +230,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 		</tbody>
 	</table>
 </div>
+
 <?php
 require('include/tpl_footer.php');
+
+$_SESSION['gateAssigner'] = serialize($gateAssigner);
 ?>

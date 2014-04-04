@@ -86,6 +86,21 @@ class GateFinder {
 		return $freeGates;
 	}
 
+	function gateMatchIcon($matchText) {
+		switch($matchText) {
+			case 'CARGO':
+				return 'shopping-cart';
+			case 'RL':
+				return 'eye-open';
+			case 'RL_HEAVY':
+				return 'plane';
+			case 'RL_NOTYET':
+				return 'eye-close';
+			case 'RANDOM':
+				return 'glyphicon-list-alt';
+		}
+	}
+
 	function findGate($callsign, $aircraftType, $origin) {
 		preg_match('/^[A-Z]{2,3}/', $callsign, $airlineIATA);
 

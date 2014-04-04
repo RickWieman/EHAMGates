@@ -100,6 +100,14 @@ class GateAssigner {
 	function resetSearch() {
 		$this->lastRequest = null;
 	}
+
+	function isGateAssigned($gate) {
+		if(array_key_exists($gate, $this->assignedGates)) {
+			return $this->assignedGates[$gate];
+		}
+
+		return false;
+	}
 }
 
 ?>

@@ -9,8 +9,8 @@ class GateAssigner {
 
 	private $lastRequest;
 
-	function __construct() {
-		$this->gateFinder = new GateFinder();
+	function __construct($dataSource = null) {
+		$this->gateFinder = new GateFinder($dataSource);
 	}
 
 	function assignGate($gate, $matchType, $callsign = 'unknown', $aircraftType = null, $origin = null) {

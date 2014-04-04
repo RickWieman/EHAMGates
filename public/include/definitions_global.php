@@ -197,6 +197,21 @@ class Definitions {
 		'LS'  # Switzerland
 	);
 
+	private static $matchTypes = array(
+		'CARGO'			=> array('icon' => 'shopping-cart',
+								 'text' => 'This is a cargo flight (based on callsign).'),
+		'RL' 			=> array('icon' => 'eye-open',
+								 'text' => 'Real life flight!'),
+		'RL_HEAVY'		=> array('icon' => 'plane',
+								 'text' => 'Real life flight, but the aircraft type is too heavy for actual gate.'),
+		'RL_NOTYET'		=> array('icon' => 'eye-close',
+								 'text' => 'Real life flight, but no real life gate available yet.'),
+		'RL_OCCUPIED'	=> array('icon' => 'flash',
+								 'text' => 'Real life flight, but the actual gate is occupied.'),
+		'RANDOM'		=> array('icon' => 'list-alt',
+								 'text' => 'Based on airline defaults and aircraft category.')
+	);
+
 	static function getAllAircraft() {
 		return self::$aircraftCategories;
 	}
@@ -228,4 +243,25 @@ class Definitions {
 
 		return $airline;
 	}
+
+	static function resolveMatchTypeIcon($matchType) {
+		if(array_key_exists($matchType, self::$matchTypes)) {
+			return self::$matchTypes[$matchType]['icon'];
+		}
+
+		return 'warning-sign';
+	}
+
+	static function resolveMatchTypeText($matchType) {
+		if(array_key_exists($matchType, self::$matchTypes)) {
+			return self::$matchTypes[$matchType]['text'];
+		}
+
+		return 'The gate could not be determined.';
+	}
+
+	static function getAllMatchTypes() {
+		return self::$matchTypes;
+	}
+
 }

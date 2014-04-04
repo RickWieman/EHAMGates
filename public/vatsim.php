@@ -1,35 +1,56 @@
 <?php
 session_start();
 
+require_once('include/definitions_global.php');
 require_once('include/vatsimparser.php');
-require_once('include/gatefinder.php');
+require_once('include/gateassigner.php');
+
+// Initialize GateAssigner: Either get it from the SESSION or create a new instance.
+if(isset($_SESSION['gateAssigner'])) {
+	$gateAssigner = unserialize($_SESSION['gateAssigner']);
+}
+
+if(!isset($_SESSION['gateAssigner']) || !$gateAssigner instanceof GateAssigner) {
+	$gateAssigner = new GateAssigner();
+}
 
 $vp = new VatsimParser();
-$gf = new GateFinder();
 
-// Add gate assignment
-if(isset($_GET['add']) && isset($_GET['gate'])
-	&& (preg_match('/[A-Z]+[0-9]+/', $_GET['add']) || $_GET['add'] == 'unknown')
-	&& (array_key_exists($_GET['gate'], Gates_EHAM::allGates())
-		|| in_array($_GET['gate'], Gates_EHAM::allCargoGates()))) {
-	$_SESSION['assignedList'][$_GET['gate']] = $_GET['add'];
-	
-	header("Location: " . $_SERVER['PHP_SELF']);
-	exit();
+// Handle GET requests
+if(isset($_GET['assign'])) {
+	if($gateAssigner->assignFoundGate()) {
+		$_SESSION['gateAssigner'] = serialize($gateAssigner);
+
+		header("Location: " . $_SERVER['PHP_SELF']);
+		exit();
+	}
 }
 
-// Delete gate assignment
-if(isset($_GET['delete']) && (array_key_exists($_GET['delete'], Gates_EHAM::allGates())
-	|| in_array($_GET['delete'], Gates_EHAM::allCargoGates()))) {
-	unset($_SESSION['assignedList'][$_GET['delete']]);
+if(isset($_GET['manual'])) {
+	if($gateAssigner->assignManualGate($_GET['manual'])) {
+		$_SESSION['gateAssigner'] = serialize($gateAssigner);
 
-	header("Location: " . $_SERVER['PHP_SELF']);
-	exit();
+		header("Location: " . $_SERVER['PHP_SELF']);
+		exit();
+	}
 }
 
-// Mark assigned gates as occupied
-foreach($_SESSION['assignedList'] as $gate => $callsign) {
-	$gf->occupyGate($gate);
+if(isset($_GET['occupied'])) {
+	if($gateAssigner->alreadyOccupied()) {
+		$_SESSION['gateAssigner'] = serialize($gateAssigner);
+
+		header("Location: " . $_SERVER['PHP_SELF']);
+		exit();
+	}
+}
+
+if(isset($_GET['release'])) {
+	if($gateAssigner->releaseGate($_GET['release'])) {
+		$_SESSION['gateAssigner'] = serialize($gateAssigner);
+
+		header("Location: " . $_SERVER['PHP_SELF']);
+		exit();
+	}
 }
 
 define('PAGE', 'vatsim');
@@ -55,24 +76,27 @@ $stamp = (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', 
 		</thead>
 		<tbody>
 			<?php
-			foreach ($vp->parseData() as $callsign => $data) {
-				if(in_array($callsign, $_SESSION['assignedList'])) {
-					$gate['gate'] = array_search($callsign, $_SESSION['assignedList']);
-					$gate['match'] = 'ASSIGNED';
+			foreach($vp->parseData() as $callsign => $data) {
+				$assigned = $gateAssigner->isCallsignAssigned($callsign);
+				if($assigned) {
+					$gate['gate'] = $assigned['gate'];
+					$gate['match'] = $assigned['matchType'];
 					$assigned = true;
 				}
 				else {
-					$gate = $gf->findGate($callsign, $data['actype'], $data['origin']);
+					$gate['gate'] = '';
+					$gate['match'] = '';
+					//$gate = $gf->findGate($callsign, $data['actype'], $data['origin']);
 					//$gate = $gate['gate'];
 					$assigned = false;
 				}
 
 				echo '<tr><td>' . $callsign . '</td><td>' . $data['actype'] . '</td><td>' . $data['origin'] . '</td>';
 				echo '<td>' . $gate['gate'] . '</td>';
-				echo '<td><span class="glyphicon glyphicon-' . $gf->gateMatchIcon($gate['match']) . '"></span></td>';
+				echo '<td><span class="glyphicon glyphicon-' . Definitions::resolveMatchTypeIcon($gate['match']) . '"></span></td>';
 				echo '<td>';
 				if($assigned) {
-					echo '<a href="?delete='. $gate['gate'] .'" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-log-out"></span> Release</a>';
+					echo '<a href="?release='. $gate['gate'] .'" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-log-out"></span> Release</a>';
 				}
 				elseif($gate['gate']) {
 					echo '<a href="?add='. $callsign .'&amp;gate='. $gate['gate'] . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</a>';

@@ -108,6 +108,17 @@ class GateAssigner {
 
 		return false;
 	}
+
+	function isCallsignAssigned($callsign) {
+		foreach($this->assignedGates as $gate => $data) {
+			if($data['callsign'] == $callsign) {
+				$data['gate'] = $gate;
+				return $data;
+			}
+		}
+
+		return false;
+	}
 }
 
 ?>

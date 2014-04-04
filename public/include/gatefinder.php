@@ -18,6 +18,13 @@ class GateFinder {
 		$this->occupiedGates[] = $gate;
 	}
 
+	function releaseGate($gate) {
+		if(in_array($gate, $this->occupiedGates)) {
+			$key = array_search($gate, $this->occupiedGates);
+			unset($this->occupiedGates[$key]);
+		}
+	}
+
 	function isGateOccupied($gate) {
 		return in_array($gate, $this->occupiedGates);
 	}
@@ -51,6 +58,10 @@ class GateFinder {
 	}
 
 	function findGate($callsign, $aircraftType, $origin) {
+		if(!preg_match('/^[A-Z]{2,3}\d+$/', $callsign)) {
+			return false;
+		}
+
 		// Determine whether this is a real flight
 		$realGate = $this->findRealGate($callsign);
 
@@ -119,6 +130,7 @@ class GateFinder {
 		$i = 0;
 		while(!$gate && $i <= 4) {
 			$flightnumber = explode(' ', $flightnumber);
+
 			$i = strlen($flightnumber[1]) + 1;
 			$flightnumber[1] = sprintf("%0" . $i . "d", $flightnumber[1]);
 			$flightnumber = implode(' ', $flightnumber);

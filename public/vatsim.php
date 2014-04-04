@@ -14,6 +14,8 @@ if(!isset($_SESSION['gateAssigner']) || !$gateAssigner instanceof GateAssigner) 
 	$gateAssigner = new GateAssigner();
 }
 
+$gateAssigner->handleRelease();
+
 $vp = new VatsimParser();
 
 define('PAGE', 'vatsim');
@@ -40,9 +42,6 @@ $stamp = (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', 
 		<tbody>
 			<?php
 			foreach($vp->parseData() as $callsign => $data) {
-
-				// TODO: In this iteration, check whether a GET request has been sent. If so, check whether *callsign* matches iteration. Then continue with GateAssigner.
-
 				$assigned = $gateAssigner->isCallsignAssigned($callsign);
 				if($assigned) {
 					$gate['gate'] = $assigned['gate'];
@@ -50,8 +49,24 @@ $stamp = (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', 
 					$assigned = true;
 				}
 				else {
-					$gate['gate'] = '';
-					$gate['match'] = '';
+					$gateAssigner->findGate($callsign, $data['actype'], $data['origin']);
+
+					if($gateAssigner->result()) {
+						$result = $gateAssigner->result();
+
+						if(isset($_GET['callsign']) && $_GET['callsign'] == $callsign) {
+							$gateAssigner->handleAssign();
+							$gateAssigner->handleAssignManual();
+							$gateAssigner->handleOccupied();
+						}
+
+						$gate['gate'] = $result['gate'];
+						$gate['match'] = $result['matchType'];
+					}
+					else {
+						$gate['gate'] = '';
+						$gate['match'] = '';
+					}
 					//$gate = $gf->findGate($callsign, $data['actype'], $data['origin']);
 					//$gate = $gate['gate'];
 					$assigned = false;
@@ -65,14 +80,17 @@ $stamp = (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', 
 					echo '<a href="?release='. $gate['gate'] .'" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-log-out"></span> Release</a>';
 				}
 				elseif($gate['gate']) {
-					echo '<a href="?add='. $callsign .'&amp;gate='. $gate['gate'] . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</a>';
+					echo '<a href="?callsign='. $callsign .'&amp;assign" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</a>';
 				}
 				echo '</td></tr>';
 			}
+			$gateAssigner->resetSearch();
 			?>
 		</tbody>
 	</table>
 </div>
 <?php
 require('include/tpl_footer.php');
+
+$_SESSION['gateAssigner'] = serialize($gateAssigner);
 ?>

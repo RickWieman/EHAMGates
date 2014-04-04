@@ -47,6 +47,7 @@ class GateAssigner {
 	function releaseGate($gate) {
 		if(array_key_exists($gate, $this->assignedGates)) {
 			unset($this->assignedGates[$gate]);
+			$this->gateFinder->releaseGate($gate);
 
 			return true;
 		}

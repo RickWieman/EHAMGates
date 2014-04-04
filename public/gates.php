@@ -71,4 +71,6 @@ require('include/tpl_header.php');
 
 <?php
 require('include/tpl_footer.php');
+
+$_SESSION['gateAssigner'] = serialize($gateAssigner);
 ?>

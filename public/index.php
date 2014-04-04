@@ -13,10 +13,12 @@ if(!isset($_SESSION['gateAssigner']) || !$gateAssigner instanceof GateAssigner) 
 	$gateAssigner = new GateAssigner();
 }
 
-$gateAssigner->handleAssign();
-$gateAssigner->handleAssignManual();
-$gateAssigner->handleOccupied();
-$gateAssigner->handleRelease();
+if($gateAssigner->handleAssign() || $gateAssigner->handleAssignManual() || $gateAssigner->handleOccupied() || $gateAssigner->handleRelease()) {
+	$_SESSION['gateAssigner'] = serialize($gateAssigner);
+
+	header("Location: " . $_SERVER['PHP_SELF']);
+	exit();
+}
 
 define('PAGE', 'search');
 require_once('include/tpl_header.php');

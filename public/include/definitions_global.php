@@ -1,7 +1,7 @@
 <?php
 
 class Definitions {
-	static $airlinesIATA = array(
+	static $airlinesICAOtoIATA = array(
 		'ADR' => 'JP', # Adria Airways
 		'AEA' => 'UX', # Air Europa
 		'AFL' => 'SU', # Aeroflot
@@ -215,5 +215,13 @@ class Definitions {
 		}
 
 		return in_array(substr($origin, 0, 2), self::$schengen);
+	}
+
+	static function convertAirlineICAOtoIATA($airline) {
+		if(array_key_exists($airline, self::$airlinesICAOtoIATA)) {
+			return self::$airlinesICAOtoIATA[$airline];
+		}
+
+		return $airline;
 	}
 }

@@ -51,51 +51,47 @@ class GateFinder {
 	}
 
 	function findGate($callsign, $aircraftType, $origin) {
-		preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
+		// Determine whether this is a real flight
+		$realGate = $this->findRealGate($callsign);
 
-		// Determine whether flight is cargo or civil
-		if(array_key_exists($airlineIATA[0], Gates_EHAM::$cargoGates)) {
-			$gate = $this->findCargoGate($callsign, $aircraftType);
+		if($realGate) {
+			if($realGate == 'UNKNOWN') {
+				$match = 'RL_NOTYET';
+			}
+			else {
+				$allGates = Gates_EHAM::allGates();
 
-			return array('gate' => $gate, 'match' => 'CARGO');
-		}
-		else {
-			$match = 'RANDOM';
-
-			// Determine whether this is a real flight
-			$realGate = $this->findRealGate($callsign);
-
-			if($realGate) {
-				if($realGate == 'UNKNOWN') {
-					$match = 'RL_NOTYET';
-				}
-				else {
-					$allGates = Gates_EHAM::allGates();
-
-					// Only return the real gate if the actual aircraft type can use that gate!
-					if($allGates[$realGate] >= Definitions::resolveAircraftCat($aircraftType)) {
-						if($this->isGateOccupied($realGate)) {
-							$match = 'RL_OCCUPIED';
-						}
-						else {
-							return array('gate' => $realGate, 'match' => 'RL');
-						}
+				// Only return the real gate if the actual aircraft type can use that gate!
+				if($allGates[$realGate] >= Definitions::resolveAircraftCat($aircraftType)) {
+					if($this->isGateOccupied($realGate)) {
+						$match = 'RL_OCCUPIED';
 					}
 					else {
-						$match = 'RL_HEAVY';
+						return array('gate' => $realGate, 'match' => 'RL');
 					}
 				}
+				else {
+					$match = 'RL_HEAVY';
+				}
 			}
+		}
 
-			// Find a plausible civil gate
-			$gate = $this->findCivilGate($callsign, $aircraftType, $origin);
+		// Find a plausible cargo gate
+		$gate = $this->findCargoGate($callsign, $aircraftType);
 
-			if(!$gate) {
-				$match = 'NONE';
-			}
+		if($gate) {
+			return array('gate' => $gate, 'match' => 'CARGO');
+		}
 
+		// Find a plausible civil gate
+		$gate = $this->findCivilGate($callsign, $aircraftType, $origin);
+
+		if($gate) {
+			$match = (isset($match)) ? $match : 'RANDOM';
 			return array('gate' => $gate, 'match' => $match);
 		}
+
+		return array('gate' => null, 'match' => 'NONE');
 	}
 
 	/* 
@@ -105,23 +101,17 @@ class GateFinder {
 	 * - IATA flight number (with up to 4 zeroes)
 	 *     EZY123 -> EZY (0)123
 	*/
-	function findRealGate($callsign, $useICAO = true) {
+	function findRealGate($callsign, $useIATA = true) {
 		// TODO: If $callsign alphanumeric, convert $callsign to numeric
 
-		if($useICAO) {
-			preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
+		$flightnumber = preg_replace('/^([A-Z]{3})/', '$1 ', $callsign);
 
-			if(array_key_exists($airlineIATA[0], Definitions::$airlinesIATA)) {
-				$airlineICAO = Definitions::$airlinesIATA[$airlineIATA[0]];
+		if($useIATA) {
+			if(preg_match('/^[A-Z]{3}/', $callsign, $airlineICAO)) {
+				$airlineIATA = Definitions::convertAirlineICAOtoIATA($airlineICAO[0]);
 
-				$flightnumber = preg_replace('/^[A-Z]{3}/', $airlineICAO . ' ', $callsign);
+				$flightnumber = preg_replace('/^[A-Z]{3}/', $airlineIATA . ' ', $callsign);
 			}
-			else {
-				$flightnumber = preg_replace('/^([A-Z]{3})/', '$1 ', $callsign);
-			}
-		}
-		else {
-			$flightnumber = preg_replace('/^([A-Z]{3})/', '$1 ', $callsign);
 		}
 
 		$gate = $this->realGates->findGateByFlightnumber($flightnumber);
@@ -138,7 +128,7 @@ class GateFinder {
 		}
 
 		// If still failed, try using original callsign
-		if(!$gate && $useICAO) {
+		if(!$gate && $useIATA) {
 			return $this->findRealGate($callsign, false);
 		}
 
@@ -146,10 +136,10 @@ class GateFinder {
 	}
 
 	function findCargoGate($callsign, $aircraftType) {
-		preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
-
-		if(array_key_exists($airlineIATA[0], Gates_EHAM::$cargoGates)) {
-			foreach(Gates_EHAM::$cargoGates[$airlineIATA[0]] as $gate) {
+		$cargoGates = Gates_EHAM::resolveCargoAirlineGate($callsign);
+		
+		if($cargoGates) {
+			foreach($cargoGates as $gate) {
 				if(!in_array($gate, $this->occupiedGates)) {
 					return $gate;
 				}

@@ -354,10 +354,20 @@ class Gates_EHAM {
 	}
 
 	static function resolveAirlineGate($callsign) {
-		preg_match('/^[A-Z]{3}/', $callsign, $airlineIATA);
+		preg_match('/^[A-Z]{3}/', $callsign, $airlineICAO);
 
-		if(array_key_exists($airlineIATA[0], self::$airlinesDefaultGates)) {
-			return self::$airlinesDefaultGates[$airlineIATA[0]];
+		if(array_key_exists($airlineICAO[0], self::$airlinesDefaultGates)) {
+			return self::$airlinesDefaultGates[$airlineICAO[0]];
+		}
+
+		return false;
+	}
+
+	static function resolveCargoAirlineGate($callsign) {
+		preg_match('/^[A-Z]{3}/', $callsign, $airlineICAO);
+
+		if(array_key_exists($airlineICAO[0], self::$cargoGates)) {
+			return self::$cargoGates[$airlineICAO[0]];
 		}
 
 		return false;
@@ -377,6 +387,14 @@ class Gates_EHAM {
 		}
 
 		return array();
+	}
+
+	static function convertNonSchengenGateToVOP($gate) {
+		if(array_key_exists($gate, self::$schengenGatesToApron)) {
+			return self::$schengenGatesToApron[$gate];
+		}
+
+		return $gate;
 	}
 }
 

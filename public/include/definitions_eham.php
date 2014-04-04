@@ -35,11 +35,20 @@ class Gates_EHAM {
 
 		// Other gates	
 		'A330' => array('E05'),
+		'A332' => array('E05'),
+		'A333' => array('E05'),
 		'A340' => array('E05'),
+		'A342' => array('E05'),
+		'A343' => array('E05'),
+		'A345' => array('E05'),
+		'A346' => array('E05'),
 		'B744' => array('D43'),
 		'B752' => array('C05','C07','C09'),
 		'B764' => array('E02','E04','E05'),
 		'B772' => array('D43','D47','E05'),
+		'B773' => array('D43','D47','E05'),
+		'B77L' => array('D43','D47','E05'),
+		'B77W' => array('D43','D47','E05'),
 		'MD11' => array('D02','D51','D53','E02','E04','E06','E03','E05'),
 		'MD90' => array('D16','D18','D22','D24','D26','D28')
 	);

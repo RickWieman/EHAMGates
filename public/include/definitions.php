@@ -454,7 +454,15 @@ class Gates_EHAM {
 		'D51' => 6,
 		'D53' => 6,
 		'D55' => 4,
-		'D57' => 6
+		'D57' => 6,
+
+		'H01' => 4,
+		'H02' => 4,
+		'H03' => 4,
+		'H04' => 4,
+		'H05' => 4,
+		'H06' => 4,
+		'H07' => 4
 	);
 
 	static $nonSchengenGates = array(
@@ -493,14 +501,6 @@ class Gates_EHAM {
 		'G05' => 8,
 		'G07' => 8,
 		'G09' => 8,
-
-		'H01' => 4,
-		'H02' => 4,
-		'H03' => 4,
-		'H04' => 4,
-		'H05' => 4,
-		'H06' => 4,
-		'H07' => 4
 	);
 
 	static $cargoGates = array(
@@ -534,6 +534,7 @@ class Gates_EHAM {
 		foreach(self::$cargoGates as $gateArray) {
 			$cargoGates = array_merge($cargoGates, $gateArray);
 		}
+		sort($cargoGates);
 
 		return $cargoGates;
 	}

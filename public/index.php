@@ -141,6 +141,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 					case 'RL_NOTYET':
 						echo '<p><span class="glyphicon glyphicon-eye-close"></span> Real life flight, but no real life gate available yet.</p>';
 						break;
+					case 'RL_OCCUPIED':
+						echo '<p><span class="glyphicon glyphicon-flash"></span> Real life flight, but the actual gate is occupied.</p>';
+						break;
 					case 'RANDOM':
 						echo '<p><span class="glyphicon glyphicon-list-alt"></span> Based on airline defaults and aircraft category.</p>';
 						break;

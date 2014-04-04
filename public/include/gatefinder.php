@@ -74,6 +74,9 @@ class GateFinder {
 
 		$aircraftCat = $this->resolveAircraftCat($aircraftType);
 
+		$cargoGates = array_fill_keys(Gates_EHAM::allCargoGates(), 8);
+		$gates = array_merge($gates, $cargoGates);
+
 		$freeGates = array();
 
 		foreach($gates as $gate => $cat) {
@@ -125,10 +128,16 @@ class GateFinder {
 
 					// Only return the real gate if the actual aircraft type can use that gate!
 					if($allGates[$realGate] >= $this->resolveAircraftCat($aircraftType)) {
-						return array('gate' => $realGate, 'match' => 'RL');
+						if($this->isGateOccupied($realGate)) {
+							$match = 'RL_OCCUPIED';
+						}
+						else {
+							return array('gate' => $realGate, 'match' => 'RL');
+						}
 					}
-
-					$match = 'RL_HEAVY';
+					else {
+						$match = 'RL_HEAVY';
+					}
 				}
 			}
 

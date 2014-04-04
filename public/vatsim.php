@@ -16,43 +16,6 @@ if(!isset($_SESSION['gateAssigner']) || !$gateAssigner instanceof GateAssigner) 
 
 $vp = new VatsimParser();
 
-// Handle GET requests
-if(isset($_GET['assign'])) {
-	if($gateAssigner->assignFoundGate()) {
-		$_SESSION['gateAssigner'] = serialize($gateAssigner);
-
-		header("Location: " . $_SERVER['PHP_SELF']);
-		exit();
-	}
-}
-
-if(isset($_GET['manual'])) {
-	if($gateAssigner->assignManualGate($_GET['manual'])) {
-		$_SESSION['gateAssigner'] = serialize($gateAssigner);
-
-		header("Location: " . $_SERVER['PHP_SELF']);
-		exit();
-	}
-}
-
-if(isset($_GET['occupied'])) {
-	if($gateAssigner->alreadyOccupied()) {
-		$_SESSION['gateAssigner'] = serialize($gateAssigner);
-
-		header("Location: " . $_SERVER['PHP_SELF']);
-		exit();
-	}
-}
-
-if(isset($_GET['release'])) {
-	if($gateAssigner->releaseGate($_GET['release'])) {
-		$_SESSION['gateAssigner'] = serialize($gateAssigner);
-
-		header("Location: " . $_SERVER['PHP_SELF']);
-		exit();
-	}
-}
-
 define('PAGE', 'vatsim');
 require('include/tpl_header.php');
 
@@ -77,6 +40,9 @@ $stamp = (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', 
 		<tbody>
 			<?php
 			foreach($vp->parseData() as $callsign => $data) {
+
+				// TODO: In this iteration, check whether a GET request has been sent. If so, check whether *callsign* matches iteration. Then continue with GateAssigner.
+
 				$assigned = $gateAssigner->isCallsignAssigned($callsign);
 				if($assigned) {
 					$gate['gate'] = $assigned['gate'];

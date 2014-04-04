@@ -119,6 +119,46 @@ class GateAssigner {
 
 		return false;
 	}
+
+	function handleAssign() {
+		if(isset($_GET['assign']) && $this->result()) {
+			return $this->assignFoundGate();
+		}
+
+		return false;
+	}
+
+	function handleAssignManual() {
+		if(isset($_GET['manual']) && $this->result()) {
+			return $this->assignManualGate($_GET['manual']);
+		}
+
+		return false;
+	}
+
+	function handleOccupied() {
+		if(isset($_GET['occupied']) && $this->result()) {
+			return $this->alreadyOccupied();
+		}
+
+		return false;
+	}
+
+	function handleOccupy() {
+		if(isset($_GET['occupy'])) {
+			return $this->assignGate($_GET['occupy'], 'OCCUPIED');
+		}
+
+		return false;
+	}
+
+	function handleRelease() {
+		if(isset($_GET['release'])) {
+			return $this->releaseGate($_GET['release']);
+		}
+
+		return false;
+	}
 }
 
 ?>

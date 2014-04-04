@@ -13,42 +13,10 @@ if(!isset($_SESSION['gateAssigner']) || !$gateAssigner instanceof GateAssigner) 
 	$gateAssigner = new GateAssigner();
 }
 
-// Handle GET requests
-if(isset($_GET['assign'])) {
-	if($gateAssigner->assignFoundGate()) {
-		$_SESSION['gateAssigner'] = serialize($gateAssigner);
-
-		header("Location: " . $_SERVER['PHP_SELF']);
-		exit();
-	}
-}
-
-if(isset($_GET['manual'])) {
-	if($gateAssigner->assignManualGate($_GET['manual'])) {
-		$_SESSION['gateAssigner'] = serialize($gateAssigner);
-
-		header("Location: " . $_SERVER['PHP_SELF']);
-		exit();
-	}
-}
-
-if(isset($_GET['occupied'])) {
-	if($gateAssigner->alreadyOccupied()) {
-		$_SESSION['gateAssigner'] = serialize($gateAssigner);
-
-		header("Location: " . $_SERVER['PHP_SELF']);
-		exit();
-	}
-}
-
-if(isset($_GET['release'])) {
-	if($gateAssigner->releaseGate($_GET['release'])) {
-		$_SESSION['gateAssigner'] = serialize($gateAssigner);
-
-		header("Location: " . $_SERVER['PHP_SELF']);
-		exit();
-	}
-}
+$gateAssigner->handleAssign();
+$gateAssigner->handleAssignManual();
+$gateAssigner->handleOccupied();
+$gateAssigner->handleRelease();
 
 define('PAGE', 'search');
 require_once('include/tpl_header.php');

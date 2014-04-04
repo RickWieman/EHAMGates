@@ -189,7 +189,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 			<option value="RJ85">RJ85</option>
 			<option disabled>--- All ---</option>
 			<?php
-			$aircraftTypes = Definitions::$aircraftCategories;
+			$aircraftTypes = Definitions::getAllAircraft();
 			ksort($aircraftTypes);
 
 			foreach($aircraftTypes as $type => $cat) {

@@ -1,7 +1,7 @@
 <?php
 
 class Definitions {
-private 	static $airlinesICAOtoIATA = array(
+	private	static $airlinesICAOtoIATA = array(
 		'ADR' => 'JP', # Adria Airways
 		'AEA' => 'UX', # Air Europa
 		'AFL' => 'SU', # Aeroflot
@@ -196,6 +196,10 @@ private 	static $airlinesICAOtoIATA = array(
 		'LM', # Malta
 		'LS'  # Switzerland
 	);
+
+	static function getAllAircraft() {
+		return self::$aircraftCategories;
+	}
 
 	static function resolveAircraftCat($aircraftType) {
 		if(array_key_exists($aircraftType, self::$aircraftCategories)) {

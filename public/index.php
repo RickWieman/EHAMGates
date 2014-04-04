@@ -5,7 +5,6 @@ if(!isset($_SESSION['assignedList'])) {
 	$_SESSION['assignedList'] = array();
 }
 
-require_once('include/definitions.php');
 require_once('include/gatefinder.php');
 
 $gf = new GateFinder();
@@ -190,7 +189,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' || isset($_SESSION['lastRequest'])) {
 			<option value="RJ85">RJ85</option>
 			<option disabled>--- All ---</option>
 			<?php
-			$aircraftTypes = Gates_EHAM::$aircraftCategories;
+			$aircraftTypes = Definitions::$aircraftCategories;
 			ksort($aircraftTypes);
 
 			foreach($aircraftTypes as $type => $cat) {

@@ -5,7 +5,6 @@ if(!isset($_SESSION['assignedList'])) {
 	$_SESSION['assignedList'] = array();
 }
 
-require_once('include/definitions.php');
 require_once('include/gatefinder.php');
 
 $allGates = Gates_EHAM::allGates();

@@ -36,51 +36,37 @@ $stamp = (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', 
 				<th>Origin</th>
 				<th>Gate</th>
 				<th></th>
-				<th></th>
 			</tr>
 		</thead>
 		<tbody>
 			<?php
 			foreach($vp->parseData() as $callsign => $data) {
-				$assigned = $gateAssigner->isCallsignAssigned($callsign);
-				if($assigned) {
-					$gate['gate'] = $assigned['gate'];
-					$gate['match'] = $assigned['matchType'];
+				$result = $gateAssigner->isCallsignAssigned($callsign);
+				if($result) {
 					$assigned = true;
 				}
 				else {
 					$gateAssigner->findGate($callsign, $data['actype'], $data['origin']);
 
-					if($gateAssigner->result()) {
-						$result = $gateAssigner->result();
+					$result = $gateAssigner->result();
 
-						if(isset($_GET['callsign']) && $_GET['callsign'] == $callsign) {
-							$gateAssigner->handleAssign();
-							$gateAssigner->handleAssignManual();
-							$gateAssigner->handleOccupied();
-						}
-
-						$gate['gate'] = $result['gate'];
-						$gate['match'] = $result['matchType'];
+					if(isset($_GET['callsign']) && $_GET['callsign'] == $callsign) {
+						$gateAssigner->handleAssign();
+						$gateAssigner->handleAssignManual();
+						$gateAssigner->handleOccupied();
 					}
-					else {
-						$gate['gate'] = '';
-						$gate['match'] = '';
-					}
-					//$gate = $gf->findGate($callsign, $data['actype'], $data['origin']);
-					//$gate = $gate['gate'];
 					$assigned = false;
 				}
 
-				echo '<tr><td>' . $callsign . '</td><td>' . $data['actype'] . '</td><td>' . $data['origin'] . '</td>';
-				echo '<td>' . $gate['gate'] . '</td>';
-				echo '<td><span class="glyphicon glyphicon-' . Definitions::resolveMatchTypeIcon($gate['match']) . '"></span></td>';
-				echo '<td>';
+				echo '<tr><td>' . $callsign . '</td><td>' . $result['aircraftType'] . '</td><td>' . $result['origin'] . '</td>';
+				echo '<td><span class="glyphicon glyphicon-' . Definitions::resolveMatchTypeIcon($result['matchType']) . '"></span> ' . $result['gate'] . '</td>';
+				echo '<td style="text-align: right;">';
 				if($assigned) {
-					echo '<a href="?release='. $gate['gate'] .'" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-log-out"></span> Release</a>';
+					echo '<a href="?release='. $result['gate'] .'" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-log-out"></span> Release</a>';
 				}
-				elseif($gate['gate']) {
+				elseif($result['matchType'] != 'NONE') {
 					echo '<a href="?callsign='. $callsign .'&amp;assign" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</a>';
+					echo ' <a href="?callsign='. $callsign .'&amp;occupied" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-ban-circle"></span> Occupied</a>';
 				}
 				echo '</td></tr>';
 			}

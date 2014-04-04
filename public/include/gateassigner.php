@@ -70,6 +70,10 @@ class GateAssigner {
 			$this->lastRequest['gate'] = $gate['gate'];
 			$this->lastRequest['matchType'] = $gate['match'];
 		}
+		else {
+			$this->lastRequest['gate'] = null;
+			$this->lastRequest['matchType'] = 'NONE';
+		}
 	}
 
 	function alreadyOccupied() {

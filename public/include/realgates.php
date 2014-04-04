@@ -1,47 +1,46 @@
 <?php
 
-require_once('definitions.php');
+require_once('definitions_eham.php');
 
 class RealGates {
 	private $dataSource = 'http://schiphol.dutchplanespotters.nl/';
+	private $cacheFile = 'data.txt';
 	private $allRealGates;
 
-	function __construct($useData) {
+	function __construct($useData = null) {
 		if($useData != null) {
 			$this->dataSource = $useData;	
 		}
 	}
 
-	// Data source: http://schiphol.dutchplanespotters.nl/
 	function fetchData() {
 		$cacheDuration = 60 * 15;
-		$stamp = (file_exists('data.txt') ? file_get_contents('data.txt', NULL, NULL, 0, 10) : 0);
+		$stamp = (file_exists($this->cacheFile) ? file_get_contents($this->cacheFile, NULL, NULL, 0, 10) : 0);
 
 		// Reload only when cache is expired
 		if(time() - $stamp > $cacheDuration) {
 			$data = file_get_contents($this->dataSource);
 		
-			file_put_contents('data.txt', time() . $data);
+			file_put_contents($this->cacheFile, time() . $data);
 
 			return $data;
 		}
 		
-		return file_get_contents('data.txt');
+		return file_get_contents($this->cacheFile);
 	}
 
 	function parseData() {
 		$data = $this->fetchData();
+		$realGates = array();
 
 		// Find flight table body
 		$data = explode('<table class="flights" cellpadding="2" cellspacing="0">', $data);
 		$data = explode('</tbody>', $data[1]);
 		$data = explode('<tbody>', $data[0]);
 
-		// One flight per row
+		// One flight per row; everything after last </tr> is garbage -> pop
 		$flights = explode('</tr>', $data[1]);
 		array_pop($flights);
-
-		$realGates = array();
 
 		// Process all flights
 		foreach($flights as $flight) {
@@ -58,12 +57,7 @@ class RealGates {
 				// Add extra 0 to all gate numbers < 10
 				$gate = preg_replace('/^([A-Z])(\d)$/', '${1}0${2}', $info[5]);
 				
-				// Convert Non-Schengen gates into 'real' gates
-				if(array_key_exists($gate, Gates_EHAM::$schengenGatesToApron)) {
-					$gate = Gates_EHAM::$schengenGatesToApron[$gate];
-				}
-				
-				$realGates[$info[6]] = $gate;
+				$realGates[$info[6]] = Gates_EHAM::convertNonSchengenGateToVOP($gate);
 			}
 			else {
 				$realGates[$info[6]] = 'UNKNOWN';

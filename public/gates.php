@@ -1,30 +1,35 @@
 <?php
 session_start();
 
-if(!isset($_SESSION['assignedList'])) {
-	$_SESSION['assignedList'] = array();
+require_once('include/definitions_global.php');
+require_once('include/gateassigner.php');
+
+// Initialize GateAssigner: Either get it from the SESSION or create a new instance.
+if(isset($_SESSION['gateAssigner'])) {
+	$gateAssigner = unserialize($_SESSION['gateAssigner']);
 }
 
-require_once('include/definitions.php');
-require_once('include/gatefinder.php');
-
-$allGates = Gates_EHAM::allGates();
-$gf = new GateFinder();
-
-// Occupy gate
-if(isset($_GET['occupy']) && array_key_exists($_GET['occupy'], $allGates)) {
-	$_SESSION['assignedList'][$_GET['occupy']] = 'unknown';
-	
-	header("Location: " . $_SERVER['PHP_SELF']);
-	exit();
+if(!isset($_SESSION['gateAssigner']) || !$gateAssigner instanceof GateAssigner) {
+	$gateAssigner = new GateAssigner();
 }
 
-// Free gate
-if(isset($_GET['free']) && array_key_exists($_GET['free'], $allGates)) {
-	unset($_SESSION['assignedList'][$_GET['free']]);
+// Handle GET requests
+if(isset($_GET['occupy'])) {
+	if($gateAssigner->assignGate($_GET['occupy'], 'OCCUPIED')) {
+		$_SESSION['gateAssigner'] = serialize($gateAssigner);
 
-	header("Location: " . $_SERVER['PHP_SELF']);
-	exit();
+		header("Location: " . $_SERVER['PHP_SELF']);
+		exit();
+	}
+}
+
+if(isset($_GET['release'])) {
+	if($gateAssigner->releaseGate($_GET['release'])) {
+		$_SESSION['gateAssigner'] = serialize($gateAssigner);
+
+		header("Location: " . $_SERVER['PHP_SELF']);
+		exit();
+	}
 }
 
 define('PAGE', 'gates');
@@ -46,17 +51,20 @@ require('include/tpl_header.php');
 		</thead>
 		<tbody>
 			<?php
+			$allGates = Gates_EHAM::allGates();
 			ksort($allGates);
 
 			foreach($allGates as $gate => $cat) {
 				echo '<tr><td>' . $gate . '</td><td>' . $cat . '</td>';
 
-				if(array_key_exists($gate, $_SESSION['assignedList'])) {
-					if($_SESSION['assignedList'][$gate] == 'unknown') {
+				if($gateAssigner->isGateAssigned($gate)) {
+					$assignment = $gateAssigner->isGateAssigned($gate);
+
+					if($assignment['callsign'] == 'unknown') {
 						echo '<td class="warning">unknown</td>';
 					}
 					else {
-						echo '<td class="danger">' . $_SESSION['assignedList'][$gate] . '</td>';	
+						echo '<td class="danger">' . $assignment['callsign'] . '</td>';	
 					}					
 					$occupied = true;
 				}
@@ -66,7 +74,7 @@ require('include/tpl_header.php');
 				}
 
 				if($occupied) {
-					echo '<td style="text-align: right;"><a href="?free=' . $gate . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span> Mark as Free</a></td></tr>';
+					echo '<td style="text-align: right;"><a href="?release=' . $gate . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span> Release</a></td></tr>';
 				}
 				else {
 					echo '<td style="text-align: right;"><a href="?occupy=' . $gate . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-plane"></span> Mark as Occupied</a></td></tr>';

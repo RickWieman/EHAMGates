@@ -4,17 +4,12 @@ require_once('../public/include/gatefinder.php');
 class GateFinderTest extends PHPUnit_Framework_TestCase {
 	
 	public function testResolveGate1() {
-		$gf = new GateFinder();
-
 		$this->assertEquals(array('B', 'C', 'D', 'E', 'F', 'G'), Gates_EHAM::resolveAirlineGate('KLM123'));
 	}
 
 	public function testResolveGate2() {
-		$gf = new GateFinder();
-
 		$this->assertEquals(array('C', 'D', 'E'), Gates_EHAM::resolveAirlineGate('TRA 06R'));
 	}
-
 
 	public function testFindGate1() {
 		$gf = new GateFinder('testdata.txt');

@@ -72,7 +72,7 @@ if($gateAssigner->result()) {
 					<label for="manual" class="sr-only">Aircraft type</label>
 					<select class="form-control" name="manual">
 						<?php
-						$freeGates = $gateAssigner->getFreeGates();
+						$freeGates = $gateAssigner->getFreeGates($result['aircraftType'], $result['origin']);
 
 						foreach($freeGates as $gate => $cat) {
 							echo '<option value="'. $gate .'">' . $gate . ' (cat. ' . $cat . ')</option>';

@@ -100,6 +100,20 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('H01', $gate);
 	}
 
+	public function testFindRealGate4() {
+		$gf = new GateFinder('testdata.txt');
+		$gate = $gf->findRealGate('KLM18');
+
+		$this->assertEquals('D57', $gate);
+	}
+
+	public function testFindRealGate5() {
+		$gf = new GateFinder('testdata.txt');
+		$gate = $gf->findRealGate('KLM36S');
+
+		$this->assertEquals('C10', $gate);
+	}
+
 	public function testFindRealGateUnknown() {
 		$gf = new GateFinder('testdata.txt');
 		$gate = $gf->findRealGate('KLM123');
@@ -128,6 +142,14 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$gate = $gf->findGate('EZY2723', 'A319', 'LIMC');
 
 		$this->assertEquals('H01', $gate['gate']);
+		$this->assertEquals('RL', $gate['match']);
+	}
+
+	public function testFindGateReal4() {
+		$gf = new GateFinder('testdata.txt');
+		$gate = $gf->findGate('KLM36S', 'B738', 'EKBI');
+
+		$this->assertEquals('C10', $gate['gate']);
 		$this->assertEquals('RL', $gate['match']);
 	}
 

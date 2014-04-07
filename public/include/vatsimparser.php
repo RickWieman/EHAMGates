@@ -1,7 +1,7 @@
 <?php
 
 class VatsimParser {
-	private $dataSource = 'http://info.vroute.net/vatsim-data.txt';
+	private $serverList = 'http://status.vatsim.net/status.txt';
 	private $allPilots = array();
 	
 	function __construct($useData = null) {
@@ -10,13 +10,41 @@ class VatsimParser {
 		}
 	}
 
+	function lastServerList() {
+		return (file_exists('data-vatsim-servers.txt') ? file_get_contents('data-vatsim-servers.txt', NULL, NULL, 0, 10) : 0);
+	}
+
+	function lastDataFetch() {
+		return (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', NULL, NULL, 0, 10) : 0);
+	}
+
+	function fetchServerList() {
+		$cacheDuration = 60 * 60;
+		
+		// Reload only when cache is expired
+		if(time() - $this->lastServerList() > $cacheDuration) {
+			$data = file_get_contents($this->serverList);
+		
+			file_put_contents('data-vatsim-servers.txt', time() . $data);
+
+			return $data;
+		}
+		
+		return file_get_contents('data-vatsim-servers.txt');
+	}
+
 	function fetchData() {
-		$cacheDuration = 60 * 5;
-		$stamp = (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', NULL, NULL, 0, 10) : 0);
+		$cacheDuration = 60 * 2;
 
 		// Reload only when cache is expired
-		if(time() - $stamp > $cacheDuration) {
-			$data = file_get_contents($this->dataSource);
+		if(time() - $this->lastDataFetch() > $cacheDuration) {
+			$serverList = $this->fetchServerList();
+			preg_match_all("/url0\=(.*)/", $serverList, $servers);
+
+			$random = rand(0, count($servers[1])-1);
+			$server = trim($servers[1][$random]);
+
+			$data = file_get_contents($server);
 		
 			file_put_contents('data-vatsim.txt', time() . $data);
 

@@ -22,17 +22,16 @@ if($gateAssigner->handleRelease()) {
 }
 
 $vp = new VatsimParser();
+$vatsimData = $vp->parseData();
 
 define('PAGE', 'vatsim');
 require('include/tpl_header.php');
-
-$stamp = (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', NULL, NULL, 0, 10) : time());
 ?>
 <div class="container col-sm-6">
 	<div class="row">
 		<h1>Inbound List</h1>
 
-		<p>Last update of VATSIM data: <?php echo date("H:i:s (d-m-Y)", $stamp); ?></p>
+		<p>Last update <?php echo date("i:s", time()-$vp->lastDataFetch()); ?> minutes ago.</p>
 
 		<table class="table table-hover table-condensed">
 			<thead>
@@ -46,7 +45,7 @@ $stamp = (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', 
 			</thead>
 			<tbody>
 				<?php
-				foreach($vp->parseData() as $callsign => $data) {
+				foreach($vatsimData as $callsign => $data) {
 					$result = $gateAssigner->isCallsignAssigned($callsign);
 					if($result) {
 						$assigned = true;

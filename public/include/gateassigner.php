@@ -97,7 +97,10 @@ class GateAssigner {
 	}
 
 	function getFreeGates($aircraftType, $origin) {
-		return $this->gateFinder->getFreeGates($aircraftType, $origin);
+		$gates = $this->gateFinder->getFreeGates($aircraftType, $origin);
+		ksort($gates);
+
+		return $gates;
 	}
 
 	function getAssignedGates() {

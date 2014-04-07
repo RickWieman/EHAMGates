@@ -14,7 +14,12 @@ if(!isset($_SESSION['gateAssigner']) || !$gateAssigner instanceof GateAssigner) 
 	$gateAssigner = new GateAssigner();
 }
 
-$gateAssigner->handleRelease();
+if($gateAssigner->handleRelease()) {
+	$_SESSION['gateAssigner'] = serialize($gateAssigner);
+
+	header("Location: " . $_SERVER['PHP_SELF']);
+	exit();
+}
 
 $vp = new VatsimParser();
 
@@ -70,6 +75,27 @@ $stamp = (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', 
 				elseif($result['matchType'] != 'NONE') {
 					echo '<a href="?callsign='. $callsign .'&amp;assign" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</a>';
 					echo ' <a href="?callsign='. $callsign .'&amp;occupied" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-ban-circle"></span> Occupied</a>';
+				}
+				else {
+					?>
+					<form class="form-inline" method="get">
+						<div class="form-group">
+							<input type="hidden" name="callsign" value="<?php echo $callsign; ?>" />
+							<label for="manual" class="sr-only">Aircraft type</label>
+							<select class="form-control-xs" name="manual">
+								<?php
+								$freeGates = $gateAssigner->getFreeGates($result['aircraftType'], $result['origin']);
+
+								foreach($freeGates as $gate => $cat) {
+									echo '<option value="'. $gate .'">' . $gate . ' (' . $cat . ')</option>';
+								}
+								?>
+							</select>
+						</div>
+
+						<button type="submit" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</button>
+					</form>
+					<?php
 				}
 				echo '</td></tr>';
 			}

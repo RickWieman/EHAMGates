@@ -37,10 +37,10 @@ $stamp = (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', 
 		<table class="table table-hover table-condensed">
 			<thead>
 				<tr>
-					<th>Callsign</th>
-					<th>Aircraft</th>
-					<th>Origin</th>
-					<th>Gate</th>
+					<th>C/S</th>
+					<th class="hidden-xs">A/C</th>
+					<th class="hidden-xs">ORGN</th>
+					<th>GATE</th>
 					<th></th>
 				</tr>
 			</thead>
@@ -67,7 +67,9 @@ $stamp = (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', 
 						$assigned = false;
 					}
 
-					echo '<tr><td>' . $callsign . '</td><td>' . $result['aircraftType'] . '</td><td>' . $result['origin'] . '</td>';
+					$rowClass = ($data['flightrules'] == 'V') ? 'text-muted' : '';
+
+					echo '<tr class="'. $rowClass .'"><td>' . $callsign . '</td><td class="hidden-xs">' . $result['aircraftType'] . '</td><td class="hidden-xs">' . $result['origin'] . '</td>';
 					echo '<td><span class="glyphicon glyphicon-' . Definitions::resolveMatchTypeIcon($result['matchType']) . '"></span> ' . $result['gate'] . '</td>';
 					echo '<td style="text-align: right;">';
 					if($assigned) {
@@ -80,20 +82,17 @@ $stamp = (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', 
 					else {
 						?>
 						<form class="form-inline" method="get">
-							<div class="form-group">
-								<input type="hidden" name="callsign" value="<?php echo $callsign; ?>" />
-								<label for="manual" class="sr-only">Aircraft type</label>
-								<select class="form-control-xs" name="manual">
-									<?php
-									$freeGates = $gateAssigner->getFreeGates($result['aircraftType'], $result['origin']);
+							<input type="hidden" name="callsign" value="<?php echo $callsign; ?>" />
+							<label for="manual" class="sr-only">Aircraft type</label>
+							<select class="form-control-xs" name="manual">
+								<?php
+								$freeGates = $gateAssigner->getFreeGates($result['aircraftType'], $result['origin']);
 
-									foreach($freeGates as $gate => $cat) {
-										echo '<option value="'. $gate .'">' . $gate . ' (' . $cat . ')</option>';
-									}
-									?>
-								</select>
-							</div>
-
+								foreach($freeGates as $gate => $cat) {
+									echo '<option value="'. $gate .'">' . $gate . ' (' . $cat . ')</option>';
+								}
+								?>
+							</select>
 							<button type="submit" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</button>
 						</form>
 						<?php
@@ -108,6 +107,8 @@ $stamp = (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', 
 
 	<div class="row">
 		<h2>Legend</h2>
+
+		<p>Greyed out flights are VFR flights, the others are IFR flights. Below is an overview of the icons used in the Gate column.</p>
 
 		<table class="table table-hover table-condensed">
 			<thead>

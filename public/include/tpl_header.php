@@ -26,9 +26,9 @@ ob_start();
 			</div>
 			<div class="collapse navbar-collapse" id="menu">
 				<ul class="nav navbar-nav">
-					<li<?php echo (PAGE == 'search') ? ' class="active"' : '' ?>><a href="index.php">Search</a></li>
-					<li<?php echo (PAGE == 'vatsim') ? ' class="active"' : '' ?>><a href="vatsim.php">Inbound List</a></li>
-					<li<?php echo (PAGE == 'gates') ? ' class="active"' : '' ?>><a href="gates.php">Occupied Gates</a></li>
+					<li<?php echo (PAGE == 'vatsim') ? ' class="active"' : '' ?>><a href="index.php">Inbound List</a></li>
+					<li<?php echo (PAGE == 'search') ? ' class="active"' : '' ?>><a href="search.php">Search</a></li>
+					<li<?php echo (PAGE == 'gates') ? ' class="active"' : '' ?>><a href="gates.php">All Gates</a></li>
 					<li<?php echo (PAGE == 'config') ? ' class="active"' : '' ?>><a href="configure.php">Configure</a></li>
 				</ul>
 			</div>

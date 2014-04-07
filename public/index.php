@@ -31,7 +31,8 @@ require('include/tpl_header.php');
 	<div class="row">
 		<h1>Inbound List</h1>
 
-		<p>Last update <?php echo date("i:s", time()-$vp->lastDataFetch()); ?> minutes ago.</p>
+		<p>VATSIM data gets updated every 2 minutes (server list every hour), real life data gets updated every 15 minutes.
+			The last VATSIM update was <strong><?php echo date("i:s", time()-$vp->lastDataFetch()); ?> minutes ago</strong>.</p>
 
 		<table class="table table-hover table-condensed">
 			<thead>

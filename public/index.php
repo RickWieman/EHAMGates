@@ -46,6 +46,10 @@ require('include/tpl_header.php');
 			</thead>
 			<tbody>
 				<?php
+				if(count($vatsimData) == 0) {
+					echo '<tr><td colspan="5">No inbound flights at the moment.</td></tr>';
+				}
+
 				foreach($vatsimData as $callsign => $data) {
 					$result = $gateAssigner->isCallsignAssigned($callsign);
 					if($result) {

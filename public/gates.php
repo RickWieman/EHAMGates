@@ -19,54 +19,82 @@ $gateAssigner->handleRelease();
 define('PAGE', 'gates');
 require('include/tpl_header.php');
 ?>
-<h1>Occupied Gates</h1>
+<h1>All Gates</h1>
 
-<p>Below all gates of Schiphol are shown with their occupants.</p>
+<p>Below all gates of Schiphol are shown. The first table shows the occupied gates, the second the free gates.</p>
 
-<div class="container col-sm-6">
-	<table class="table table-hover table-condensed">
-		<thead>
-			<tr>
-				<th>Gate</th>
-				<th>Category</th>
-				<th>Occupant</th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody>
-			<?php
-			$allGates = Gates_EHAM::allGates();
-			ksort($allGates);
 
-			foreach($allGates as $gate => $cat) {
-				echo '<tr><td>' . $gate . '</td><td>' . $cat . '</td>';
 
-				if($gateAssigner->isGateAssigned($gate)) {
+<div class="container row">
+	<div class="col-sm-4">
+		<h2>Occupied</h2>
+
+		<table class="table table-hover table-condensed">
+			<thead>
+				<tr>
+					<th>GATE</th>
+					<th>A/C</th>
+					<th>C/S</th>
+					<th></th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php
+				$allGates = $gateAssigner->getAssignedGates();
+				ksort($allGates);
+
+				if(count($allGates) == 0) {
+					echo '<tr><td colspan="5">All gates are free.</td></tr>';
+				}
+
+				foreach($allGates as $gate => $data) {
+					echo '<tr><td>' . $gate . '</td>';
+
 					$assignment = $gateAssigner->isGateAssigned($gate);
 
 					if($assignment['callsign'] == 'unknown') {
-						echo '<td class="warning">unknown</td>';
+						echo '<td colspan="3"><em>unknown</em></td>';
 					}
 					else {
-						echo '<td class="danger">' . $assignment['callsign'] . '</td>';	
+						echo '<td>' . $data['aircraftType'] . '</td>';
+						echo '<td>' . $assignment['callsign'] . '</td>';
+						echo '<td><span class="glyphicon glyphicon-'	. Definitions::resolveMatchTypeIcon($assignment['matchType']) . '"></span></td>';
 					}					
-					$occupied = true;
+				
+					echo '<td style="text-align: right;"><a href="?release=' . $gate . '" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-log-out"></span> Release</a></td></tr>';
+					
 				}
-				else {
-					echo '<td class="success">free</td>';
-					$occupied = false;
-				}
+				?>
+			</tbody>
+		</table>
+	</div>
+	<div class="col-sm-3 col-sm-offset-1">
+		<h2>Free</h2>
 
-				if($occupied) {
-					echo '<td style="text-align: right;"><a href="?release=' . $gate . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span> Release</a></td></tr>';
+		<table class="table table-hover table-condensed">
+			<thead>
+				<tr>
+					<th>GATE</th>
+					<th>CAT.</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php
+				$allGates = Gates_EHAM::allGates();
+				ksort($allGates);
+
+				foreach($allGates as $gate => $cat) {
+					if(!$gateAssigner->isGateAssigned($gate)) {
+						echo '<tr><td>' . $gate . '</td><td>' . $cat . '</td>';
+						echo '<td style="text-align: right;"><a href="?occupy=' . $gate . '" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-ban-circle"></span> Occupy</a></td></tr>';
+					}					
 				}
-				else {
-					echo '<td style="text-align: right;"><a href="?occupy=' . $gate . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-plane"></span> Mark as Occupied</a></td></tr>';
-				}
-			}
-			?>
-		</tbody>
-	</table>
+				?>
+			</tbody>
+		</table>
+	</div>
 </div>
 
 <?php

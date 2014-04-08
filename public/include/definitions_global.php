@@ -209,7 +209,9 @@ class Definitions {
 		'RL_OCCUPIED'	=> array('icon' => 'flash',
 								 'text' => 'Real life flight, but the actual gate is occupied.'),
 		'RANDOM'		=> array('icon' => 'list-alt',
-								 'text' => 'Based on airline defaults and aircraft category.')
+								 'text' => 'Based on airline defaults and aircraft category.'),
+		'MANUAL'		=> array('icon' => 'user',
+								 'text' => 'Assigned manually.')
 	);
 
 	static function getAllAircraft() {

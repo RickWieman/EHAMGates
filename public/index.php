@@ -128,7 +128,7 @@ require('include/tpl_header.php');
 					echo '</tr>';
 				}
 				?>
-				<tr><td><span class="glyphicon glyphicon-warning-sign"></span></td><td>The gate could not be determined. You can assign manually.</td></tr>
+				<tr><td><span class="glyphicon glyphicon-warning-sign"></span></td><td>The gate could not be determined.</td></tr>
 			</tbody>
 		</table>
 	</div>

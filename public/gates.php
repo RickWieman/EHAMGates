@@ -77,14 +77,16 @@ require('include/tpl_header.php');
 
 			<table class="table table-hover table-condensed">
 				<thead>
-					<th></th>
-					<th>Description</th>
+					<tr>
+						<th></th>
+						<th>Description</th>
+					</tr>
 				</thead>
 				<tbody>
 					<?php
 					foreach(Definitions::getAllMatchTypes() as $description) {
 						echo '<tr>';
-						echo '<td><span class="glyphicon glyphicon-' . $description['icon'] . '"></span</td>';
+						echo '<td><span class="glyphicon glyphicon-' . $description['icon'] . '"></span></td>';
 						echo '<td>' . $description['text'] . '</td>';
 						echo '</tr>';
 					}

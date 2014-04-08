@@ -122,7 +122,7 @@ if($gateAssigner->result()) {
 	</div>
 	<div class="form-group">
 		<label for="inputACType" class="sr-only">Aircraft type</label>
-		<select class="form-control" name="inputACType">
+		<select class="form-control" name="inputACType" id="inputACType">
 			<option disabled>--- Common ---</option>
 			<option value="A319">A319</option>
 			<option value="A320">A320</option>

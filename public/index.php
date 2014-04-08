@@ -27,7 +27,7 @@ $vatsimData = $vp->parseData();
 define('PAGE', 'vatsim');
 require('include/tpl_header.php');
 ?>
-<div class="container col-sm-6">
+<div class="col-sm-6">
 	<div class="row">
 		<h1>Inbound List</h1>
 
@@ -116,14 +116,16 @@ require('include/tpl_header.php');
 
 		<table class="table table-hover table-condensed">
 			<thead>
-				<th></th>
-				<th>Description</th>
+				<tr>
+					<th></th>
+					<th>Description</th>
+				</tr>
 			</thead>
 			<tbody>
 				<?php
 				foreach(Definitions::getAllMatchTypes() as $description) {
 					echo '<tr>';
-					echo '<td><span class="glyphicon glyphicon-' . $description['icon'] . '"></span</td>';
+					echo '<td><span class="glyphicon glyphicon-' . $description['icon'] . '"></span></td>';
 					echo '<td>' . $description['text'] . '</td>';
 					echo '</tr>';
 				}

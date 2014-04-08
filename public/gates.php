@@ -23,107 +23,106 @@ if($gateAssigner->handleOccupy() || $gateAssigner->handleRelease()) {
 define('PAGE', 'gates');
 require('include/tpl_header.php');
 ?>
-<h1>All Gates</h1>
+<div class="row">
+	<div class="col-md-9">
+		<h1>All Gates</h1>
 
-<p>Below all gates of Schiphol are shown. The first table shows the occupied gates, the second the free gates.</p>
+		<p>Below all gates of Schiphol are shown. The first table shows the occupied gates, the second the free gates.</p>
 
-
-
-<div class="container row">
-	<div class="col-sm-4">
 		<div class="row">
-			<h2>Occupied</h2>
+			<div class="col-sm-5">
+				<h2>Occupied</h2>
 
-			<table class="table table-hover table-condensed">
-				<thead>
-					<tr>
-						<th>GATE</th>
-						<th>A/C</th>
-						<th>C/S</th>
-						<th></th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php
-					$allGates = $gateAssigner->getAssignedGates();
-					ksort($allGates);
+				<table class="table table-hover table-condensed">
+					<thead>
+						<tr>
+							<th>GATE</th>
+							<th>A/C</th>
+							<th>C/S</th>
+							<th></th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php
+						$allGates = $gateAssigner->getAssignedGates();
+						ksort($allGates);
 
-					if(count($allGates) == 0) {
-						echo '<tr><td colspan="5">All gates are free.</td></tr>';
-					}
-
-					foreach($allGates as $gate => $data) {
-						echo '<tr><td>' . $gate . '</td>';
-
-						$assignment = $gateAssigner->isGateAssigned($gate);
-
-						if($assignment['callsign'] == 'unknown') {
-							echo '<td colspan="3"><em>unknown</em></td>';
+						if(count($allGates) == 0) {
+							echo '<tr><td colspan="5">All gates are free.</td></tr>';
 						}
-						else {
-							echo '<td>' . $data['aircraftType'] . '</td>';
-							echo '<td>' . $assignment['callsign'] . '</td>';
-							echo '<td><span class="glyphicon glyphicon-'	. Definitions::resolveMatchTypeIcon($assignment['matchType']) . '"></span></td>';
-						}					
-					
-						echo '<td style="text-align: right;"><a href="?release=' . $gate . '" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-log-out"></span> Release</a></td></tr>';
+
+						foreach($allGates as $gate => $data) {
+							echo '<tr><td>' . $gate . '</td>';
+
+							$assignment = $gateAssigner->isGateAssigned($gate);
+
+							if($assignment['callsign'] == 'unknown') {
+								echo '<td colspan="3"><em>unknown</em></td>';
+							}
+							else {
+								echo '<td>' . $data['aircraftType'] . '</td>';
+								echo '<td>' . $assignment['callsign'] . '</td>';
+								echo '<td><span class="glyphicon glyphicon-'	. Definitions::resolveMatchTypeIcon($assignment['matchType']) . '"></span></td>';
+							}					
 						
-					}
-					?>
-				</tbody>
-			</table>
+							echo '<td style="text-align: right;"><a href="?release=' . $gate . '" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-log-out"></span> Release</a></td></tr>';
+							
+						}
+						?>
+					</tbody>
+				</table>
+			
+				<h3>Legend</h3>
+
+				<p>Below is an overview of the icons used.</p>
+
+				<table class="table table-hover table-condensed">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php
+						foreach(Definitions::getAllMatchTypes() as $description) {
+							echo '<tr>';
+							echo '<td><span class="glyphicon glyphicon-' . $description['icon'] . '"></span></td>';
+							echo '<td>' . $description['text'] . '</td>';
+							echo '</tr>';
+						}
+						?>
+					</tbody>
+				</table>
+			</div>
+			<div class="col-sm-4 col-sm-offset-1">
+				<h2>Free</h2>
+
+				<table class="table table-hover table-condensed">
+					<thead>
+						<tr>
+							<th>GATE</th>
+							<th>CAT.</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php
+						$allGates = Gates_EHAM::allGates();
+						ksort($allGates);
+
+						foreach($allGates as $gate => $cat) {
+							if(!$gateAssigner->isGateAssigned($gate)) {
+								echo '<tr><td>' . $gate . '</td><td>' . $cat . '</td>';
+								echo '<td style="text-align: right;"><a href="?occupy=' . $gate . '" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-ban-circle"></span> Occupy</a></td></tr>';
+							}					
+						}
+						?>
+					</tbody>
+				</table>
+			</div>
 		</div>
-		<div class="row">
-			<h3>Legend</h3>
-
-			<p>Below is an overview of the icons used.</p>
-
-			<table class="table table-hover table-condensed">
-				<thead>
-					<tr>
-						<th></th>
-						<th>Description</th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php
-					foreach(Definitions::getAllMatchTypes() as $description) {
-						echo '<tr>';
-						echo '<td><span class="glyphicon glyphicon-' . $description['icon'] . '"></span></td>';
-						echo '<td>' . $description['text'] . '</td>';
-						echo '</tr>';
-					}
-					?>
-				</tbody>
-			</table>
-		</div>
-	</div>
-	<div class="col-sm-3 col-sm-offset-1">
-		<h2>Free</h2>
-
-		<table class="table table-hover table-condensed">
-			<thead>
-				<tr>
-					<th>GATE</th>
-					<th>CAT.</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php
-				$allGates = Gates_EHAM::allGates();
-				ksort($allGates);
-
-				foreach($allGates as $gate => $cat) {
-					if(!$gateAssigner->isGateAssigned($gate)) {
-						echo '<tr><td>' . $gate . '</td><td>' . $cat . '</td>';
-						echo '<td style="text-align: right;"><a href="?occupy=' . $gate . '" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-ban-circle"></span> Occupy</a></td></tr>';
-					}					
-				}
-				?>
-			</tbody>
-		</table>
 	</div>
 </div>
 

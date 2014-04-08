@@ -27,8 +27,8 @@ $vatsimData = $vp->parseData();
 define('PAGE', 'vatsim');
 require('include/tpl_header.php');
 ?>
-<div class="col-sm-6">
-	<div class="row">
+<div class="row">
+	<div class="col-md-6">
 		<h1>Inbound List</h1>
 
 		<p>VATSIM data gets updated every 2 minutes (server list every hour), real life data gets updated every 15 minutes.
@@ -108,8 +108,10 @@ require('include/tpl_header.php');
 			</tbody>
 		</table>
 	</div>
+</div>
 
-	<div class="row">
+<div class="row">
+	<div class="col-md-6">
 		<h2>Legend</h2>
 
 		<p>Greyed out flights are VFR flights, the others are IFR flights. Below is an overview of the icons used in the Gate column.</p>

@@ -1,4 +1,3 @@
 .vagrant/
 data.txt
-data-vatsim.txt
-data-vatsim-servers.txt
+data-*.txt

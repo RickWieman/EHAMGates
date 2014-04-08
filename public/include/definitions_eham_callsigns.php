@@ -1,6 +1,8 @@
 <?php
 
 class Callsigns_EHAM {
+	private static $extraCallsignsFile = 'data-callsigns.txt';
+
 	private static $KLM = array(
 		'KLM10B' => 'KL 1210',
 		'KLM10M' => 'KL 1208',
@@ -474,14 +476,46 @@ class Callsigns_EHAM {
 		'KLM19U' => 'KL 1973'
 	);
 
+	static function findFlightnumber($callsign) {
+		$getFlightnumber = file_get_contents('http://planefinder.net/data/endpoints/flight_ajax.php?term=' . $callsign);
+		$getFlightnumber = json_decode($getFlightnumber, true);
+
+		if($getFlightnumber) {
+			foreach($getFlightnumber as $data) {
+				if($data['id'] == $callsign) {
+					return preg_replace('/^([A-Z]{2,3})/', '$1 ', $data['value']);
+				}
+			}
+		}
+
+		return false;
+	}
+
+	static function getCallsignsFromFile() {
+		$data = file_get_contents(self::$extraCallsignsFile);
+		$data = json_decode($data, true);
+
+		return $data;
+	}
+
+	static function addFlightnumber($callsign, $flightnumber) {
+		$data = self::getCallsignsFromFile();
+		$data[$callsign] = $flightnumber;
+
+		file_put_contents(self::$extraCallsignsFile, json_encode($data));
+	}
+
 	static function convertAlphanumeric($callsign) {
-		$callsigns = self::$KLM;
+		$callsigns = array_merge(self::$KLM, self::getCallsignsFromFile());
 
 		if(array_key_exists($callsign, $callsigns)) {
 			return $callsigns[$callsign];
 		}
 
-		return false;
+		$findRemote = self::findFlightnumber($callsign);
+		self::addFlightnumber($callsign, $findRemote);
+		
+		return $findRemote;
 	}
 }
 

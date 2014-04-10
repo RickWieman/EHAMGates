@@ -26,5 +26,27 @@ class VatsimParserTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals($data2, $data1);
 	}
+
+	public function testParser() {
+		$vp1 = new VatsimParser('testdata-vatsim-servers.txt');
+		$vp1->fetchData(true, 'testdata-vatsim.txt');
+		$data = $vp1->parseData();
+
+		$this->assertArrayHasKey('AFL309', $data);
+		$this->assertArrayHasKey('CND294', $data);
+		$this->assertArrayHasKey('KLM655', $data);
+		$this->assertArrayNotHasKey('G-BAFM', $data);
+		$this->assertArrayNotHasKey('KLM757', $data);
+	}
+
+	public function testParsedData() {
+		$vp1 = new VatsimParser('testdata-vatsim-servers.txt');
+		$vp1->fetchData(true, 'testdata-vatsim.txt');
+		$data = $vp1->parseData();
+
+		$this->assertEquals('KIAD', $data['KLM655']['origin']);
+		$this->assertEquals('I', $data['KLM655']['flightrules']);
+		$this->assertEquals('B77L', $data['KLM655']['actype']);
+	}
 }
 ?>

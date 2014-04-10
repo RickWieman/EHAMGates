@@ -1,3 +1,4 @@
 .vagrant/
+tests_results/
 data.txt
 data-*.txt

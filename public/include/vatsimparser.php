@@ -4,9 +4,9 @@ class VatsimParser {
 	private $serverList = 'http://status.vatsim.net/status.txt';
 	private $allPilots = array();
 	
-	function __construct($useData = null) {
-		if($useData != null) {
-			$this->dataSource = $useData;	
+	function __construct($useServerList = null) {
+		if($useServerList != null) {
+			$this->serverList = $useServerList;	
 		}
 	}
 
@@ -18,37 +18,48 @@ class VatsimParser {
 		return (file_exists('data-vatsim.txt') ? file_get_contents('data-vatsim.txt', NULL, NULL, 0, 10) : 0);
 	}
 
-	function fetchServerList() {
+	function fetchServerList($force = false) {
 		$cacheDuration = 60 * 60;
 		
 		// Reload only when cache is expired
-		if(time() - $this->lastServerList() > $cacheDuration) {
+		if(time() - $this->lastServerList() > $cacheDuration || $force) {
 			$data = file_get_contents($this->serverList);
 		
-			file_put_contents('data-vatsim-servers.txt', time() . $data);
+			if($data) {
+				$data = time() . $data;
+				file_put_contents('data-vatsim-servers.txt', $data);
 
-			return $data;
+				return $data;
+			}
 		}
 		
 		return file_get_contents('data-vatsim-servers.txt');
 	}
 
-	function fetchData() {
+	function fetchData($force = false, $useServerUrl = null) {
 		$cacheDuration = 60 * 2;
 
 		// Reload only when cache is expired
-		if(time() - $this->lastDataFetch() > $cacheDuration) {
-			$serverList = $this->fetchServerList();
-			preg_match_all("/url0\=(.*)/", $serverList, $servers);
+		if(time() - $this->lastDataFetch() > $cacheDuration || $force) {
+			if($useServerUrl) {
+				$data = file_get_contents($useServerUrl);
+			}
+			else {
+				$serverList = $this->fetchServerList();
+				preg_match_all("/url0\=(.*)/", $serverList, $servers);
 
-			$random = rand(0, count($servers[1])-1);
-			$server = trim($servers[1][$random]);
+				$random = rand(0, count($servers[1])-1);
+				$server = trim($servers[1][$random]);
 
-			$data = file_get_contents($server);
+				$data = file_get_contents($server);
+			}
 		
-			file_put_contents('data-vatsim.txt', time() . $data);
+			if($data) {
+				$data = time() . $data;
+				file_put_contents('data-vatsim.txt', $data);
 
-			return $data;
+				return $data;
+			}
 		}
 		
 		return file_get_contents('data-vatsim.txt');

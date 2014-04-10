@@ -13,17 +13,20 @@ class RealGates {
 		}
 	}
 
-	function fetchData() {
+	function fetchData($force = false) {
 		$cacheDuration = 60 * 15;
 		$stamp = (file_exists($this->cacheFile) ? file_get_contents($this->cacheFile, NULL, NULL, 0, 10) : 0);
 
 		// Reload only when cache is expired
-		if(time() - $stamp > $cacheDuration) {
+		if(time() - $stamp > $cacheDuration || $force) {
 			$data = file_get_contents($this->dataSource);
 		
-			file_put_contents($this->cacheFile, time() . $data);
+			if($data) {
+				$data = time() . $data;
+				file_put_contents($this->cacheFile, $data);
 
-			return $data;
+				return $data;
+			}
 		}
 		
 		return file_get_contents($this->cacheFile);

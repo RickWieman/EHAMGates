@@ -2,6 +2,7 @@
 
 class Definitions {
 	private	static $airlinesICAOtoIATA = array(
+		'ADH' => 'AP', # Air One
 		'ADR' => 'JP', # Adria Airways
 		'AEA' => 'UX', # Air Europa
 		'AFL' => 'SU', # Aeroflot
@@ -13,6 +14,7 @@ class Definitions {
 		'AZA' => 'AZ', # Alitalia
 		'BAW' => 'BA', # British Airways
 		'BEE' => 'BE', # Flybe
+		'BER' => 'AB', # Air Berlin
 		'BTI' => 'BT', # Air Baltic
 		'CAI' => 'CAI', # Corendon Airlines
 		'CAL' => 'CI', # China Airlines

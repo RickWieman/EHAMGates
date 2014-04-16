@@ -63,6 +63,7 @@ class Gates_EHAM {
 	);
 
 	private static $airlinesDefaultGates = array(
+		'ADH' => array('H'),
 		'ADR' => array('B'),
 		'AEA' => array('C'),
 		'AFL' => array('G'),
@@ -74,6 +75,7 @@ class Gates_EHAM {
 		'AZA' => array('B', 'C'),
 		'BAW' => array('D'),
 		'BEE' => array('D'),
+		'BER' => array('H'),
 		'BTI' => array('B'),
 		'CAI' => array('G'),
 		'CAL' => array('F'),
@@ -123,28 +125,31 @@ class Gates_EHAM {
 		'VLG' => array('B')
 	);
 
-	private static $schengenGatesToApron = array(
-		'Z02' => 'D02',
-		'D60' => 'D04',
-		'D62' => 'D08',
-		'Z10' => 'D10',
-		'D66' => 'D12',
-		'D68' => 'D14',
-		'D74' => 'D46',
-		'D78' => 'D52',
-		'D84' => 'D56',
+	private static $busGates = array(
+		'D06'
+	);
 
-		'D61' => 'D03',
-		'D63' => 'D05',
-		'Z07' => 'D07',
-		'D73' => 'D41',
-		'D77' => 'D43',
-		'D79' => 'D47',
-		'D81' => 'D49',
-		'D83' => 'D51',
-		'D85' => 'D53',
-		'D87' => 'D55',
-		'D86' => 'D57',
+	private static $schengenGatesToApron = array(
+		'D60' => 'D02',
+		'D62' => 'D04',
+		'D64' => 'D08',
+		'D66' => 'D10',
+		'D68' => 'D12',
+		'D76' => 'D46',
+		'D82' => 'D52',
+		'D86' => 'D56',
+
+		'D59' => 'D03',
+		'D61' => 'D05',
+		'D63' => 'D07',
+		'D71' => 'D41',
+		'D73' => 'D43',
+		'D77' => 'D47',
+		'D79' => 'D49',
+		'D81' => 'D51',
+		'D83' => 'D53',
+		'D85' => 'D55',
+		'D87' => 'D57',
 
 		'M01' => 'H01',
 		'M02' => 'H02',
@@ -391,7 +396,7 @@ class Gates_EHAM {
 		return array();
 	}
 
-	static function convertNonSchengenGateToVOP($gate) {
+	static function convertSchengenGateToVOP($gate) {
 		if(array_key_exists($gate, self::$schengenGatesToApron)) {
 			return self::$schengenGatesToApron[$gate];
 		}

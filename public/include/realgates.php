@@ -60,7 +60,7 @@ class RealGates {
 				// Add extra 0 to all gate numbers < 10
 				$gate = preg_replace('/^([A-Z])(\d)$/', '${1}0${2}', $info[5]);
 				
-				$realGates[$info[6]] = Gates_EHAM::convertNonSchengenGateToVOP($gate);
+				$realGates[$info[6]] = Gates_EHAM::convertSchengenGateToVOP($gate);
 			}
 			else {
 				$realGates[$info[6]] = 'UNKNOWN';

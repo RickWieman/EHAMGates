@@ -477,13 +477,13 @@ class Callsigns_EHAM {
 	);
 
 	static function findFlightnumber($callsign) {
-		$getFlightnumber = file_get_contents('http://planefinder.net/data/endpoints/flight_ajax.php?term=' . $callsign);
+		$getFlightnumber = file_get_contents('http://planefinder.net/data/endpoints/search_ajax.php?searchText=' . $callsign);
 		$getFlightnumber = json_decode($getFlightnumber, true);
 
 		if($getFlightnumber) {
-			foreach($getFlightnumber as $data) {
-				if($data['id'] == $callsign) {
-					return preg_replace('/^([A-Z]{2,3})/', '$1 ', $data['value']);
+			foreach($getFlightnumber['flights'] as $data) {
+				if($data['subtitle'] == $callsign) {
+					return preg_replace('/^([A-Z]{2,3})/', '$1 ', $data['title']);
 				}
 			}
 		}

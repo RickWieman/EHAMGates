@@ -30,16 +30,21 @@ class GateFinder {
 		return in_array($gate, $this->occupiedGates);
 	}
 
-	function getFreeGates($aircraftType, $origin) {
-		if(Definitions::resolveSchengenOrigin($origin)) {
-			$gates = Gates_EHAM::allSchengenGates();
+	function getFreeGates($aircraftType, $origin, $platform = false) {
+		if($platform) {
+			$gates = Gates_EHAM::allApronVOPs();
 		}
 		else {
-			$gates = Gates_EHAM::allNonSchengenGates();
-		}
+			if(Definitions::resolveSchengenOrigin($origin)) {
+				$gates = Gates_EHAM::allSchengenGates();
+			}
+			else {
+				$gates = Gates_EHAM::allNonSchengenGates();
+			}
 
-		$cargoGates = Gates_EHAM::allCargoGates();
-		$gates = array_merge($gates, $cargoGates);
+			$cargoGates = Gates_EHAM::allCargoGates();
+			$gates = array_merge($gates, $cargoGates);
+		}
 
 		$extraGates = Gates_EHAM::getExtraGates($aircraftType);
 		$excludedGates = Gates_EHAM::getExcludedGates($aircraftType);
@@ -71,19 +76,28 @@ class GateFinder {
 				$match = 'RL_NOTYET';
 			}
 			else {
-				$allGates = Gates_EHAM::allGates();
+				if(Gates_EHAM::isBusGate($realGate)) {
+					$gate = $this->findApronVOP($aircraftType, $origin, true);
 
-				// Only return the real gate if the actual aircraft type can use that gate!
-				if($allGates[$realGate] >= Definitions::resolveAircraftCat($aircraftType)) {
-					if($this->isGateOccupied($realGate)) {
-						$match = 'RL_OCCUPIED';
-					}
-					else {
-						return array('gate' => $realGate, 'match' => 'RL');
+					if($gate) {
+						return array('gate' => $gate, 'match' => 'RL_BUS');
 					}
 				}
 				else {
-					$match = 'RL_HEAVY';
+					$allGates = Gates_EHAM::allGates();
+
+					// Only return the real gate if the actual aircraft type can use that gate!
+					if($allGates[$realGate] >= Definitions::resolveAircraftCat($aircraftType)) {
+						if($this->isGateOccupied($realGate)) {
+							$match = 'RL_OCCUPIED';
+						}
+						else {
+							return array('gate' => $realGate, 'match' => 'RL');
+						}
+					}
+					else {
+						$match = 'RL_HEAVY';
+					}
 				}
 			}
 		}
@@ -166,8 +180,7 @@ class GateFinder {
 
 	function findCivilGate($callsign, $aircraftType, $origin) {
 		$defaultGate = Gates_EHAM::resolveAirlineGate($callsign);
-		$cat = Definitions::resolveAircraftCat($aircraftType);
-
+		
 		if($defaultGate) {
 			$availableGates = $this->getFreeGates($aircraftType, $origin);
 
@@ -190,6 +203,20 @@ class GateFinder {
 				$foundGates = array_keys($matches);
 				return $foundGates[0];
 			}
+		}
+
+		return false;
+	}
+
+	function findApronVOP($aircraftType, $origin) {
+		$availableGates = $this->getFreeGates($aircraftType, $origin, true);
+		
+		asort($availableGates);
+
+		// Return the first of the available gates
+		if(count($availableGates) > 0) {
+			$foundGates = array_keys($availableGates);
+			return $foundGates[0];
 		}
 
 		return false;

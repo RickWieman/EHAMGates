@@ -184,6 +184,21 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(in_array(substr($gate['gate'], 0, 1), Gates_EHAM::resolveAirlineGate('TRA')));
 		$this->assertTrue(array_key_exists($gate['gate'], Gates_EHAM::allSchengenGates()));
 	}
+
+	public function testFindApronVOP() {
+		$gf = new GateFinder('testdata.txt');
+		$gate = $gf->findApronVOP('E190', 'ENCN');
+
+		$this->assertTrue(array_key_exists($gate, Gates_EHAM::allApronVOPs()));
+	}
+
+	public function testFindBusGate() {
+		$gf = new GateFinder('testdata.txt');
+		$gate = $gf->findGate('KLM1206', 'E190', 'ENCN');
+
+		$this->assertTrue(array_key_exists($gate['gate'], Gates_EHAM::allApronVOPs()));
+		$this->assertEquals('RL_BUS', $gate['match']);
+	}
 }
 
 ?>

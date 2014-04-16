@@ -340,6 +340,10 @@ class Gates_EHAM {
 			self::$schengenNonSchengenGates, self::$nonSchengenGates);
 	}
 
+	static function allApronVOPs() {
+		return self::$bravoApron;
+	}
+
 	static function allSchengenGates() {
 		return array_merge(self::$bravoApron, self::$schengenGates,
 			self::$schengenNonSchengenGates);
@@ -402,6 +406,10 @@ class Gates_EHAM {
 		}
 
 		return $gate;
+	}
+
+	static function isBusGate($gate) {
+		return in_array($gate, self::$busGates);
 	}
 }
 

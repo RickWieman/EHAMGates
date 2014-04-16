@@ -205,6 +205,8 @@ class Definitions {
 								 'text' => 'This is a cargo flight (based on callsign).'),
 		'RL' 			=> array('icon' => 'eye-open',
 								 'text' => 'Real life flight!'),
+		'RL_BUS'		=> array('icon' => 'transfer',
+								 'text' => 'Real life flight on a bus gate.'),
 		'RL_HEAVY'		=> array('icon' => 'plane',
 								 'text' => 'Real life flight, but the aircraft type is too heavy for actual gate.'),
 		'RL_NOTYET'		=> array('icon' => 'eye-close',

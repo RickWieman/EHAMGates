@@ -199,6 +199,13 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(array_key_exists($gate['gate'], Gates_EHAM::allApronVOPs()));
 		$this->assertEquals('RL_BUS', $gate['match']);
 	}
+
+	public function testFindGateStrangeCallsign() {
+		$gf = new GateFinder('testdata.txt');
+		$gate = $gf->findGate('PHABC', 'E190', 'ENCN');
+
+		$this->assertFalse($gate);
+	}
 }
 
 ?>

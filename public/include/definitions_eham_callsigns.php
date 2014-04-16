@@ -2,6 +2,7 @@
 
 class Callsigns_EHAM {
 	private static $extraCallsignsFile = 'data-callsigns.txt';
+	private static $retention = 900; // 15 minutes
 
 	private static $KLM = array(
 		'KLM10B' => 'KL 1210',
@@ -500,18 +501,39 @@ class Callsigns_EHAM {
 
 	static function addFlightnumber($callsign, $flightnumber) {
 		$data = self::getCallsignsFromFile();
-		$data[$callsign] = $flightnumber;
+		$data[$callsign]['flightnumber'] = $flightnumber;
+		$data[$callsign]['added'] = time();
 
 		file_put_contents(self::$extraCallsignsFile, json_encode($data));
+
+		return $data[$callsign];
 	}
 
 	static function convertAlphanumeric($callsign) {
-		$callsigns = array_merge(self::$KLM, self::getCallsignsFromFile());
+		$defaultCallsigns = self::$KLM;
+		$storedCallsigns = self::getCallsignsFromFile();
 
-		if(array_key_exists($callsign, $callsigns)) {
-			return $callsigns[$callsign];
+		if(array_key_exists($callsign, $defaultCallsigns)) {
+			return $defaultCallsigns[$callsign];
 		}
 
+		if(array_key_exists($callsign, $storedCallsigns)) {
+			$data = $storedCallsigns[$callsign];
+
+			if($data['added'] + self::$retention < time()) {
+				$findRemote = self::findFlightnumber($callsign);
+
+				if($findRemote) {
+					$data = self::addFlightnumber($callsign, $findRemote);
+				}
+				else {
+					$data = self::addFlightnumber($callsign, $data['flightnumber']);
+				}
+			}
+
+			return $data['flightnumber'];
+		}
+		
 		$findRemote = self::findFlightnumber($callsign);
 		self::addFlightnumber($callsign, $findRemote);
 		

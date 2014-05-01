@@ -17,7 +17,7 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 
 	public function testFindGate1() {
 		$gf = new GateFinder('testdata.txt');
-		$gate = $gf->findGate('TRA123', 'B738', 'EBBR');
+		$gate = $gf->findGate('AFR123', 'A321', 'EBBR');
 
 		$allGates = Gates_EHAM::allGates();
 

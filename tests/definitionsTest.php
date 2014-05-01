@@ -9,7 +9,7 @@ class DefinitionsTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testAircraftToCat2() {
-		$this->assertEquals(8, Definitions::resolveAircraftCat('A380'));
+		$this->assertEquals(9, Definitions::resolveAircraftCat('A388'));
 	}
 
 	public function testAircraftToCatUnknown() {

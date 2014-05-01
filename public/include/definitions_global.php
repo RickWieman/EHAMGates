@@ -106,6 +106,7 @@ class Definitions {
 		'CRJ9' => 3,
 		'CRJX' => 3,
 		
+		'A318' => 4,
 		'A319' => 4,
 		'A320' => 4,
 		'A321' => 4,
@@ -167,8 +168,10 @@ class Definitions {
 		'B783' => 8,
 		'B788' => 8,
 		'B789' => 8,
-		'A380' => 8,
-		'A388' => 8
+
+		'A380' => 9,
+		'A388' => 9,
+		'B748' => 9
 	);
 
 	private static $schengen = array(

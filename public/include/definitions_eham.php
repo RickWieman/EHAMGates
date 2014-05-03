@@ -138,9 +138,20 @@ class Gates_EHAM {
 		'TFL' => array('B', 'D', 'E', 'G'),
 		'THY' => array('G'),
 		'TRA' => array('C', 'D', 'E'),
-		'UAE' => array('G'), # G09 due to A380!
+		'UAE' => array('G'),
 		'UAL' => array('E', 'G'),
 		'VLG' => array('B')
+	);
+
+	private static $cargoAirlinesDefaultGates = array(
+		'ABW' => array('S94', 'S95'),
+		'ANA' => array('R72', 'R74', 'R77', 'R80', 'R81', 'R82', 'R83', 'R84', 'R85', 'R86', 'R87'),
+		'CCA' => array('R72', 'R74', 'R77', 'R80', 'R81', 'R82', 'R83', 'R84', 'R85', 'R86', 'R87'),
+		'CPE' => array('R72', 'R74', 'R77', 'R80', 'R81', 'R82', 'R83', 'R84', 'R85', 'R86', 'R87'),
+		'FDX' => array('S72', 'S74'),
+		'QTR' => array('R72', 'R74', 'R77', 'R80', 'R81', 'R82', 'R83', 'R84', 'R85', 'R86', 'R87'),
+		'MPH' => array('S72', 'S74', 'S77'),
+		'SQC' => array('R72', 'R74', 'R77', 'R80')
 	);
 
 	private static $busGates = array(
@@ -343,14 +354,29 @@ class Gates_EHAM {
 	);
 
 	private static $cargoGates = array(
-		'ABW' => array('S94', 'S95'),
-		'ANA' => array('R72', 'R74', 'R77', 'R80', 'R81', 'R82', 'R83', 'R84', 'R85', 'R86', 'R87'),
-		'CCA' => array('R72', 'R74', 'R77', 'R80', 'R81', 'R82', 'R83', 'R84', 'R85', 'R86', 'R87'),
-		'CPE' => array('R72', 'R74', 'R77', 'R80', 'R81', 'R82', 'R83', 'R84', 'R85', 'R86', 'R87'),
-		'FDX' => array('S72', 'S74'),
-		'QTR' => array('R72', 'R74', 'R77', 'R80', 'R81', 'R82', 'R83', 'R84', 'R85', 'R86', 'R87'),
-		'MPH' => array('S72', 'S74', 'S77'),
-		'SQC' => array('R72', 'R74', 'R77', 'R80')
+		'R72' => 8,
+		'R74' => 8,
+		'R77' => 8,
+		'R80' => 8,
+		'R81' => 8,
+		'R82' => 8,
+		'R83' => 8,
+		'R84' => 8,
+		'R85' => 6,
+		'R86' => 8,
+		'R87' => 5,
+
+		'S72' => 8,
+		'S74' => 8,
+		'S77' => 8,
+		'S79' => 8,
+		'S82' => 8,
+		'S84' => 8,
+		'S87' => 8,
+		'S90' => 8,
+		'S92' => 8,
+		'S94' => 8,
+		'S95' => 8
 	);
 
 	static function allGates() {
@@ -372,34 +398,25 @@ class Gates_EHAM {
 	}
 
 	static function allCargoGates() {
-		$cargoGates = array();
+		return self::$cargoGates;
+	}
 
-		foreach(self::$cargoGates as $gateArray) {
-			$cargoGates = array_merge($cargoGates, $gateArray);
+	static function resolveGate($callsign, $gateList) {
+		$airlineCode = Definitions::resolveAirlineCode($callsign);
+
+		if($airlineCode && array_key_exists($airlineCode, $gateList)) {
+			return $gateList[$airlineCode];
 		}
-		sort($cargoGates);
 
-		return array_fill_keys($cargoGates, 8);
+		return false;
 	}
 
 	static function resolveAirlineGate($callsign) {
-		$airlineCode = Definitions::resolveAirlineCode($callsign);
-
-		if($airlineCode && array_key_exists($airlineCode, self::$airlinesDefaultGates)) {
-			return self::$airlinesDefaultGates[$airlineCode];
-		}
-
-		return false;
+		return self::resolveGate($callsign, self::$airlinesDefaultGates);
 	}
 
 	static function resolveCargoAirlineGate($callsign) {
-		$airlineCode = Definitions::resolveAirlineCode($callsign);
-
-		if($airlineCode && array_key_exists($airlineCode, self::$cargoGates)) {
-			return self::$cargoGates[$airlineCode];
-		}
-
-		return false;
+		return self::resolveGate($callsign, self::$cargoAirlinesDefaultGates);
 	}
 
 	static function getExtraGates($aircraftType) {

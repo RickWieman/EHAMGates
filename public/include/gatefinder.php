@@ -30,9 +30,12 @@ class GateFinder {
 		return in_array($gate, $this->occupiedGates);
 	}
 
-	function getFreeGates($aircraftType, $origin, $platform = false) {
-		if($platform) {
+	function getFreeGates($aircraftType, $origin, $location = 'default') {
+		if($location == 'platform') {
 			$gates = Gates_EHAM::allApronVOPs();
+		}
+		elseif($location == 'cargo') {
+			$gates = Gates_EHAM::allCargoGates();
 		}
 		else {
 			if(Definitions::resolveSchengenOrigin($origin)) {
@@ -103,14 +106,14 @@ class GateFinder {
 		}
 
 		// Find a plausible cargo gate
-		$gate = $this->findCargoGate($callsign, $aircraftType);
+		$gate = $this->findRandomGate($callsign, $aircraftType, $origin, 'cargo');
 
 		if($gate) {
 			return array('gate' => $gate, 'match' => 'CARGO');
 		}
 
 		// Find a plausible civil gate
-		$gate = $this->findCivilGate($callsign, $aircraftType, $origin);
+		$gate = $this->findRandomGate($callsign, $aircraftType, $origin);
 
 		if($gate) {
 			$match = (isset($match)) ? $match : 'RANDOM';
@@ -164,31 +167,22 @@ class GateFinder {
 		return $gate;
 	}
 
-	function findCargoGate($callsign, $aircraftType) {
-		$cargoGates = Gates_EHAM::resolveCargoAirlineGate($callsign);
-		
-		if($cargoGates) {
-			foreach($cargoGates as $gate) {
-				if(!in_array($gate, $this->occupiedGates)) {
-					return $gate;
-				}
-			}
+	function findRandomGate($callsign, $aircraftType, $origin, $type = 'civil') {
+		if($type == 'cargo') {
+			$defaultGates = Gates_EHAM::resolveCargoAirlineGate($callsign);
 		}
-
-		return false;
-	}
-
-	function findCivilGate($callsign, $aircraftType, $origin) {
-		$defaultGate = Gates_EHAM::resolveAirlineGate($callsign);
+		else {
+			$defaultGates = Gates_EHAM::resolveAirlineGate($callsign);
+		}
 		
-		if($defaultGate) {
-			$availableGates = $this->getFreeGates($aircraftType, $origin);
+		if($defaultGates) {
+			$availableGates = $this->getFreeGates($aircraftType, $origin, $type);
 
 			// Determine which gates are available for the airline
 			$matches = array();
-			foreach($defaultGate as $pier) {
+			foreach($defaultGates as $pier) {
 				foreach($availableGates as $gate => $gateCat) {
-					if(substr($gate, 0, 1) == $pier) {
+					if(preg_match('/^' . $pier . '/', $gate)) {
 						$matches[$gate] = $gateCat;
 					}
 				}
@@ -209,7 +203,7 @@ class GateFinder {
 	}
 
 	function findApronVOP($aircraftType, $origin) {
-		$availableGates = $this->getFreeGates($aircraftType, $origin, true);
+		$availableGates = $this->getFreeGates($aircraftType, $origin, 'platform');
 		
 		asort($availableGates);
 

@@ -79,6 +79,9 @@ require('include/tpl_header.php');
 					if($assigned) {
 						echo '<a href="?release='. $result['gate'] .'" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-log-out"></span> Release</a>';
 					}
+					elseif(!isset($result['matchType'])) {
+						echo '<em>No Actions</em>';
+					}
 					elseif($result['matchType'] != 'NONE') {
 						echo '<a href="?callsign='. $callsign .'&amp;assign" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</a>';
 						echo ' <a href="?callsign='. $callsign .'&amp;occupied" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-ban-circle"></span> Occupied</a>';

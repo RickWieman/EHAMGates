@@ -204,7 +204,7 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$gf = new GateFinder('testdata.txt');
 		$gate = $gf->findGate('PHABC', 'E190', 'ENCN');
 
-		$this->assertFalse($gate);
+		$this->assertEquals('NONE', $gate['match']);
 	}
 }
 

@@ -65,7 +65,7 @@ class GateFinder {
 
 	function findGate($callsign, $aircraftType, $origin) {
 		if(!preg_match('/^[A-Z]{2,3}\d+[A-Z]*$/', $callsign)) {
-			return false;
+			return array('gate' => null, 'match' => 'NONE');
 		}
 
 		// Determine whether this is a real flight

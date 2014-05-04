@@ -145,11 +145,11 @@ class Gates_EHAM {
 
 	private static $cargoAirlinesDefaultGates = array(
 		'ABW' => array('S94', 'S95'),
-		'ANA' => array('R72', 'R74', 'R77', 'R80', 'R81', 'R82', 'R83', 'R84', 'R85', 'R86', 'R87'),
-		'CCA' => array('R72', 'R74', 'R77', 'R80', 'R81', 'R82', 'R83', 'R84', 'R85', 'R86', 'R87'),
-		'CPE' => array('R72', 'R74', 'R77', 'R80', 'R81', 'R82', 'R83', 'R84', 'R85', 'R86', 'R87'),
+		'ANA' => array('R'),
+		'CCA' => array('R'),
+		'CPE' => array('R'),
 		'FDX' => array('S72', 'S74'),
-		'QTR' => array('R72', 'R74', 'R77', 'R80', 'R81', 'R82', 'R83', 'R84', 'R85', 'R86', 'R87'),
+		'QTR' => array('R'),
 		'MPH' => array('S72', 'S74', 'S77'),
 		'SQC' => array('R72', 'R74', 'R77', 'R80')
 	);

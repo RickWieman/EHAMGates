@@ -75,7 +75,7 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$gf = new GateFinder('testdata.txt');
 		$gate = $gf->findGate('ANA789', 'B744', 'KEWR');
 
-		$this->assertTrue(in_array($gate['gate'], Gates_EHAM::resolveCargoAirlineGate('ANA')));
+		$this->assertTrue(in_array(substr($gate['gate'], 0, 1), Gates_EHAM::resolveCargoAirlineGate('ANA')));
 		$this->assertEquals('CARGO', $gate['match']);
 	}
 
@@ -86,7 +86,7 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$allGates = Gates_EHAM::allCargoGates();
 
 		$this->assertEquals(5, $allGates[$gate['gate']]);
-		$this->assertTrue(in_array($gate['gate'], Gates_EHAM::resolveCargoAirlineGate('ANA')));
+		$this->assertTrue(in_array(substr($gate['gate'], 0, 1), Gates_EHAM::resolveCargoAirlineGate('ANA')));
 		$this->assertEquals('CARGO', $gate['match']);
 	}
 

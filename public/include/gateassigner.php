@@ -15,7 +15,7 @@ class GateAssigner {
 
 	function assignGate($gate, $matchType, $callsign = 'unknown', $aircraftType = null, $origin = null) {
 		if((array_key_exists($gate, Gates_EHAM::allGates())
-			|| in_array($gate, Gates_EHAM::allCargoGates()))) {
+			|| array_key_exists($gate, Gates_EHAM::allCargoGates()))) {
 			$this->assignedGates[$gate] = array(
 				'callsign' => $callsign,
 				'aircraftType' => $aircraftType,

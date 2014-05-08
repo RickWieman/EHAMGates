@@ -149,6 +149,8 @@ class Gates_EHAM {
 		'CCA' => array('R'),
 		'CPE' => array('R'),
 		'FDX' => array('S72', 'S74'),
+		'LCO' => array('R'),
+		'NCA' => array('R'),
 		'QTR' => array('R'),
 		'MPH' => array('S72', 'S74', 'S77'),
 		'SQC' => array('R72', 'R74', 'R77', 'R80')
@@ -192,14 +194,6 @@ class Gates_EHAM {
 	);
 
 	private static $bravoApron = array(
-		'A31' => 4,
-		'A32' => 8,
-		'A33' => 4,
-		'A34' => 8,
-		'A35' => 4,
-		'A36' => 8,
-		'A37' => 4,
-
 		'A41' => 3,
 		'A43' => 3,
 		'A45' => 3,
@@ -356,6 +350,14 @@ class Gates_EHAM {
 	);
 
 	private static $cargoGates = array(
+		'A31' => 4,
+		'A32' => 8,
+		'A33' => 4,
+		'A34' => 8,
+		'A35' => 4,
+		'A36' => 8,
+		'A37' => 4,
+
 		'R72' => 8,
 		'R74' => 8,
 		'R77' => 8,

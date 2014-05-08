@@ -211,6 +211,20 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('RL_BUS', $gate['match']);
 	}
 
+	public function testFindBusGateTooHeavy() {
+		$gf = new GateFinder('testdata.txt');
+		$gate = $gf->findGate('KLM1206', 'MD11', 'ENCN');
+
+		$allGates = Gates_EHAM::allGates();
+		$extraGates = Gates_EHAM::getExtraGates('MD11');
+
+		$this->assertEquals('RL_HEAVY', $gate['match']);
+
+		$this->assertTrue($allGates[$gate['gate']] == 7 || in_array($gate['gate'], $extraGates));
+		$this->assertTrue(in_array(substr($gate['gate'], 0, 1), Gates_EHAM::resolveAirlineGate('KLM')));
+		$this->assertTrue(array_key_exists($gate['gate'], Gates_EHAM::allSchengenGates()));		
+	}
+
 	public function testFindGateStrangeCallsign() {
 		$gf = new GateFinder('testdata.txt');
 		$gate = $gf->findGate('PHABC', 'E190', 'ENCN');

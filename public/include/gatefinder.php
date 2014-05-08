@@ -79,16 +79,19 @@ class GateFinder {
 				$match = 'RL_NOTYET';
 			}
 			else {
-				if(Gates_EHAM::isBusGate($realGate)) {
-					$gate = $this->findApronVOP($aircraftType, $origin, true);
+				$allGates = Gates_EHAM::allGates();
 
+				if(Gates_EHAM::isBusGate($realGate)) {
+					$gate = $this->findApronVOP($aircraftType, $origin);
+					
 					if($gate) {
 						return array('gate' => $gate, 'match' => 'RL_BUS');
 					}
+					else {
+						$match = 'RL_HEAVY';
+					}
 				}
 				else {
-					$allGates = Gates_EHAM::allGates();
-
 					// Only return the real gate if the actual aircraft type can use that gate!
 					if($allGates[$realGate] >= Definitions::resolveAircraftCat($aircraftType)) {
 						if($this->isGateOccupied($realGate)) {

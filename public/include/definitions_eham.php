@@ -155,7 +155,9 @@ class Gates_EHAM {
 	);
 
 	private static $busGates = array(
-		'D06'
+		'D06',
+		'D42',
+		'D72'
 	);
 
 	private static $schengenGatesToApron = array(

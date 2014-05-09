@@ -157,6 +157,24 @@ class Gates_EHAM {
 	);
 
 	private static $busGates = array(
+		'B01',
+		'B02',
+		'B03',
+		'B04',
+		'B05',
+		'B06',
+		'B07',
+		'B08',
+		'B18',
+		'B22',
+		'B26',
+		'B30',
+		'B34',
+		'C21',
+		'C22',
+		'C23',
+		'C24',
+		'C25',
 		'D06',
 		'D42',
 		'D72'
@@ -390,6 +408,10 @@ class Gates_EHAM {
 
 	static function allApronVOPs() {
 		return self::$bravoApron;
+	}
+
+	static function allBusGates() {
+		return self::$busGates;
 	}
 
 	static function allSchengenGates() {

@@ -12,6 +12,14 @@ class DefinitionsTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(9, Definitions::resolveAircraftCat('A388'));
 	}
 
+	public function testInvalidAircraftToCat1() {
+		$this->assertEquals(9, Definitions::resolveAircraftCat('A380'));
+	}
+
+	public function testInvalidAircraftToCat2() {
+		$this->assertEquals(4, Definitions::resolveAircraftCat('737'));
+	}
+
 	public function testAircraftToCatUnknown() {
 		$this->assertFalse(Definitions::resolveAircraftCat('FOO1'));
 	}

@@ -170,9 +170,14 @@ class Definitions {
 		'B788' => 8,
 		'B789' => 8,
 
-		'A380' => 9,
 		'A388' => 9,
 		'B748' => 9
+	);
+
+	private static $invalidAircraftTypeMapping = array(
+		'737' => 'B737',
+		'747' => 'B747',
+		'A380' => 'A388'
 	);
 
 	private static $schengen = array(
@@ -228,6 +233,10 @@ class Definitions {
 	}
 
 	static function resolveAircraftCat($aircraftType) {
+		if(array_key_exists($aircraftType, self::$invalidAircraftTypeMapping)) {
+			$aircraftType = self::$invalidAircraftTypeMapping[$aircraftType];
+		}
+
 		if(array_key_exists($aircraftType, self::$aircraftCategories)) {
 			return self::$aircraftCategories[$aircraftType];
 		}

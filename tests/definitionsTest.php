@@ -3,7 +3,26 @@ require_once('../public/include/definitions_global.php');
 require_once('../public/include/definitions_eham.php');
 
 class DefinitionsTest extends PHPUnit_Framework_TestCase {
-	
+	public function testCanTranslateInvalidAircraft() {
+		$this->assertTrue(Definitions::canTranslateAircraftType('A380'));
+	}
+
+	public function testCannotTranslateInvalidAircraft() {
+		$this->assertFalse(Definitions::canTranslateAircraftType('FOO1'));
+	}
+
+	public function testTranslateInvalidAircraft1() {
+		$this->assertEquals('A388', Definitions::translateInvalidAircraft('A380'));
+	}
+
+	public function testTranslateInvalidAircraft2() {
+		$this->assertEquals('B737', Definitions::translateInvalidAircraft('737'));
+	}
+
+	public function testTranslateValidAircraft() {
+		$this->assertEquals('B744', Definitions::translateInvalidAircraft('B744'));
+	}
+
 	public function testAircraftToCat1() {
 		$this->assertEquals(4, Definitions::resolveAircraftCat('B738'));
 	}
@@ -21,7 +40,8 @@ class DefinitionsTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testAircraftToCatUnknown() {
-		$this->assertFalse(Definitions::resolveAircraftCat('FOO1'));
+		$this->assertFalse(Definitions::isValidAircraftType('FOO1'));
+		$this->assertEquals(1, Definitions::resolveAircraftCat('FOO1'));
 	}
 
 	public function testSchengen1() {

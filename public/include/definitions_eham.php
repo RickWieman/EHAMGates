@@ -446,6 +446,8 @@ class Gates_EHAM {
 	}
 
 	static function getExtraGates($aircraftType) {
+		$aircraftType = Definitions::translateInvalidAircraft($aircraftType);
+
 		if(array_key_exists($aircraftType, self::$aircraftExtraGates)) {
 			return self::$aircraftExtraGates[$aircraftType];
 		}
@@ -454,6 +456,8 @@ class Gates_EHAM {
 	}
 
 	static function getExcludedGates($aircraftType) {
+		$aircraftType = Definitions::translateInvalidAircraft($aircraftType);
+		
 		if(array_key_exists($aircraftType, self::$aircraftNotOnGates)) {
 			return self::$aircraftNotOnGates[$aircraftType];
 		}

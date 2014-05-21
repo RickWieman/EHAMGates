@@ -277,16 +277,32 @@ class Definitions {
 		return self::$aircraftCategories;
 	}
 
-	static function resolveAircraftCat($aircraftType) {
-		if(array_key_exists($aircraftType, self::$invalidAircraftTypeMapping)) {
-			$aircraftType = self::$invalidAircraftTypeMapping[$aircraftType];
+	static function isValidAircraftType($aircraftType) {
+		return array_key_exists($aircraftType, self::$aircraftCategories);
+	}
+
+	static function canTranslateAircraftType($aircraftType) {
+		return (self::isValidAircraftType($aircraftType) 
+			|| array_key_exists($aircraftType, self::$invalidAircraftTypeMapping));
+	}
+
+	static function translateInvalidAircraft($aircraftType) {
+		if(!self::isValidAircraftType($aircraftType) && self::canTranslateAircraftType($aircraftType)) {
+			
+			return self::$invalidAircraftTypeMapping[$aircraftType];
 		}
 
-		if(array_key_exists($aircraftType, self::$aircraftCategories)) {
+		return $aircraftType;
+	}
+
+	static function resolveAircraftCat($aircraftType) {
+		$aircraftType = self::translateInvalidAircraft($aircraftType);
+		
+		if(self::isValidAircraftType($aircraftType)) {
 			return self::$aircraftCategories[$aircraftType];
 		}
 
-		return false;
+		return 1;
 	}
 
 	static function resolveSchengenOrigin($origin) {

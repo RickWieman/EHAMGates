@@ -72,8 +72,10 @@ require('include/tpl_header.php');
 					}
 
 					$rowClass = ($data['flightrules'] == 'V') ? 'text-muted' : '';
+					$isUnknownAircraftType = !Definitions::canTranslateAircraftType($result['aircraftType']);
 
-					echo '<tr class="'. $rowClass .'"><td>' . $callsign . '</td><td class="hidden-xs">' . $result['aircraftType'] . '</td><td class="hidden-xs">' . $result['origin'] . '</td>';
+					echo '<tr class="'. $rowClass .'"><td>' . $callsign . '</td><td class="hidden-xs' . (($isUnknownAircraftType) ? ' danger' : '') . '">' . $result['aircraftType'] . '</td>';
+					echo '<td class="hidden-xs">' . $result['origin'] . '</td>';
 					echo '<td><span class="glyphicon glyphicon-' . Definitions::resolveMatchTypeIcon($result['matchType']) . '"></span> ' . $result['gate'] . '</td>';
 					echo '<td style="text-align: right;">';
 					if($assigned) {

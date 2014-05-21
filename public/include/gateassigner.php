@@ -9,6 +9,8 @@ class GateAssigner {
 
 	private $lastRequest;
 
+	private $foundGates = array();
+
 	function __construct($dataSource = null) {
 		$this->gateFinder = new GateFinder($dataSource);
 	}
@@ -54,20 +56,25 @@ class GateAssigner {
 		return false;
 	}
 
-	function findGate($callsign, $aircraftType, $origin) {
-		$callsign = strtoupper($callsign);
-		$origin = strtoupper($origin);
+	function findGate($callsign, $aircraftType, $origin, $force = true) {
+		if($force || !array_key_exists($callsign, $this->foundGates)) {
+			$callsign = strtoupper($callsign);
+			$origin = strtoupper($origin);
 
-		$this->lastRequest = array(
-			'callsign' 		=> $callsign,
-			'aircraftType' 	=> $aircraftType,
-			'origin' 		=> $origin
-		);
+			$gate = $this->gateFinder->findGate($callsign, $aircraftType, $origin);
 
-		$gate = $this->gateFinder->findGate($callsign, $aircraftType, $origin);
+			$result = array(
+				'callsign' 		=> $callsign,
+				'aircraftType' 	=> $aircraftType,
+				'origin' 		=> $origin,
+				'gate'			=> $gate['gate'],
+				'matchType'		=> $gate['match']
+			);
 
-		$this->lastRequest['gate'] = $gate['gate'];
-		$this->lastRequest['matchType'] = $gate['match'];
+			$this->foundGates[$callsign] = $result;
+		}
+
+		$this->lastRequest = $this->foundGates[$callsign];
 	}
 
 	function alreadyOccupied() {

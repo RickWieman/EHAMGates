@@ -56,11 +56,11 @@ require('include/tpl_header.php');
 						$assigned = true;
 					}
 					else {
-						$gateAssigner->findGate($callsign, $data['actype'], $data['origin']);
-
-						$result = $gateAssigner->result();
-
 						if(isset($_GET['callsign']) && $_GET['callsign'] == $callsign) {
+							// Load previously calculated result (by not enforcing the find)
+							$gateAssigner->findGate($callsign, $data['actype'], $data['origin'], false);
+							$result = $gateAssigner->result();
+
 							if($gateAssigner->handleAssign() || $gateAssigner->handleAssignManual() || $gateAssigner->handleOccupied()) {
 								$_SESSION['gateAssigner'] = serialize($gateAssigner);
 
@@ -68,6 +68,9 @@ require('include/tpl_header.php');
 								exit();
 							}
 						}
+
+						$gateAssigner->findGate($callsign, $data['actype'], $data['origin']);
+						$result = $gateAssigner->result();
 						$assigned = false;
 					}
 

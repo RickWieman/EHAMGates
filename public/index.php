@@ -89,22 +89,27 @@ require('include/tpl_header.php');
 						echo ' <a href="?callsign='. $callsign .'&amp;occupied" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-ban-circle"></span> Occupied</a>';
 					}
 					else {
-						?>
-						<form class="form-inline" method="get">
-							<input type="hidden" name="callsign" value="<?php echo $callsign; ?>" />
-							<label for="manual" class="sr-only">Aircraft type</label>
-							<select class="form-control-xs" name="manual">
-								<?php
-								$freeGates = $gateAssigner->getFreeGates($result['aircraftType'], $result['origin']);
+						$freeGates = $gateAssigner->getFreeGates($result['aircraftType'], $result['origin']);
 
-								foreach($freeGates as $gate => $cat) {
-									echo '<option value="'. $gate .'">' . $gate . ' (' . $cat . ')</option>';
-								}
-								?>
-							</select>
-							<button type="submit" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</button>
-						</form>
-						<?php
+						if(count($freeGates) > 0) {
+							?>
+							<form class="form-inline" method="get">
+								<input type="hidden" name="callsign" value="<?php echo $callsign; ?>" />
+								<label for="manual" class="sr-only">Aircraft type</label>
+								<select class="form-control-xs" name="manual">
+									<?php
+									foreach($freeGates as $gate => $cat) {
+										echo '<option value="'. $gate .'">' . $gate . ' (' . $cat . ')</option>';
+									}
+									?>
+								</select>
+								<button type="submit" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</button>
+							</form>
+							<?php
+						}
+						else {
+							echo '<em>No Suitable Gates</em>';
+						}
 					}
 					echo '</td></tr>';
 				}

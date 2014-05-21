@@ -45,7 +45,6 @@ class Gates_EHAM {
 		'A340' => array('E05'),
 		'A342' => array('E05'),
 		'A343' => array('E05'),
-		'A380' => array('E18','G09'),
 		'A388' => array('E18','G09'),
 		'B731' => array('D14'),
 		'B732' => array('D14'),

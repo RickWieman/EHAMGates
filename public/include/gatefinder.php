@@ -191,14 +191,16 @@ class GateFinder {
 				}
 			}
 
-			// Sort the available gates, based on their category
-			// We do not want to use cat. 8 gates for cat. 2 aircraft if lower cat. gates are available
-			asort($matches);
-
-			// Return the first of the available gates
+			// If there are gates available, pick a random one (only the smallest of course)
 			if(count($matches) > 0) {
-				$foundGates = array_keys($matches);
-				return $foundGates[0];
+				$foundGates = array_keys($matches, min($matches));
+
+				// If there are <= 2 gates available, add some slightly larger gates (for better randomization)
+				if(count($foundGates) <= 2) {
+					$foundGates = array_merge($foundGates, array_keys($matches, min($matches)+1));
+				}
+
+				return $foundGates[array_rand($foundGates)];
 			}
 		}
 
@@ -208,12 +210,16 @@ class GateFinder {
 	function findApronVOP($aircraftType, $origin) {
 		$availableGates = $this->getFreeGates($aircraftType, $origin, 'platform');
 		
-		asort($availableGates);
-
-		// Return the first of the available gates
+		// If there are VOPs available, pick a random one (only the smallest of course)
 		if(count($availableGates) > 0) {
-			$foundGates = array_keys($availableGates);
-			return $foundGates[0];
+			$suitableGates = array_keys($availableGates, min($availableGates));
+
+			// If there are <= 2 VOPs available, add some slightly larger VOPs (for better randomization)
+			if(count($suitableGates) <= 2) {
+				$suitableGates = array_merge($suitableGates, array_keys($availableGates, min($availableGates)+1));
+			}
+
+			return $suitableGates[array_rand($suitableGates)];
 		}
 
 		return false;

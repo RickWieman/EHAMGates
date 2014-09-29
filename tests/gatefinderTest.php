@@ -164,6 +164,22 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('RL', $gate['match']);
 	}
 
+	public function testFindGateRealException() {
+		$gf = new GateFinder('testdata.txt');
+		$gate = $gf->findGate('KLM1124', 'B738', 'EKDK');
+
+		$this->assertEquals('D14', $gate['gate']);
+		$this->assertEquals('RL', $gate['match']);
+	}
+
+	public function testFindGateRealExceptionTooHeavy() {
+		$gf = new GateFinder('testdata.txt');
+		$gate = $gf->findGate('KLM1124', 'B744', 'EKDK');
+
+		$this->assertNotEquals('D14', $gate['gate']);
+		$this->assertEquals('RL_HEAVY', $gate['match']);
+	}
+
 	public function testFindGateRealTooHeavy() {
 		$gf = new GateFinder('testdata.txt');
 		$gate = $gf->findGate('TRA6868', 'B744', 'LGAV');

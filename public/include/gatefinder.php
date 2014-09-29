@@ -93,8 +93,9 @@ class GateFinder {
 				}
 				else {
 					// Only return the real gate if the actual aircraft type can use that gate!
-					if($allGates[$realGate] >= Definitions::resolveAircraftCat($aircraftType)
-						|| in_array($realGate, Gates_EHAM::getExtraGates($aircraftType))) {
+					if(($allGates[$realGate] >= Definitions::resolveAircraftCat($aircraftType)
+						|| in_array($realGate, Gates_EHAM::getExtraGates($aircraftType)))
+						&& !in_array($realGate, Gates_EHAM::getExcludedGates($aircraftType))) {
 						if($this->isGateOccupied($realGate)) {
 							$match = 'RL_OCCUPIED';
 						}

@@ -67,7 +67,8 @@ class GateFinder {
 	}
 
 	function findGate($callsign, $aircraftType, $origin) {
-		if(!preg_match('/^[A-Z]{2,3}\d+[A-Z]*$/', $callsign)) {
+		// Check whether the callsign is an IATA or ICAO flightnumber...
+		if(!preg_match('/^(([A-Z0-9]{2})|([A-Z]{3}))\d+[A-Z]*$/', $callsign)) {
 			return array('gate' => null, 'match' => 'NONE');
 		}
 
@@ -135,13 +136,13 @@ class GateFinder {
 	 * - IATA flight number (with up to 4 zeroes)
 	 *     EZY123 -> EZY (0)123
 	*/
-	function findRealGate($callsign, $useIATA = true) {
+	function findRealGate($callsign, $useICAO = true) {
 		$flightnumber = Callsigns_EHAM::convertAlphanumeric($callsign);
-		
-		if(!$flightnumber) {
-			$flightnumber = preg_replace('/^([A-Z]{2,3})/', '$1 ', $callsign);
 
-			if($useIATA) {
+		if(!$flightnumber) {
+			$flightnumber = preg_replace('/^([A-Z0-9]{2})/', '$1 ', $callsign);
+
+			if($useICAO) {
 				if(preg_match('/^[A-Z]{3}/', $callsign, $airlineICAO)) {
 					$airlineIATA = Definitions::convertAirlineICAOtoIATA($airlineICAO[0]);
 
@@ -165,7 +166,7 @@ class GateFinder {
 		}
 
 		// If still failed, try using original callsign
-		if(!$gate && $useIATA) {
+		if(!$gate && $useICAO) {
 			return $this->findRealGate($callsign, false);
 		}
 
@@ -228,5 +229,3 @@ class GateFinder {
 	}
 
 }
-
-?>

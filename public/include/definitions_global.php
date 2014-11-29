@@ -3,6 +3,7 @@
 class Definitions {
 	public static $generalAviationGate = "GA";
 
+	// Formatted for Dutch Planespotters (hence EZY => EZY, not EZY => U2)
 	private	static $airlinesICAOtoIATA = array(
 		'ADH' => 'AP', # Air One
 		'ADR' => 'JP', # Adria Airways
@@ -34,7 +35,7 @@ class Definitions {
 		'ELY' => 'LY', # El Al Israel Airlines
 		'ETD' => 'EY', # Etihad Airways
 		'EXS' => 'LS', # Jet2.com
-		'EZY' => 'U2', # easyJet
+		'EZY' => 'EZY', # easyJet
 		'FBF' => 'FBF', # Fine Airlines
 		'FIN' => 'AY', # Finnair
 		'GAV' => 'GAV', # Granada Aviación
@@ -59,6 +60,7 @@ class Definitions {
 		'TAP' => 'TP', # TAP Portugal
 		'IBE' => 'IB', # Iberia Airlines
 		'TFL' => 'OR', # Arkefly
+		'TGZ' => 'A9', # Georgian Airways
 		'THY' => 'TK', # Turkish Airlines
 		'TRA' => 'HV', # Transavia Holland
 		'UAE' => 'EK', # Emirates Airline
@@ -101,7 +103,6 @@ class Definitions {
 		'B462' => 3,
 		'B463' => 3,
 		'T134' => 3,
-		'A318' => 3,
 		'CRJ1' => 3,
 		'CRJ2' => 3,
 		'CRJ7' => 3,
@@ -164,7 +165,6 @@ class Definitions {
 		'B77F' => 8,
 		'B77W' => 8,
 		'B744' => 8,
-		'B748' => 8,
 		'B74D' => 8,
 		'B74R' => 8,
 		'B74S' => 8,

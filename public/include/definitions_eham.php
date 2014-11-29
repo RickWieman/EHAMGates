@@ -2,7 +2,9 @@
 require_once('definitions_global.php');
 
 class Gates_EHAM {
-	
+	public static $lat = 52.3081;
+	public static $long = 4.7642;
+
 	private static $aircraftExtraGates = array(
 		// Bravo Apron
 		'B463' => array('B91','B92','B93','B94','B95'),
@@ -482,5 +484,3 @@ class Gates_EHAM {
 		return in_array($gate, self::$busGates);
 	}
 }
-
-?>

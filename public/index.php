@@ -1,9 +1,12 @@
 <?php
 session_start();
 
+date_default_timezone_set('Zulu');
+
 require_once('include/definitions_global.php');
 require_once('include/vatsimparser.php');
 require_once('include/gateassigner.php');
+require_once('include/tools.php');
 
 // Initialize GateAssigner: Either get it from the SESSION or create a new instance.
 if(isset($_SESSION['gateAssigner'])) {
@@ -34,12 +37,13 @@ require('include/tpl_header.php');
 		<p>VATSIM data gets updated every 2 minutes (server list every hour), real life data gets updated every 15 minutes.
 			The last VATSIM update was <strong><?php echo date("i:s", time()-$vp->lastDataFetch()); ?> minutes ago</strong>.</p>
 
-		<table class="table table-hover table-condensed">
+		<table class="table table-hover table-condensed" id="inboundList">
 			<thead>
 				<tr>
 					<th>C/S</th>
 					<th class="hidden-xs">A/C</th>
 					<th class="hidden-xs">ORGN</th>
+					<th class="hidden-xs">ETA</th>
 					<th>GATE</th>
 					<th></th>
 				</tr>
@@ -79,6 +83,24 @@ require('include/tpl_header.php');
 
 					echo '<tr class="'. $rowClass .'"><td>' . $callsign . '</td><td class="hidden-xs' . (($isUnknownAircraftType) ? ' danger' : '') . '">' . $result['aircraftType'] . '</td>';
 					echo '<td class="hidden-xs">' . $result['origin'] . '</td>';
+
+					if($data['groundspeed'] > 25) {
+						$etaTime = Tools::calculateETA($data['lat'], $data['long'], Gates_EHAM::$lat, Gates_EHAM::$long, $data['groundspeed']);
+
+						$status = date("H:i", (time() + $etaTime) - (time() - $vp->lastDataFetch())) . 'z';
+					}
+					else {
+						$dtg = Tools::calculateDTG($data['lat'], $data['long'], Gates_EHAM::$lat, Gates_EHAM::$long);
+
+						if($dtg < 15) {
+							$status = 'Landed';
+						}
+						else {
+							$status = 'Departing';
+						}
+					}
+
+					echo '<td class="hidden-xs">' . $status .'</td>';
 					echo '<td><span class="glyphicon glyphicon-' . Definitions::resolveMatchTypeIcon($result['matchType']) . '"></span> ' . $result['gate'] . '</td>';
 					echo '<td style="text-align: right;">';
 					if($assigned) {

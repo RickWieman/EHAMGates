@@ -127,7 +127,14 @@ class VatsimParser {
 
 			if(array_key_exists(3, $fields) && $fields[3] == 'PILOT') {
 				if($fields[13] == 'EHAM') {
-					$allPilots[$fields[0]] = array('origin' => $fields[11], 'actype' => $this->parseAircraftType($fields[9]), 'flightrules' => $fields[21]);
+					$allPilots[$fields[0]] = array(
+						'origin' => $fields[11],
+						'actype' => $this->parseAircraftType($fields[9]),
+						'flightrules' => $fields[21],
+						'lat' => $fields[5],
+						'long' => $fields[6],
+						'groundspeed' => $fields[8]
+					);
 				}
 			}
 		}
@@ -137,4 +144,3 @@ class VatsimParser {
 		return $allPilots;
 	}
 }
-?>

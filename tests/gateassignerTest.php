@@ -80,7 +80,7 @@ class GateAssignerTest extends PHPUnit_Framework_TestCase {
 
 		$assigned = $this->ga->isCallsignAssigned('TRA6868');
 
-		$this->assertEquals('TRA6868', $assigned['callsign']);
+		$this->assertNotFalse($assigned);
 	}
 
 	public function testAssignedCallsignFalse() {

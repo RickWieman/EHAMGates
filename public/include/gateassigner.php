@@ -4,6 +4,7 @@ require_once('gatefinder.php');
 
 class GateAssigner {
 	
+	private $assignedCallsigns = array();
 	private $assignedGates = array();
 	private $gateFinder;
 
@@ -18,13 +19,16 @@ class GateAssigner {
 	function assignGate($gate, $matchType, $callsign = 'unknown', $aircraftType = null, $origin = null) {
 		if((array_key_exists($gate, Gates_EHAM::allGates())
 			|| array_key_exists($gate, Gates_EHAM::allCargoGates()))) {
-			$this->assignedGates[$gate] = array(
-				'callsign' => $callsign,
-				'aircraftType' => $aircraftType,
-				'origin' => $origin,
-				'matchType' => $matchType
-			);
+			if($callsign != 'unknown') {
+				$this->assignedCallsigns[$callsign] = array(
+					'gate' => $gate,
+					'aircraftType' => $aircraftType,
+					'origin' => $origin,
+					'matchType' => $matchType
+				);
+			}
 
+			$this->assignedGates[$gate] = $callsign;
 			$this->gateFinder->occupyGate($gate);
 			
 			if($matchType != 'OCCUPIED') {
@@ -47,6 +51,11 @@ class GateAssigner {
 
 	function releaseGate($gate) {
 		if(array_key_exists($gate, $this->assignedGates)) {
+			$callsign = $this->assignedGates[$gate];
+			if($callsign != 'unknown') {
+				unset($this->assignedCallsigns[$callsign]);
+			}
+
 			unset($this->assignedGates[$gate]);
 			$this->gateFinder->releaseGate($gate);
 
@@ -123,11 +132,8 @@ class GateAssigner {
 	}
 
 	function isCallsignAssigned($callsign) {
-		foreach($this->assignedGates as $gate => $data) {
-			if($data['callsign'] == $callsign) {
-				$data['gate'] = $gate;
-				return $data;
-			}
+		if(array_key_exists($callsign, $this->assignedCallsigns)) {
+			return $this->assignedCallsigns[$callsign];
 		}
 
 		return false;

@@ -138,6 +138,12 @@ class GateAssigner {
 		return $this->assignedGates;
 	}
 
+	function getAssignedCallsigns() {
+		ksort($this->assignedCallsigns);
+
+		return $this->assignedCallsigns;
+	}
+
 	function resetSearch() {
 		$this->lastRequest = null;
 	}
@@ -206,5 +212,3 @@ class GateAssigner {
 		return false;
 	}
 }
-
-?>

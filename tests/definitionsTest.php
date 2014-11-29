@@ -52,6 +52,14 @@ class DefinitionsTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse(Definitions::resolveSchengenOrigin('KLAX'));
 	}
 
+	public function testSchengenNonSpecified1() {
+		$this->assertTrue(Definitions::resolveSchengenOrigin('schengen'));
+	}
+
+	public function testSchengenNonSpecified21() {
+		$this->assertFalse(Definitions::resolveSchengenOrigin('nonschengen'));
+	}
+
 	public function testBusGate() {
 		$this->assertTrue(Gates_EHAM::isBusGate('D06'));
 	}

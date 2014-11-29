@@ -11,6 +11,7 @@ ob_start();
 	<title>EHAM Gate Finder</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 </head>
 <body>
 	<nav class="navbar navbar-default" role="navigation">

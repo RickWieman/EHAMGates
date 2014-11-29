@@ -85,9 +85,10 @@ require('include/tpl_header.php');
 					echo '<td class="hidden-xs">' . $result['origin'] . '</td>';
 
 					if($data['groundspeed'] > 25) {
-						$etaTime = Tools::calculateETA($data['lat'], $data['long'], Gates_EHAM::$lat, Gates_EHAM::$long, $data['groundspeed']);
+						$eta = Tools::calculateETA($data['lat'], $data['long'], Gates_EHAM::$lat, Gates_EHAM::$long, $data['groundspeed']);
+						$etaTime = (time() + $eta) - (time() - $vp->lastDataFetch());
 
-						$status = date("H:i", (time() + $etaTime) - (time() - $vp->lastDataFetch())) . 'z';
+						$status = '<span class="hide">' . date("Y-m-d", $etaTime) . '</span>' . date("H:i", $etaTime) . 'z';
 					}
 					else {
 						$dtg = Tools::calculateDTG($data['lat'], $data['long'], Gates_EHAM::$lat, Gates_EHAM::$long);
@@ -144,6 +145,15 @@ require('include/tpl_header.php');
 			</tbody>
 		</table>
 	</div>
+	<script src="js/jquery.tablesorter.min.js"></script>
+	<script src="js/jquery.tablesorter.widgets.min.js"></script>
+	<script>
+		$(document).ready(function() {
+			$("#inboundList").tablesorter({
+				widgets: ["saveSort"]
+			});
+		});
+	</script>
 </div>
 
 <div class="row">

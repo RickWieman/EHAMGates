@@ -18,7 +18,8 @@ class GateAssigner {
 
 	function assignGate($gate, $matchType, $callsign = 'unknown', $aircraftType = null, $origin = null) {
 		if((array_key_exists($gate, Gates_EHAM::allGates())
-			|| array_key_exists($gate, Gates_EHAM::allCargoGates()))) {
+			|| array_key_exists($gate, Gates_EHAM::allCargoGates())
+			|| $gate == Definitions::$generalAviationGate)) {
 			if($callsign != 'unknown') {
 				$this->assignedCallsigns[$callsign] = array(
 					'gate' => $gate,
@@ -28,8 +29,10 @@ class GateAssigner {
 				);
 			}
 
-			$this->assignedGates[$gate] = $callsign;
-			$this->gateFinder->occupyGate($gate);
+			if($gate != Definitions::$generalAviationGate) {
+				$this->assignedGates[$gate] = $callsign;
+				$this->gateFinder->occupyGate($gate);
+			}
 			
 			if($matchType != 'OCCUPIED') {
 				$this->resetSearch();
@@ -58,6 +61,22 @@ class GateAssigner {
 
 			unset($this->assignedGates[$gate]);
 			$this->gateFinder->releaseGate($gate);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	function releaseCallsign($callsign) {
+		if(array_key_exists($callsign, $this->assignedCallsigns)) {
+			$gate = $this->assignedCallsigns[$callsign]['gate'];
+			if($gate != Definitions::$generalAviationGate) {
+				unset($this->assignedGates[$gate]);
+				$this->gateFinder->releaseGate($gate);
+			}
+
+			unset($this->assignedCallsigns[$callsign]);
 
 			return true;
 		}
@@ -174,6 +193,14 @@ class GateAssigner {
 	function handleRelease() {
 		if(isset($_GET['release'])) {
 			return $this->releaseGate($_GET['release']);
+		}
+
+		return false;
+	}
+
+	function handleReleaseCS() {
+		if(isset($_GET['releaseCS'])) {
+			return $this->releaseCallsign($_GET['releaseCS']);
 		}
 
 		return false;

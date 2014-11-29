@@ -1,6 +1,8 @@
 <?php
 
 class Definitions {
+	public static $generalAviationGate = "GA";
+
 	private	static $airlinesICAOtoIATA = array(
 		'ADH' => 'AP', # Air One
 		'ADR' => 'JP', # Adria Airways

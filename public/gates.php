@@ -52,17 +52,17 @@ require('include/tpl_header.php');
 							echo '<tr><td colspan="5">All gates are free.</td></tr>';
 						}
 
-						foreach($allGates as $gate => $data) {
+						foreach($allGates as $gate => $callsign) {
 							echo '<tr><td>' . $gate . '</td>';
 
-							$assignment = $gateAssigner->isGateAssigned($gate);
+							$assignment = $gateAssigner->isCallsignAssigned($callsign);
 
-							if($assignment['callsign'] == 'unknown') {
+							if($callsign == 'unknown') {
 								echo '<td colspan="3"><em>unknown</em></td>';
 							}
 							else {
-								echo '<td>' . $data['aircraftType'] . '</td>';
-								echo '<td>' . $assignment['callsign'] . '</td>';
+								echo '<td>' . $assignment['aircraftType'] . '</td>';
+								echo '<td>' . $callsign . '</td>';
 								echo '<td><span class="glyphicon glyphicon-'	. Definitions::resolveMatchTypeIcon($assignment['matchType']) . '"></span></td>';
 							}					
 						

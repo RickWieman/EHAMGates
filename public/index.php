@@ -14,7 +14,7 @@ if(!isset($_SESSION['gateAssigner']) || !$gateAssigner instanceof GateAssigner) 
 	$gateAssigner = new GateAssigner();
 }
 
-if($gateAssigner->handleRelease()) {
+if($gateAssigner->handleRelease() || $gateAssigner->handleReleaseCS()) {
 	$_SESSION['gateAssigner'] = serialize($gateAssigner);
 
 	header("Location: " . $_SERVER['PHP_SELF']);
@@ -82,7 +82,7 @@ require('include/tpl_header.php');
 					echo '<td><span class="glyphicon glyphicon-' . Definitions::resolveMatchTypeIcon($result['matchType']) . '"></span> ' . $result['gate'] . '</td>';
 					echo '<td style="text-align: right;">';
 					if($assigned) {
-						echo '<a href="?release='. $result['gate'] .'" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-log-out"></span> Release</a>';
+						echo '<a href="?releaseCS='. $callsign .'" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-log-out"></span> Release</a>';
 					}
 					elseif(!isset($result['matchType'])) {
 						echo '<em>No Actions</em>';
@@ -105,6 +105,7 @@ require('include/tpl_header.php');
 										echo '<option value="'. $gate .'">' . $gate . ' (' . $cat . ')</option>';
 									}
 									?>
+									<option value="<?php echo Definitions::$generalAviationGate; ?>">* GA *</option>
 								</select>
 								<button type="submit" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</button>
 							</form>

@@ -388,7 +388,7 @@ class Definitions {
 	
 	static function resolveAirlineCode($callsign) {
 		if(!preg_match('/^[A-Z]{3}/', $callsign, $airlineCode)) {
-			if(!preg_match('/^[A-Z]{2}/', $callsign, $airlineCode)) {
+			if(!preg_match('/^[A-Z0-9]{2}/', $callsign, $airlineCode)) {
 				return false;
 			}
 			return Definitions::convertAirlineIATAtoICAO($airlineCode[0]);

@@ -33,7 +33,8 @@ Last update of real life data: <?php echo date("H:i:s (d-m-Y)", $stamp); ?></p>
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if(!empty($_POST['inputCallsign']) && !empty($_POST['inputACType'])
-		&& ($_POST['inputOriginMethod'] == 'checkbox' || ($_POST['inputOriginMethod'] == 'text' && !empty($_POST['inputOrigin'])))) {
+		&& ($_POST['inputOriginMethod'] == 'checkbox' || ($_POST['inputOriginMethod'] == 'text' && !empty($_POST['inputOrigin'])))
+		&& (!$gateAssigner->isCallsignAssigned($_POST['inputCallsign']))) {
 
 		if($_POST['inputOriginMethod'] == 'checkbox') {
 			$origin = (isset($_POST['inputOrigin']) && $_POST['inputOrigin'] == 'schengen') ? 'schengen' : 'nonschengen';
@@ -49,7 +50,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		?>
 		<div class="alert alert-danger">
 			<span class="glyphicon glyphicon-warning-sign"></span>
-			Please fill in all the fields...
+			<?php if($gateAssigner->isCallsignAssigned($_POST['inputCallsign'])) { ?>
+				This callsign is already assigned!
+			<?php } else { ?>
+				Please fill in all the fields...
+			<?php } ?>
 		</div>
 		<?php
 	}
@@ -185,9 +190,9 @@ if($gateAssigner->result()) {
 		<tbody>
 			<?php
 			$i = 0;
-			foreach($gateAssigner->getAssignedGates() as $gate => $data) {
-				if($data['callsign'] != 'unknown') {
-					echo '<tr><td>' . $data['callsign'] . '</td><td>' . $gate . '</td>';
+			foreach($gateAssigner->getAssignedGates() as $gate => $callsign) {
+				if($callsign != 'unknown') {
+					echo '<tr><td>' . $callsign . '</td><td>' . $gate . '</td>';
 					echo '<td style="text-align: right;"><a href="?release=' . $gate . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a></td></tr>';
 					$i++;
 				}

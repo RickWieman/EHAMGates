@@ -4,6 +4,16 @@ if(!defined('PAGE')) {
 }
 ?>
 	</div>
+	<footer class="footer">
+		<div class="container">
+			<hr />
+			<p class="small">
+				Version 0.5.1<br />
+				Not to be used in real aviation!<br />
+				Source code available at <a href="https://github.com/RickWieman/EHAMGates">GitHub</a>.
+			</p>
+		</div>
+	</footer>
 	<script src="js/bootstrap.min.js"></script>
 </body>
 </html>

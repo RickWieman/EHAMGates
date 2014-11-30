@@ -37,9 +37,8 @@ require('include/tpl_header.php');
 	<div class="col-md-6">
 		<h1>Inbound List</h1>
 
-		<p>VATSIM data gets updated every 2 minutes (server list every hour), real life data gets updated every 15 minutes.</p>
-		<p>The last VATSIM update: <strong><?php echo date("i:s", time() - $vp->lastDataFetch()); ?> minutes ago</strong>.<br />
-		Last real life data update: <strong><?php echo date("i:s", time() - $rldLastDataFetch); ?> minutes ago</strong>.</p>
+		<p>Next VATSIM update in <strong><?php echo date("i:s", 120 + $vp->lastDataFetch() - time()); ?> minutes</strong>.<br />
+		Next DPS update in <strong><?php echo date("i:s", 900 + $rldLastDataFetch - time()); ?> minutes</strong>.</p>
 
 		<table class="table table-hover table-condensed" id="inboundList">
 			<thead>

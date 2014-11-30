@@ -26,6 +26,9 @@ if($gateAssigner->handleRelease() || $gateAssigner->handleReleaseCS()) {
 
 $vp = new VatsimParser();
 $vatsimData = $vp->parseData();
+$gateAssigner->loadRemoteData();
+
+$rldLastDataFetch = (file_exists('data.txt') ? file_get_contents('data.txt', NULL, NULL, 0, 10) : time());
 
 define('PAGE', 'vatsim');
 require('include/tpl_header.php');
@@ -34,8 +37,9 @@ require('include/tpl_header.php');
 	<div class="col-md-6">
 		<h1>Inbound List</h1>
 
-		<p>VATSIM data gets updated every 2 minutes (server list every hour), real life data gets updated every 15 minutes.
-			The last VATSIM update was <strong><?php echo date("i:s", time()-$vp->lastDataFetch()); ?> minutes ago</strong>.</p>
+		<p>VATSIM data gets updated every 2 minutes (server list every hour), real life data gets updated every 15 minutes.</p>
+		<p>The last VATSIM update: <strong><?php echo date("i:s", time() - $vp->lastDataFetch()); ?> minutes ago</strong>.<br />
+		Last real life data update: <strong><?php echo date("i:s", time() - $rldLastDataFetch); ?> minutes ago</strong>.</p>
 
 		<table class="table table-hover table-condensed" id="inboundList">
 			<thead>

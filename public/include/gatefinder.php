@@ -14,7 +14,11 @@ class GateFinder {
 	function __construct($useData = null) {
 		$this->realGates = new RealGates($useData);
 	}
-	
+
+	function loadRemoteData() {
+		$this->realGates->parseData();
+	}
+
 	function occupyGate($gate) {
 		$this->occupiedGates[] = $gate;
 	}

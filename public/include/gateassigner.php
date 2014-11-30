@@ -16,6 +16,10 @@ class GateAssigner {
 		$this->gateFinder = new GateFinder($dataSource);
 	}
 
+	function loadRemoteData() {
+		$this->gateFinder->loadRemoteData();
+	}
+
 	function assignGate($gate, $matchType, $callsign = 'unknown', $aircraftType = null, $origin = null) {
 		if((array_key_exists($gate, Gates_EHAM::allGates())
 			|| array_key_exists($gate, Gates_EHAM::allCargoGates())

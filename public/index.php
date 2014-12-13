@@ -84,7 +84,8 @@ require('include/tpl_header.php');
 					$rowClass = ($data['flightrules'] == 'V') ? 'text-muted' : '';
 					$isUnknownAircraftType = !Definitions::canTranslateAircraftType($result['aircraftType']);
 
-					echo '<tr class="'. $rowClass .'"><td>' . $callsign . '</td><td class="hidden-xs' . (($isUnknownAircraftType) ? ' danger' : '') . '">' . $result['aircraftType'] . '</td>';
+					echo '<tr class="'. $rowClass .'" id="row-'. $callsign .'">';
+					echo '<td>' . $callsign . '</td><td class="hidden-xs' . (($isUnknownAircraftType) ? ' danger' : '') . '">' . $result['aircraftType'] . '</td>';
 					echo '<td class="hidden-xs">' . $result['origin'] . '</td>';
 
 					if($data['groundspeed'] > 25) {
@@ -106,34 +107,45 @@ require('include/tpl_header.php');
 
 					echo '<td class="hidden-xs">' . $status .'</td>';
 					echo '<td><span class="glyphicon glyphicon-' . Definitions::resolveMatchTypeIcon($result['matchType']) . '"></span> ' . $result['gate'] . '</td>';
-					echo '<td style="text-align: right;">';
+					echo '<td style="text-align: right; width: 150px;" class="action-buttons">';
 					if($assigned) {
-						echo '<a href="?releaseCS='. $callsign .'" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-log-out"></span> Release</a>';
+						echo '<a href="?releaseCS='. $callsign .'" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span></a>';
 					}
 					elseif(!isset($result['matchType'])) {
 						echo '<em>No Actions</em>';
 					}
-					elseif($result['matchType'] != 'NONE') {
-						echo '<a href="?callsign='. $callsign .'&amp;assign" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</a>';
-						echo ' <a href="?callsign='. $callsign .'&amp;occupied" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-ban-circle"></span> Occupied</a>';
-					}
 					else {
+						if($result['matchType'] != 'NONE') {
+							echo '<span class="auto-assign">';
+								echo '<a href="?callsign='. $callsign .'&amp;assign" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-ok"></span></a>';
+								echo ' <a href="?callsign='. $callsign .'&amp;occupied" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-ban-circle"></span></a>';
+								echo ' <a href="javascript:toggleForm(\''.$callsign.'\')" class="btn btn-warning btn-xs"><span class="glyphicon glyphicon-user"></span></a>';
+							echo '</span>';
+						}
+
 						$freeGates = $gateAssigner->getFreeGates($result['aircraftType'], $result['origin']);
 
 						if(count($freeGates) > 0) {
 							?>
-							<form class="form-inline" method="get">
+							<form class="form-inline" method="get"<?php echo ($result['matchType'] != 'NONE') ? ' style="display: none;"' : null ?>>
 								<input type="hidden" name="callsign" value="<?php echo $callsign; ?>" />
 								<label for="manual" class="sr-only">Aircraft type</label>
 								<select class="form-control-xs" name="manual">
 									<?php
 									foreach($freeGates as $gate => $cat) {
-										echo '<option value="'. $gate .'">' . $gate . ' (' . $cat . ')</option>';
+										echo '<option value="'. $gate .'"' . (($result['matchType'] != 'NONE' && $result['gate'] == $gate) ? ' selected="selected"' : null) . '>';
+											echo $gate . ' (' . $cat . ')';
+										echo '</option>';
 									}
 									?>
 									<option value="<?php echo Definitions::$generalAviationGate; ?>">* GA *</option>
 								</select>
-								<button type="submit" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</button>
+								<button type="submit" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-ok"></span></button>
+								<?php
+								if($result['matchType'] != 'NONE') {
+									echo ' <a href="javascript:toggleForm(\''.$callsign.'\')" class="btn btn-warning btn-xs"><span class="glyphicon glyphicon-user"></span></a>';
+								}
+								?>
 							</form>
 							<?php
 						}
@@ -156,6 +168,12 @@ require('include/tpl_header.php');
 				widgets: ["saveSort"]
 			});
 		});
+
+		function toggleForm(callsign) {
+			var buttonField = $("#row-" + callsign).find(".action-buttons");
+			buttonField.find("form").toggle();
+			buttonField.find(".auto-assign").toggle();
+		}
 	</script>
 </div>
 

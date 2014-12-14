@@ -109,7 +109,7 @@ require('include/tpl_header.php');
 					echo '<td><span class="glyphicon glyphicon-' . Definitions::resolveMatchTypeIcon($result['matchType']) . '"></span> ' . $result['gate'] . '</td>';
 					echo '<td style="text-align: right; width: 150px;" class="action-buttons">';
 					if($assigned) {
-						echo '<a href="?releaseCS='. $callsign .'" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span></a>';
+						echo '<a href="?releaseCS='. $callsign .'" class="btn btn-danger btn-xs" title="Release"><span class="glyphicon glyphicon-remove"></span></a>';
 					}
 					elseif(!isset($result['matchType'])) {
 						echo '<em>No Actions</em>';
@@ -117,9 +117,9 @@ require('include/tpl_header.php');
 					else {
 						if($result['matchType'] != 'NONE') {
 							echo '<span class="auto-assign">';
-								echo '<a href="?callsign='. $callsign .'&amp;assign" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-ok"></span></a>';
-								echo ' <a href="?callsign='. $callsign .'&amp;occupied" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-ban-circle"></span></a>';
-								echo ' <a href="javascript:toggleForm(\''.$callsign.'\')" class="btn btn-warning btn-xs"><span class="glyphicon glyphicon-user"></span></a>';
+								echo '<a href="?callsign='. $callsign .'&amp;assign" class="btn btn-success btn-xs" title="Assign"><span class="glyphicon glyphicon-ok"></span></a>';
+								echo ' <a href="?callsign='. $callsign .'&amp;occupied" class="btn btn-danger btn-xs" title="Already Occupied"><span class="glyphicon glyphicon-ban-circle"></span></a>';
+								echo ' <a href="javascript:toggleForm(\''.$callsign.'\')" class="btn btn-warning btn-xs" title="Manual Override"><span class="glyphicon glyphicon-user"></span></a>';
 							echo '</span>';
 						}
 
@@ -129,7 +129,6 @@ require('include/tpl_header.php');
 							?>
 							<form class="form-inline" method="get"<?php echo ($result['matchType'] != 'NONE') ? ' style="display: none;"' : null ?>>
 								<input type="hidden" name="callsign" value="<?php echo $callsign; ?>" />
-								<label for="manual" class="sr-only">Aircraft type</label>
 								<select class="form-control-xs" name="manual">
 									<?php
 									foreach($freeGates as $gate => $cat) {
@@ -140,10 +139,10 @@ require('include/tpl_header.php');
 									?>
 									<option value="<?php echo Definitions::$generalAviationGate; ?>">* GA *</option>
 								</select>
-								<button type="submit" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-ok"></span></button>
+								<button type="submit" class="btn btn-success btn-xs" title="Assign"><span class="glyphicon glyphicon-ok"></span></button>
 								<?php
 								if($result['matchType'] != 'NONE') {
-									echo ' <a href="javascript:toggleForm(\''.$callsign.'\')" class="btn btn-warning btn-xs"><span class="glyphicon glyphicon-user"></span></a>';
+									echo ' <a href="javascript:toggleForm(\''.$callsign.'\')" class="btn btn-warning btn-xs" title="Manual Override"><span class="glyphicon glyphicon-user"></span></a>';
 								}
 								?>
 							</form>

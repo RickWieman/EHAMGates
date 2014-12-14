@@ -13,6 +13,7 @@ require('include/tpl_header.php');
 <h1>Personal Configuration</h1>
 
 <p>Here you can tweak the Gate Finder to your personal needs. The changes you make are stored in cookies and preserved for 30 days.</p>
+<p>Currently, this configuration only changes the behavior of the Search page.</p>
 
 <form class="form-horizontal" role="form" method="post">
 	<div class="form-group">

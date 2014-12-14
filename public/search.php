@@ -195,7 +195,7 @@ require_once('include/tpl_header.php');
 					foreach($gateAssigner->getAssignedGates() as $gate => $callsign) {
 						if($callsign != 'unknown') {
 							echo '<tr><td>' . $callsign . '</td><td>' . $gate . '</td>';
-							echo '<td style="text-align: right;"><a href="?release=' . $gate . '" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a></td></tr>';
+							echo '<td style="text-align: right;"><a href="?release=' . $gate . '" class="btn btn-danger btn-xs" title="Release"><span class="glyphicon glyphicon-remove"></span></a></td></tr>';
 							$i++;
 						}
 					}

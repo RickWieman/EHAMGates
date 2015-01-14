@@ -485,7 +485,7 @@ class Callsigns_EHAM {
 	}
 
 	static function getCallsignsFromFile() {
-		$data = file_get_contents(self::$extraCallsignsFile);
+		$data = (file_exists(self::$extraCallsignsFile)) ? file_get_contents(self::$extraCallsignsFile) : '{}';
 		$data = json_decode($data, true);
 
 		return $data;

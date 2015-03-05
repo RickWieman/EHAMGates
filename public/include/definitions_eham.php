@@ -152,7 +152,7 @@ class Gates_EHAM {
 		'FDX' => array('S72', 'S74'),
 		'LCO' => array('R'),
 		'NCA' => array('R'),
-		'QTR' => array('R'),
+		'QTR' => array('S'),
 		'MPH' => array('S72', 'S74', 'S77'),
 		'SQC' => array('R72', 'R74', 'R77', 'R80')
 	);

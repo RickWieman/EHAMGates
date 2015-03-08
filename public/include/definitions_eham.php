@@ -287,28 +287,15 @@ class Gates_EHAM {
 		'C11' => 4,
 		'C13' => 4,
 		'C15' => 4,
+	);
 
+	private static $schengenNonSchengenGates = array(
 		'D02' => 6,
 		'D04' => 6,
 		'D08' => 6,
 		'D10' => 5,
 		'D12' => 5,
-		'D14' => 3,
-		'D16' => 4,
-		'D18' => 4,
-		'D22' => 4,
-		'D24' => 4,
-		'D26' => 4,
-		'D28' => 4,
 
-		'D23' => 4,
-		'D25' => 4,
-		'D27' => 4,
-		'D29' => 4,
-		'D31' => 4
-	);
-
-	private static $schengenNonSchengenGates = array(
 		'D44' => 4,
 		'D48' => 4,
 		'D52' => 4,
@@ -337,6 +324,20 @@ class Gates_EHAM {
 	);
 
 	private static $nonSchengenGates = array(
+		'D14' => 3,
+		'D16' => 4,
+		'D18' => 4,
+		'D22' => 4,
+		'D24' => 4,
+		'D26' => 4,
+		'D28' => 4,
+
+		'D23' => 4,
+		'D25' => 4,
+		'D27' => 4,
+		'D29' => 4,
+		'D31' => 4,
+
 		'E02' => 6,
 		'E04' => 4,
 		'E06' => 7,

@@ -302,6 +302,7 @@ class Definitions {
 		'LK', # Czech Republic
 		'LP', # Portugal
 		'LE', # Spain
+		'GC', # Canary Islands
 		'ES', # Sweden
 		'LM', # Malta
 		'LS'  # Switzerland

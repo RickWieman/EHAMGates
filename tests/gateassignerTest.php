@@ -32,17 +32,19 @@ class GateAssignerTest extends PHPUnit_Framework_TestCase {
 		$this->ga->assignFoundGate();
 
 		$this->assertArrayHasKey($result['gate'], $this->ga->getAssignedGates());
+		$this->assertArrayHasKey('TRA6868', $this->ga->getAssignedCallsigns());
 		$this->assertNotFalse($this->ga->isGateAssigned($result['gate']));
+		$this->assertNotFalse($this->ga->isCallsignAssigned('TRA6868'));
 		$this->assertFalse($this->ga->result());
 	}
 
 	public function testAssignGateManual() {
-		$result = $this->ga->result();
-
 		$this->ga->assignManualGate('D53');
 
 		$this->assertArrayHasKey('D53', $this->ga->getAssignedGates());
+		$this->assertArrayHasKey('TRA6868', $this->ga->getAssignedCallsigns());
 		$this->assertNotFalse($this->ga->isGateAssigned('D53'));
+		$this->assertNotFalse($this->ga->isCallsignAssigned('TRA6868'));
 		$this->assertFalse($this->ga->result());
 	}
 
@@ -51,7 +53,25 @@ class GateAssignerTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertFalse($assign);
 		$this->assertArrayNotHasKey('Z01', $this->ga->getAssignedGates());
+		$this->assertArrayNotHasKey('TRA6868', $this->ga->getAssignedCallsigns());
 		$this->assertFalse($this->ga->isGateAssigned('Z01'));
+	}
+
+	public function testReleaseCallsign() {
+		$this->ga->assignFoundGate();
+		$this->assertArrayHasKey('TRA6868', $this->ga->getAssignedCallsigns());
+
+		$this->ga->releaseCallsign('TRA6868');
+		$this->assertArrayNotHasKey('TRA6868', $this->ga->getAssignedCallsigns());
+	}
+
+	public function testReleaseCallsignFail() {
+		$this->assertFalse($this->ga->isCallsignAssigned('TRA6868'));
+
+		$release = $this->ga->releaseCallsign('TRA6868');
+
+		$this->assertFalse($release);
+		$this->assertFalse($this->ga->isCallsignAssigned('TRA6868'));
 	}
 
 	public function testReleaseGate() {
@@ -74,19 +94,31 @@ class GateAssignerTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testAssignedCallsign() {
-		$result = $this->ga->result();
-
 		$this->ga->assignFoundGate();
 
 		$assigned = $this->ga->isCallsignAssigned('TRA6868');
 
-		$this->assertEquals('TRA6868', $assigned['callsign']);
+		$this->assertNotFalse($assigned);
 	}
 
 	public function testAssignedCallsignFalse() {
 		$assigned = $this->ga->isCallsignAssigned('ABC001');
 
 		$this->assertFalse($assigned);
+	}
+
+	public function testAlreadyOccupied() {
+		$result1 = $this->ga->result();
+
+		$this->ga->alreadyOccupied();
+
+		$this->assertArrayHasKey($result1['gate'], $this->ga->getAssignedGates());
+		$this->assertEquals('unknown', $this->ga->isGateAssigned($result1['gate']));
+		$this->assertArrayNotHasKey('TRA6868', $this->ga->getAssignedCallsigns());
+
+		$result2 = $this->ga->result();
+
+		$this->assertNotEquals($result2['gate'], $result1['gate']);
 	}
 }
 ?>

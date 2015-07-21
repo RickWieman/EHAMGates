@@ -17,8 +17,6 @@ class RealGatesTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testAllGatesImplemented() {
-		$this->markTestSkipped('Not all real gates can be implemented yet due to incomplete scenery.');
-
 		$rg = new RealGates('testdata.txt');
 
 		$allRealGates = array_filter($rg->getAllRealGates(), function($value) {

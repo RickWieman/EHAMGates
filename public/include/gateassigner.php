@@ -4,26 +4,39 @@ require_once('gatefinder.php');
 
 class GateAssigner {
 	
+	private $assignedCallsigns = array();
 	private $assignedGates = array();
 	private $gateFinder;
 
 	private $lastRequest;
 
+	private $foundGates = array();
+
 	function __construct($dataSource = null) {
 		$this->gateFinder = new GateFinder($dataSource);
 	}
 
+	function loadRemoteData() {
+		$this->gateFinder->loadRemoteData();
+	}
+
 	function assignGate($gate, $matchType, $callsign = 'unknown', $aircraftType = null, $origin = null) {
 		if((array_key_exists($gate, Gates_EHAM::allGates())
-			|| array_key_exists($gate, Gates_EHAM::allCargoGates()))) {
-			$this->assignedGates[$gate] = array(
-				'callsign' => $callsign,
-				'aircraftType' => $aircraftType,
-				'origin' => $origin,
-				'matchType' => $matchType
-			);
+			|| array_key_exists($gate, Gates_EHAM::allCargoGates())
+			|| $gate == Definitions::$generalAviationGate)) {
+			if($callsign != 'unknown') {
+				$this->assignedCallsigns[$callsign] = array(
+					'gate' => $gate,
+					'aircraftType' => $aircraftType,
+					'origin' => $origin,
+					'matchType' => $matchType
+				);
+			}
 
-			$this->gateFinder->occupyGate($gate);
+			if($gate != Definitions::$generalAviationGate) {
+				$this->assignedGates[$gate] = $callsign;
+				$this->gateFinder->occupyGate($gate);
+			}
 			
 			if($matchType != 'OCCUPIED') {
 				$this->resetSearch();
@@ -45,6 +58,11 @@ class GateAssigner {
 
 	function releaseGate($gate) {
 		if(array_key_exists($gate, $this->assignedGates)) {
+			$callsign = $this->assignedGates[$gate];
+			if($callsign != 'unknown') {
+				unset($this->assignedCallsigns[$callsign]);
+			}
+
 			unset($this->assignedGates[$gate]);
 			$this->gateFinder->releaseGate($gate);
 
@@ -54,20 +72,41 @@ class GateAssigner {
 		return false;
 	}
 
-	function findGate($callsign, $aircraftType, $origin) {
-		$callsign = strtoupper($callsign);
-		$origin = strtoupper($origin);
+	function releaseCallsign($callsign) {
+		if(array_key_exists($callsign, $this->assignedCallsigns)) {
+			$gate = $this->assignedCallsigns[$callsign]['gate'];
+			if($gate != Definitions::$generalAviationGate) {
+				unset($this->assignedGates[$gate]);
+				$this->gateFinder->releaseGate($gate);
+			}
 
-		$this->lastRequest = array(
-			'callsign' 		=> $callsign,
-			'aircraftType' 	=> $aircraftType,
-			'origin' 		=> $origin
-		);
+			unset($this->assignedCallsigns[$callsign]);
 
-		$gate = $this->gateFinder->findGate($callsign, $aircraftType, $origin);
+			return true;
+		}
 
-		$this->lastRequest['gate'] = $gate['gate'];
-		$this->lastRequest['matchType'] = $gate['match'];
+		return false;
+	}
+
+	function findGate($callsign, $aircraftType, $origin, $force = true) {
+		if($force || !array_key_exists($callsign, $this->foundGates)) {
+			$callsign = strtoupper($callsign);
+			$origin = strtoupper($origin);
+
+			$gate = $this->gateFinder->findGate($callsign, $aircraftType, $origin);
+
+			$result = array(
+				'callsign' 		=> $callsign,
+				'aircraftType' 	=> $aircraftType,
+				'origin' 		=> $origin,
+				'gate'			=> $gate['gate'],
+				'matchType'		=> $gate['match']
+			);
+
+			$this->foundGates[$callsign] = $result;
+		}
+
+		$this->lastRequest = $this->foundGates[$callsign];
 	}
 
 	function alreadyOccupied() {
@@ -103,6 +142,12 @@ class GateAssigner {
 		return $this->assignedGates;
 	}
 
+	function getAssignedCallsigns() {
+		ksort($this->assignedCallsigns);
+
+		return $this->assignedCallsigns;
+	}
+
 	function resetSearch() {
 		$this->lastRequest = null;
 	}
@@ -116,11 +161,8 @@ class GateAssigner {
 	}
 
 	function isCallsignAssigned($callsign) {
-		foreach($this->assignedGates as $gate => $data) {
-			if($data['callsign'] == $callsign) {
-				$data['gate'] = $gate;
-				return $data;
-			}
+		if(array_key_exists($callsign, $this->assignedCallsigns)) {
+			return $this->assignedCallsigns[$callsign];
 		}
 
 		return false;
@@ -165,6 +207,12 @@ class GateAssigner {
 
 		return false;
 	}
-}
 
-?>
+	function handleReleaseCS() {
+		if(isset($_GET['releaseCS'])) {
+			return $this->releaseCallsign($_GET['releaseCS']);
+		}
+
+		return false;
+	}
+}

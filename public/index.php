@@ -1,9 +1,12 @@
 <?php
 session_start();
 
+date_default_timezone_set('Zulu');
+
 require_once('include/definitions_global.php');
 require_once('include/vatsimparser.php');
 require_once('include/gateassigner.php');
+require_once('include/tools.php');
 
 // Initialize GateAssigner: Either get it from the SESSION or create a new instance.
 if(isset($_SESSION['gateAssigner'])) {
@@ -14,7 +17,7 @@ if(!isset($_SESSION['gateAssigner']) || !$gateAssigner instanceof GateAssigner) 
 	$gateAssigner = new GateAssigner();
 }
 
-if($gateAssigner->handleRelease()) {
+if($gateAssigner->handleRelease() || $gateAssigner->handleReleaseCS()) {
 	$_SESSION['gateAssigner'] = serialize($gateAssigner);
 
 	header("Location: " . $_SERVER['PHP_SELF']);
@@ -23,6 +26,9 @@ if($gateAssigner->handleRelease()) {
 
 $vp = new VatsimParser();
 $vatsimData = $vp->parseData();
+$gateAssigner->loadRemoteData();
+
+$rldLastDataFetch = (file_exists('data.txt') ? file_get_contents('data.txt', NULL, NULL, 0, 10) : time());
 
 define('PAGE', 'vatsim');
 require('include/tpl_header.php');
@@ -31,15 +37,16 @@ require('include/tpl_header.php');
 	<div class="col-md-6">
 		<h1>Inbound List</h1>
 
-		<p>VATSIM data gets updated every 2 minutes (server list every hour), real life data gets updated every 15 minutes.
-			The last VATSIM update was <strong><?php echo date("i:s", time()-$vp->lastDataFetch()); ?> minutes ago</strong>.</p>
+		<p>Next VATSIM update in <strong><?php echo date("i:s", 120 + $vp->lastDataFetch() - time()); ?> minutes</strong>.<br />
+		Next DPS update in <strong><?php echo date("i:s", 900 + $rldLastDataFetch - time()); ?> minutes</strong>.</p>
 
-		<table class="table table-hover table-condensed">
+		<table class="table table-hover table-condensed" id="inboundList">
 			<thead>
 				<tr>
 					<th>C/S</th>
 					<th class="hidden-xs">A/C</th>
 					<th class="hidden-xs">ORGN</th>
+					<th class="hidden-xs">ETA</th>
 					<th>GATE</th>
 					<th></th>
 				</tr>
@@ -56,11 +63,11 @@ require('include/tpl_header.php');
 						$assigned = true;
 					}
 					else {
-						$gateAssigner->findGate($callsign, $data['actype'], $data['origin']);
-
-						$result = $gateAssigner->result();
-
 						if(isset($_GET['callsign']) && $_GET['callsign'] == $callsign) {
+							// Load previously calculated result (by not enforcing the find)
+							$gateAssigner->findGate($callsign, $data['actype'], $data['origin'], false);
+							$result = $gateAssigner->result();
+
 							if($gateAssigner->handleAssign() || $gateAssigner->handleAssignManual() || $gateAssigner->handleOccupied()) {
 								$_SESSION['gateAssigner'] = serialize($gateAssigner);
 
@@ -68,41 +75,82 @@ require('include/tpl_header.php');
 								exit();
 							}
 						}
+
+						$gateAssigner->findGate($callsign, $data['actype'], $data['origin']);
+						$result = $gateAssigner->result();
 						$assigned = false;
 					}
 
 					$rowClass = ($data['flightrules'] == 'V') ? 'text-muted' : '';
+					$isUnknownAircraftType = !Definitions::canTranslateAircraftType($result['aircraftType']);
 
-					echo '<tr class="'. $rowClass .'"><td>' . $callsign . '</td><td class="hidden-xs">' . $result['aircraftType'] . '</td><td class="hidden-xs">' . $result['origin'] . '</td>';
+					echo '<tr class="'. $rowClass .'" id="row-'. $callsign .'">';
+					echo '<td>' . $callsign . '</td><td class="hidden-xs' . (($isUnknownAircraftType) ? ' danger' : '') . '">' . $result['aircraftType'] . '</td>';
+					echo '<td class="hidden-xs">' . $result['origin'] . '</td>';
+
+					if($data['groundspeed'] > 25) {
+						$eta = Tools::calculateETA($data['lat'], $data['long'], Gates_EHAM::$lat, Gates_EHAM::$long, $data['groundspeed']);
+						$etaTime = round((time() + $eta) - (time() - $vp->lastDataFetch()));
+
+						$status = '<span class="hide">' . $etaTime . '</span>' . date("H:i", $etaTime) . 'z';
+					}
+					else {
+						$dtg = Tools::calculateDTG($data['lat'], $data['long'], Gates_EHAM::$lat, Gates_EHAM::$long);
+
+						if($dtg < 15) {
+							$status = 'Landed';
+						}
+						else {
+							$status = 'Departing';
+						}
+					}
+
+					echo '<td class="hidden-xs">' . $status .'</td>';
 					echo '<td><span class="glyphicon glyphicon-' . Definitions::resolveMatchTypeIcon($result['matchType']) . '"></span> ' . $result['gate'] . '</td>';
-					echo '<td style="text-align: right;">';
+					echo '<td style="text-align: right; width: 150px;" class="action-buttons">';
 					if($assigned) {
-						echo '<a href="?release='. $result['gate'] .'" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-log-out"></span> Release</a>';
+						echo '<a href="?releaseCS='. $callsign .'" class="btn btn-danger btn-xs" title="Release"><span class="glyphicon glyphicon-remove"></span></a>';
 					}
 					elseif(!isset($result['matchType'])) {
 						echo '<em>No Actions</em>';
 					}
-					elseif($result['matchType'] != 'NONE') {
-						echo '<a href="?callsign='. $callsign .'&amp;assign" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</a>';
-						echo ' <a href="?callsign='. $callsign .'&amp;occupied" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-ban-circle"></span> Occupied</a>';
-					}
 					else {
-						?>
-						<form class="form-inline" method="get">
-							<input type="hidden" name="callsign" value="<?php echo $callsign; ?>" />
-							<label for="manual" class="sr-only">Aircraft type</label>
-							<select class="form-control-xs" name="manual">
-								<?php
-								$freeGates = $gateAssigner->getFreeGates($result['aircraftType'], $result['origin']);
+						if($result['matchType'] != 'NONE') {
+							echo '<span class="auto-assign">';
+								echo '<a href="?callsign='. $callsign .'&amp;assign" class="btn btn-success btn-xs" title="Assign"><span class="glyphicon glyphicon-ok"></span></a>';
+								echo ' <a href="?callsign='. $callsign .'&amp;occupied" class="btn btn-danger btn-xs" title="Already Occupied"><span class="glyphicon glyphicon-ban-circle"></span></a>';
+								echo ' <a href="javascript:toggleForm(\''.$callsign.'\')" class="btn btn-warning btn-xs" title="Manual Override"><span class="glyphicon glyphicon-user"></span></a>';
+							echo '</span>';
+						}
 
-								foreach($freeGates as $gate => $cat) {
-									echo '<option value="'. $gate .'">' . $gate . ' (' . $cat . ')</option>';
+						$freeGates = $gateAssigner->getFreeGates($result['aircraftType'], $result['origin']);
+
+						if(count($freeGates) > 0) {
+							?>
+							<form class="form-inline" method="get"<?php echo ($result['matchType'] != 'NONE') ? ' style="display: none;"' : null ?>>
+								<input type="hidden" name="callsign" value="<?php echo $callsign; ?>" />
+								<select class="form-control-xs" name="manual">
+									<?php
+									foreach($freeGates as $gate => $cat) {
+										echo '<option value="'. $gate .'"' . (($result['matchType'] != 'NONE' && $result['gate'] == $gate) ? ' selected="selected"' : null) . '>';
+											echo $gate . ' (' . $cat . ')';
+										echo '</option>';
+									}
+									echo '<option value="'. Definitions::$generalAviationGate . '"' . (($data['flightrules'] == 'V') ? ' selected="selected"' : null) . '>* GA *</option>';
+									?>
+								</select>
+								<button type="submit" class="btn btn-success btn-xs" title="Assign"><span class="glyphicon glyphicon-ok"></span></button>
+								<?php
+								if($result['matchType'] != 'NONE') {
+									echo ' <a href="javascript:toggleForm(\''.$callsign.'\')" class="btn btn-warning btn-xs" title="Manual Override"><span class="glyphicon glyphicon-user"></span></a>';
 								}
 								?>
-							</select>
-							<button type="submit" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-log-in"></span> Assign</button>
-						</form>
-						<?php
+							</form>
+							<?php
+						}
+						else {
+							echo '<em>No Suitable Gates</em>';
+						}
 					}
 					echo '</td></tr>';
 				}
@@ -111,6 +159,21 @@ require('include/tpl_header.php');
 			</tbody>
 		</table>
 	</div>
+	<script src="js/jquery.tablesorter.min.js"></script>
+	<script src="js/jquery.tablesorter.widgets.min.js"></script>
+	<script>
+		$(document).ready(function() {
+			$("#inboundList").tablesorter({
+				widgets: ["saveSort"]
+			});
+		});
+
+		function toggleForm(callsign) {
+			var buttonField = $("#row-" + callsign).find(".action-buttons");
+			buttonField.find("form").toggle();
+			buttonField.find(".auto-assign").toggle();
+		}
+	</script>
 </div>
 
 <div class="row">

@@ -48,5 +48,40 @@ class VatsimParserTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('I', $data['KLM655']['flightrules']);
 		$this->assertEquals('B77L', $data['KLM655']['actype']);
 	}
+
+	public function testAircraftTypeSingle() {
+		$vp1 = new VatsimParser('testdata-vatsim-servers.txt');
+
+		$actual = $vp1->parseAircraftType('B777L');
+		$this->assertEquals('B777L', $actual);
+	}
+
+	public function testAircraftTypeDualFirst() {
+		$vp1 = new VatsimParser('testdata-vatsim-servers.txt');
+
+		$actual = $vp1->parseAircraftType('H/B744');
+		$this->assertEquals('B744', $actual);
+	}
+
+	public function testAircraftTypeDualLast() {
+		$vp1 = new VatsimParser('testdata-vatsim-servers.txt');
+
+		$actual = $vp1->parseAircraftType('B777L/F');
+		$this->assertEquals('B777L', $actual);
+	}
+
+	public function testAircraftTypeTriple() {
+		$vp1 = new VatsimParser('testdata-vatsim-servers.txt');
+
+		$actual = $vp1->parseAircraftType('H/B777W/F');
+		$this->assertEquals('B777W', $actual);
+	}
+
+	public function testAircraftTypeTripleWeird() {
+		$vp1 = new VatsimParser('testdata-vatsim-servers.txt');
+
+		$actual = $vp1->parseAircraftType('M/B737-700/X');
+		$this->assertEquals('B737-700', $actual);
+	}
 }
 ?>

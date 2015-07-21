@@ -4,7 +4,16 @@ if(!defined('PAGE')) {
 }
 ?>
 	</div>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<footer class="footer">
+		<div class="container">
+			<hr />
+			<p class="small">
+				Version 0.5.3.2<br />
+				Not to be used in real aviation!<br />
+				Source code available at <a href="https://github.com/RickWieman/EHAMGates">GitHub</a>.
+			</p>
+		</div>
+	</footer>
 	<script src="js/bootstrap.min.js"></script>
 </body>
 </html>

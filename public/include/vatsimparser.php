@@ -65,6 +65,10 @@ class VatsimParser {
 		return file_get_contents('data-vatsim.txt');
 	}
 
+	function parseAircraftType($filedAircraftType) {
+		return preg_replace('/([A-Z]*\/)?([A-Z0-9\-]*)(\/[A-Z]*)?/', '$2', $filedAircraftType);
+	}
+
 	function parseData() {
 		$data = $this->fetchData();
 
@@ -123,8 +127,14 @@ class VatsimParser {
 
 			if(array_key_exists(3, $fields) && $fields[3] == 'PILOT') {
 				if($fields[13] == 'EHAM') {
-					$actype = preg_replace('/([A-Z]\/)?(.*)(\/[A-Z])+/', '$2', $fields[9]);
-					$allPilots[$fields[0]] = array('origin' => $fields[11], 'actype' => $actype, 'flightrules' => $fields[21]);
+					$allPilots[$fields[0]] = array(
+						'origin' => $fields[11],
+						'actype' => $this->parseAircraftType($fields[9]),
+						'flightrules' => $fields[21],
+						'lat' => $fields[5],
+						'long' => $fields[6],
+						'groundspeed' => $fields[8]
+					);
 				}
 			}
 		}
@@ -134,4 +144,3 @@ class VatsimParser {
 		return $allPilots;
 	}
 }
-?>

@@ -2,7 +2,9 @@
 require_once('definitions_global.php');
 
 class Gates_EHAM {
-	
+	public static $lat = 52.3081;
+	public static $long = 4.7642;
+
 	private static $aircraftExtraGates = array(
 		// Bravo Apron
 		'B463' => array('B91','B92','B93','B94','B95'),
@@ -45,7 +47,6 @@ class Gates_EHAM {
 		'A340' => array('E05'),
 		'A342' => array('E05'),
 		'A343' => array('E05'),
-		'A380' => array('E18','G09'),
 		'A388' => array('E18','G09'),
 		'B731' => array('D14'),
 		'B732' => array('D14'),
@@ -71,7 +72,7 @@ class Gates_EHAM {
 		'A318'   => array('D56'),
 		'A319'   => array('D56'),
 		'A320'   => array('D56'),
-		'A321'   => array('C15','C18','D23','D56'),
+		'A321'   => array('C15','C18','D23','D44','D56'),
 		'BAE146' => array('C07'),
 		'B773'   => array('F02','G04','G06','G08'),
 		'MD80'   => array('C15'),
@@ -151,7 +152,7 @@ class Gates_EHAM {
 		'FDX' => array('S72', 'S74'),
 		'LCO' => array('R'),
 		'NCA' => array('R'),
-		'QTR' => array('R'),
+		'QTR' => array('S'),
 		'MPH' => array('S72', 'S74', 'S77'),
 		'SQC' => array('R72', 'R74', 'R77', 'R80')
 	);
@@ -186,8 +187,10 @@ class Gates_EHAM {
 		'D64' => 'D08',
 		'D66' => 'D10',
 		'D68' => 'D12',
-		'D76' => 'D46',
+		'D74' => 'D44',
+		'D78' => 'D48',
 		'D82' => 'D52',
+		'D84' => 'D54',
 		'D86' => 'D56',
 
 		'D59' => 'D03',
@@ -284,28 +287,19 @@ class Gates_EHAM {
 		'C11' => 4,
 		'C13' => 4,
 		'C15' => 4,
+	);
 
+	private static $schengenNonSchengenGates = array(
 		'D02' => 6,
 		'D04' => 6,
 		'D08' => 6,
 		'D10' => 5,
 		'D12' => 5,
-		'D14' => 3,
-		'D16' => 4,
-		'D18' => 4,
-		'D22' => 4,
-		'D24' => 4,
-		'D26' => 4,
-		'D28' => 4,
 
-		'D23' => 4,
-		'D27' => 4,
-		'D31' => 4
-	);
-
-	private static $schengenNonSchengenGates = array(
-		'D46' => 4,
+		'D44' => 4,
+		'D48' => 4,
 		'D52' => 4,
+		'D54' => 4,
 		'D56' => 4,
 
 		'D03' => 7,
@@ -330,6 +324,20 @@ class Gates_EHAM {
 	);
 
 	private static $nonSchengenGates = array(
+		'D14' => 3,
+		'D16' => 4,
+		'D18' => 4,
+		'D22' => 4,
+		'D24' => 4,
+		'D26' => 4,
+		'D28' => 4,
+
+		'D23' => 4,
+		'D25' => 4,
+		'D27' => 4,
+		'D29' => 4,
+		'D31' => 4,
+
 		'E02' => 6,
 		'E04' => 4,
 		'E06' => 7,
@@ -398,7 +406,7 @@ class Gates_EHAM {
 		'S90' => 8,
 		'S92' => 8,
 		'S94' => 8,
-		'S95' => 8
+		'S96' => 8
 	);
 
 	static function allGates() {
@@ -446,6 +454,8 @@ class Gates_EHAM {
 	}
 
 	static function getExtraGates($aircraftType) {
+		$aircraftType = Definitions::translateInvalidAircraft($aircraftType);
+
 		if(array_key_exists($aircraftType, self::$aircraftExtraGates)) {
 			return self::$aircraftExtraGates[$aircraftType];
 		}
@@ -454,6 +464,8 @@ class Gates_EHAM {
 	}
 
 	static function getExcludedGates($aircraftType) {
+		$aircraftType = Definitions::translateInvalidAircraft($aircraftType);
+		
 		if(array_key_exists($aircraftType, self::$aircraftNotOnGates)) {
 			return self::$aircraftNotOnGates[$aircraftType];
 		}
@@ -473,5 +485,3 @@ class Gates_EHAM {
 		return in_array($gate, self::$busGates);
 	}
 }
-
-?>

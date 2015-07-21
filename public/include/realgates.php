@@ -9,16 +9,19 @@ class RealGates {
 
 	function __construct($useData = null) {
 		if($useData != null) {
-			$this->dataSource = $useData;	
+			$this->dataSource = $useData;
 		}
 	}
 
-	function fetchData($force = false) {
+	function isCacheExpired() {
 		$cacheDuration = 60 * 15;
 		$stamp = (file_exists($this->cacheFile) ? file_get_contents($this->cacheFile, NULL, NULL, 0, 10) : 0);
 
-		// Reload only when cache is expired
-		if(time() - $stamp > $cacheDuration || $force) {
+		return time() - $stamp > $cacheDuration;
+	}
+
+	function fetchData($force = false) {
+		if($this->isCacheExpired() || $force) {
 			$data = file_get_contents($this->dataSource);
 		
 			if($data) {
@@ -73,7 +76,7 @@ class RealGates {
 	}
 
 	function getAllRealGates() {
-		if(empty($this->allRealGates)) {
+		if(empty($this->allRealGates) || $this->isCacheExpired()) {
 			$this->parseData();
 		}
 

@@ -52,21 +52,21 @@ require('include/tpl_header.php');
 							echo '<tr><td colspan="5">All gates are free.</td></tr>';
 						}
 
-						foreach($allGates as $gate => $data) {
+						foreach($allGates as $gate => $callsign) {
 							echo '<tr><td>' . $gate . '</td>';
 
-							$assignment = $gateAssigner->isGateAssigned($gate);
+							$assignment = $gateAssigner->isCallsignAssigned($callsign);
 
-							if($assignment['callsign'] == 'unknown') {
+							if($callsign == 'unknown') {
 								echo '<td colspan="3"><em>unknown</em></td>';
 							}
 							else {
-								echo '<td>' . $data['aircraftType'] . '</td>';
-								echo '<td>' . $assignment['callsign'] . '</td>';
+								echo '<td>' . $assignment['aircraftType'] . '</td>';
+								echo '<td>' . $callsign . '</td>';
 								echo '<td><span class="glyphicon glyphicon-'	. Definitions::resolveMatchTypeIcon($assignment['matchType']) . '"></span></td>';
 							}					
 						
-							echo '<td style="text-align: right;"><a href="?release=' . $gate . '" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-log-out"></span> Release</a></td></tr>';
+							echo '<td style="text-align: right;"><a href="?release=' . $gate . '" class="btn btn-danger btn-xs" title="Release"><span class="glyphicon glyphicon-remove"></span></a></td></tr>';
 							
 						}
 						?>
@@ -109,13 +109,13 @@ require('include/tpl_header.php');
 					</thead>
 					<tbody>
 						<?php
-						$allGates = Gates_EHAM::allGates();
+						$allGates = array_merge(Gates_EHAM::allGates(), Gates_EHAM::allCargoGates());
 						ksort($allGates);
 
 						foreach($allGates as $gate => $cat) {
 							if(!$gateAssigner->isGateAssigned($gate)) {
 								echo '<tr><td>' . $gate . '</td><td>' . $cat . '</td>';
-								echo '<td style="text-align: right;"><a href="?occupy=' . $gate . '" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-ban-circle"></span> Occupy</a></td></tr>';
+								echo '<td style="text-align: right;"><a href="?occupy=' . $gate . '" class="btn btn-danger btn-xs" title="Already Occupied"><span class="glyphicon glyphicon-ban-circle"></span></a></td></tr>';
 							}					
 						}
 						?>

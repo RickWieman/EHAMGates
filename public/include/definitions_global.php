@@ -261,7 +261,16 @@ class Definitions {
   		'C72R',
   		'C750',
   		'C77R',
-  		'C82R'
+  		'C82R',
+   		'LJ23', //Learjet
+  		'LJ24',
+  		'LJ25',
+  		'LJ31',
+  		'LJ35',
+  		'LJ40',
+  		'LJ45',
+  		'LJ55',
+  		'LJ60'
 );
 
 	private static $invalidAircraftTypeMapping = array(

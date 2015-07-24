@@ -176,7 +176,7 @@ class Definitions {
 		'B748' => 9
 	);
 
-	private static $generalAviationAircraft = array( //Information from http://www.flugzeuginfo.net/table_accodes_en.php
+	private static $generalAviationAircraft = array( //Source: http://www.flugzeuginfo.net/table_accodes_en.php
   		'B18T', //Beech
   		'B190',
   		'B350',
@@ -262,6 +262,17 @@ class Definitions {
   		'C750',
   		'C77R',
   		'C82R',
+  		'COL3', //Lancair (Source: http://www.icao.int/publications/DOC8643/Pages/ManufacturersName.aspx)
+  		'COL4',
+  		'LNC2',
+  		'LNCE',
+  		'EVOT',
+  		'LNT4',
+  		'TGRS',
+  		'LEG2',
+  		'SNGY',
+  		'EVOP',
+  		'LNP4',
    		'LJ23', //Learjet
   		'LJ24',
   		'LJ25',

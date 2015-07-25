@@ -71,6 +71,14 @@ class DefinitionsTest extends PHPUnit_Framework_TestCase {
 	public function testBusGateFalse2() {
 		$this->assertFalse(Gates_EHAM::isBusGate('D05'));
 	}
+
+	public function testGeneralAviationAircraft() {
+		$this->assertTrue(Definitions::isGeneralAviationAircraft('C152'));
+	}
+
+	public function testNonGeneralAviationAircraft() {
+		$this->assertFalse(Definitions::isGeneralAviationAircraft('B738'));
+	}
 }
 
 ?>

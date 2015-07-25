@@ -325,10 +325,8 @@ class Definitions {
   		'PAY3',
   		'PAY4',
   		'PILL',
-  		'S108',
-
-
-);
+  		'S108'
+	);
 
 	private static $invalidAircraftTypeMapping = array(
 		'707' => 'B703',	//Boeing 707
@@ -509,6 +507,10 @@ class Definitions {
 
 	static function getAllAircraft() {
 		return self::$aircraftCategories;
+	}
+
+	static function isGeneralAviationAircraft($aircraftType) {
+		return in_array(self::translateInvalidAircraft($aircraftType), self::$generalAviationAircraft);
 	}
 
 	static function isValidAircraftType($aircraftType) {

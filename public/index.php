@@ -136,7 +136,7 @@ require('include/tpl_header.php');
 											echo $gate . ' (' . $cat . ')';
 										echo '</option>';
 									}
-									echo '<option value="'. Definitions::$generalAviationGate . '"' . (($data['flightrules'] == 'V') ? ' selected="selected"' : null) . '>* GA *</option>';
+									echo '<option value="'. Definitions::$generalAviationGate . '"' . (($data['flightrules'] == 'V' || Definitions::isGeneralAviationAircraft($result['aircraftType'])) ? ' selected="selected"' : null) . '>* GA *</option>';
 									?>
 								</select>
 								<button type="submit" class="btn btn-success btn-xs" title="Assign"><span class="glyphicon glyphicon-ok"></span></button>

@@ -4,6 +4,11 @@ class Callsigns {
 	private static $extraCallsignsFile = 'data-callsigns.txt';
 	private static $retention = 3600; // 60 minutes
 
+	// Always convert airline codes below to the format for DPS (or more commonly used codes).
+	private static $convertAirlineCode = array(
+		'U2' => 'EZY'
+	);
+
 	static function findFlightnumber($callsign) {
 		$getFlightnumber = file_get_contents('http://planefinder.net/data/endpoints/search_ajax.php?searchText=' . $callsign);
 		$getFlightnumber = json_decode($getFlightnumber, true);
@@ -11,7 +16,14 @@ class Callsigns {
 		if($getFlightnumber) {
 			foreach($getFlightnumber['flights'] as $data) {
 				if($data['subtitle'] == $callsign) {
-					return preg_replace('/^([A-Z0-9]{2})/', '$1 ', $data['title']);
+					$flightNumber = preg_replace('/^([A-Z0-9]{2})/', '$1 ', $data['title']);
+
+					$flight = explode(' ', $flightNumber);
+					if(array_key_exists($flight[0], self::$convertAirlineCode)) {
+						return self::$convertAirlineCode[$flight[0]] . ' ' . $flight[1];
+					}
+
+					return $flightNumber;
 				}
 			}
 		}

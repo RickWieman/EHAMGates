@@ -82,7 +82,7 @@ require('include/tpl_header.php');
 					}
 
 					$rowClass = ($data['flightrules'] == 'V') ? 'text-muted' : '';
-					$isUnknownAircraftType = !Definitions::canTranslateAircraftType($result['aircraftType']);
+					$isUnknownAircraftType = !Definitions::canTranslateAircraftType($result['aircraftType']) && !Definitions::isGeneralAviationAircraft($result['aircraftType']);
 
 					echo '<tr class="'. $rowClass .'" id="row-'. $callsign .'">';
 					echo '<td>' . $callsign . '</td><td class="hidden-xs' . (($isUnknownAircraftType) ? ' danger' : '') . '">' . $result['aircraftType'] . '</td>';

@@ -114,20 +114,6 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('H01', $gate);
 	}
 
-	public function testFindRealGate4() {
-		$gf = new GateFinder('testdata.txt');
-		$gate = $gf->findRealGate('KLM18');
-
-		$this->assertEquals('D57', $gate);
-	}
-
-	public function testFindRealGate5() {
-		$gf = new GateFinder('testdata.txt');
-		$gate = $gf->findRealGate('KLM36S');
-
-		$this->assertEquals('C10', $gate);
-	}
-
 	public function testFindRealGateUnknown() {
 		$gf = new GateFinder('testdata.txt');
 		$gate = $gf->findRealGate('KLM123');

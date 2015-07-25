@@ -2,7 +2,7 @@
 
 require_once('definitions_global.php');
 require_once('definitions_eham.php');
-require_once('definitions_eham_callsigns.php');
+require_once('definitions_callsigns.php');
 require_once('realgates.php');
 
 class GateFinder {
@@ -141,7 +141,7 @@ class GateFinder {
 	 *     EZY123 -> EZY (0)123
 	*/
 	function findRealGate($callsign, $useICAO = true) {
-		$flightnumber = Callsigns_EHAM::convertAlphanumeric($callsign);
+		$flightnumber = Callsigns::convertAlphanumeric($callsign);
 
 		if(!$flightnumber) {
 			$flightnumber = preg_replace('/^([A-Z0-9]{2})/', '$1 ', $callsign);

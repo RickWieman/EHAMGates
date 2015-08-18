@@ -12,6 +12,15 @@ ob_start();
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<?php if (PAGE == 'vatsim' && isset($_COOKIE['autoReload']) && $_COOKIE['autoReload'] == 'true') { ?>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			window.setTimeout(function() {
+				location.reload(true);
+			}, <?php echo (isset($_COOKIE['autoReloadInterval'])) ? $_COOKIE['autoReloadInterval'] * 1000 : 60000 ?>);
+		});
+	</script>
+	<?php } ?>
 </head>
 <body>
 	<nav class="navbar navbar-default" role="navigation">

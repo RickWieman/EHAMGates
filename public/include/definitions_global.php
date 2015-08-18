@@ -488,19 +488,19 @@ class Definitions {
 
 	private static $matchTypes = array(
 		'CARGO'			=> array('icon' => 'shopping-cart',
-								 'text' => 'This is a cargo flight (based on callsign).'),
+								 'text' => 'Cargo flight (based on callsign).'),
 		'RL' 			=> array('icon' => 'eye-open',
 								 'text' => 'Real life flight!'),
 		'RL_BUS'		=> array('icon' => 'transfer',
 								 'text' => 'Real life flight on a bus gate.'),
 		'RL_HEAVY'		=> array('icon' => 'plane',
-								 'text' => 'Real life flight, but the aircraft type is too heavy for actual gate.'),
+								 'text' => 'Real life flight, but the virtual aircraft is too heavy for the real life gate.'),
 		'RL_NOTYET'		=> array('icon' => 'eye-close',
 								 'text' => 'Real life flight, but no real life gate available yet.'),
 		'RL_OCCUPIED'	=> array('icon' => 'flash',
-								 'text' => 'Real life flight, but the actual gate is occupied.'),
+								 'text' => 'Real life flight, but the real life gate is already occupied.'),
 		'RANDOM'		=> array('icon' => 'list-alt',
-								 'text' => 'Based on airline defaults and aircraft category.'),
+								 'text' => 'Random gate, based on aircraft category and other flights by the same airline.'),
 		'MANUAL'		=> array('icon' => 'user',
 								 'text' => 'Assigned manually.')
 	);

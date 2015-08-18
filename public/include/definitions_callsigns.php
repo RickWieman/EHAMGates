@@ -9,7 +9,7 @@ class Callsigns {
 		'U2' => 'EZY'
 	);
 
-	static function findFlightnumber($callsign) {
+	static function findFlightnumberRemote($callsign) {
 		$getFlightnumber = file_get_contents('http://planefinder.net/data/endpoints/search_ajax.php?searchText=' . $callsign);
 		$getFlightnumber = json_decode($getFlightnumber, true);
 
@@ -55,7 +55,7 @@ class Callsigns {
 			$data = $storedCallsigns[$callsign];
 
 			if($data['added'] + self::$retention < time()) {
-				$findRemote = self::findFlightnumber($callsign);
+				$findRemote = self::findFlightnumberRemote($callsign);
 
 				if($findRemote) {
 					$data = self::addFlightnumber($callsign, $findRemote);
@@ -68,9 +68,27 @@ class Callsigns {
 			return $data['flightnumber'];
 		}
 		
-		$findRemote = self::findFlightnumber($callsign);
+		$findRemote = self::findFlightnumberRemote($callsign);
 		self::addFlightnumber($callsign, $findRemote);
 		
 		return $findRemote;
+	}
+
+	static function findFlightnumber($callsign, $useICAO = true) {
+		$flightnumber = Callsigns::convertAlphanumeric($callsign);
+
+		if(!$flightnumber) {
+			$flightnumber = preg_replace('/^([A-Z0-9]{2})/', '$1 ', $callsign);
+
+			if($useICAO) {
+				if(preg_match('/^[A-Z]{3}/', $callsign, $airlineICAO)) {
+					$airlineIATA = Definitions::convertAirlineICAOtoIATA($airlineICAO[0]);
+
+					$flightnumber = preg_replace('/^[A-Z]{3}/', $airlineIATA . ' ', $callsign);
+				}
+			}
+		}
+
+		return $flightnumber;
 	}
 }

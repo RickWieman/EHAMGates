@@ -6,6 +6,7 @@ class RealGates {
 	private $dataSource = 'http://schiphol.dutchplanespotters.nl/';
 	private $cacheFile = 'data.txt';
 	private $allRealGates;
+	private $airlinePiers;
 
 	function __construct($useData = null) {
 		if($useData != null) {
@@ -38,6 +39,7 @@ class RealGates {
 	function parseData() {
 		$data = $this->fetchData();
 		$realGates = array();
+		$airlinePiers = array();
 
 		// Find flight table body
 		$data = explode('<table class="flights" cellpadding="2" cellspacing="0">', $data);
@@ -64,6 +66,21 @@ class RealGates {
 				$gate = preg_replace('/^([A-Z])(\d)$/', '${1}0${2}', $info[5]);
 				
 				$realGates[$info[6]] = Gates_EHAM::convertSchengenGateToVOP($gate);
+
+				// Store pier(s) of the airline
+				$airlineIATA = explode(' ', $info[6]);
+				$airlineIATA = $airlineIATA[0];
+				if(!array_key_exists($airlineIATA, $airlinePiers)) {
+					$airlinePiers[$airlineIATA] = array();
+				}
+
+				$pier = substr($gate, 0, 1);
+				if(!array_key_exists($pier, $airlinePiers[$airlineIATA])) {
+					$airlinePiers[$airlineIATA][$pier] = 1;
+				}
+				else {
+					$airlinePiers[$airlineIATA][$pier]++;
+				}
 			}
 			else {
 				$realGates[$info[6]] = 'UNKNOWN';
@@ -71,6 +88,7 @@ class RealGates {
 		}
 
 		$this->allRealGates = $realGates;
+		$this->airlinePiers = $airlinePiers;
 
 		return $realGates;
 	}
@@ -83,11 +101,29 @@ class RealGates {
 		return $this->allRealGates;
 	}
 
+	function getAllAirlinePiers() {
+		if(empty($this->airlinePiers) || $this->isCacheExpired()) {
+			$this->parseData();
+		}
+
+		return $this->airlinePiers;
+	}
+
 	function findGateByFlightnumber($flightnumber) {
 		$realGates = $this->getAllRealGates();
 
 		if(array_key_exists($flightnumber, $realGates)) {
 			return $realGates[$flightnumber];
+		}
+
+		return false;
+	}
+
+	function findPierByAirlineIATA($airline) {
+		$airlinePiers = $this->getAllAirlinePiers();
+
+		if(array_key_exists($airline, $airlinePiers)) {
+			return $airlinePiers[$airline];
 		}
 
 		return false;

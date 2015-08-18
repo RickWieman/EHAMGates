@@ -439,7 +439,7 @@ class Gates_EHAM {
 		$airlineCode = Definitions::resolveAirlineCode($callsign);
 
 		if($airlineCode && array_key_exists($airlineCode, $gateList)) {
-			return $gateList[$airlineCode];
+			return array_fill_keys(array_keys(array_flip($gateList[$airlineCode])), 1);
 		}
 
 		return false;

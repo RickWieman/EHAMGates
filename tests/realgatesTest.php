@@ -29,5 +29,28 @@ class RealGatesTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(0, count($missingGates));
 	}
+
+	public function testAirlinePier1() {
+		$rg = new RealGates('testdata.txt');
+		$piers = $rg->findPierByAirlineIATA('KL');
+
+		$this->assertArrayHasKey('D', $piers);
+		$this->assertEquals(114, $piers['D']);
+	}
+
+	public function testAirlinePier2() {
+		$rg = new RealGates('testdata.txt');
+		$piers = $rg->findPierByAirlineIATA('DL');
+
+		$this->assertArrayHasKey('E', $piers);
+		$this->assertEquals(8, $piers['E']);
+	}
+
+	public function testAirlineUnknownPier() {
+		$rg = new RealGates('testdata.txt');
+		$piers = $rg->findPierByAirlineIATA('ZZ');
+
+		$this->assertFalse($piers);
+	}
 }
 ?>

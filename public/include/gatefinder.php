@@ -141,19 +141,7 @@ class GateFinder {
 	 *     EZY123 -> EZY (0)123
 	*/
 	function findRealGate($callsign, $useICAO = true) {
-		$flightnumber = Callsigns::convertAlphanumeric($callsign);
-
-		if(!$flightnumber) {
-			$flightnumber = preg_replace('/^([A-Z0-9]{2})/', '$1 ', $callsign);
-
-			if($useICAO) {
-				if(preg_match('/^[A-Z]{3}/', $callsign, $airlineICAO)) {
-					$airlineIATA = Definitions::convertAirlineICAOtoIATA($airlineICAO[0]);
-
-					$flightnumber = preg_replace('/^[A-Z]{3}/', $airlineIATA . ' ', $callsign);
-				}
-			}
-		}
+		$flightnumber = Callsigns::findFlightnumber($callsign, $useICAO);
 
 		$gate = $this->realGates->findGateByFlightnumber($flightnumber);
 
@@ -182,7 +170,12 @@ class GateFinder {
 			$defaultGates = Gates_EHAM::resolveCargoAirlineGate($callsign);
 		}
 		else {
-			$defaultGates = Gates_EHAM::resolveAirlineGate($callsign);
+			$flight = explode(' ', Callsigns::findFlightnumber($callsign));
+			$defaultGates = $this->realGates->findPierByAirlineIATA($flight[0]);
+
+			if(!$defaultGates) {
+				$defaultGates = Gates_EHAM::resolveAirlineGate($callsign);
+			}
 		}
 		
 		if($defaultGates) {
@@ -190,7 +183,7 @@ class GateFinder {
 
 			// Determine which gates are available for the airline
 			$matches = array();
-			foreach($defaultGates as $pier) {
+			foreach($defaultGates as $pier => $occurrences) {
 				foreach($availableGates as $gate => $gateCat) {
 					if(preg_match('/^' . $pier . '/', $gate)) {
 						$matches[$gate] = $gateCat;

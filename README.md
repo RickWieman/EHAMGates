@@ -1,4 +1,4 @@
-EHAMGates
+EHAMGates [![Build Status](https://travis-ci.org/RickWieman/EHAMGates.svg?branch=master)](https://travis-ci.org/RickWieman/EHAMGates)
 =========
 
 Gate assignment tool for Amsterdam Airport Schiphol (EHAM). Not to be used in real aviation!

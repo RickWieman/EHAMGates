@@ -184,11 +184,16 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$allGates = Gates_EHAM::allGates();
 		$extraGates = Gates_EHAM::getExtraGates('MD11');
 
+		// As Transavia is a regular airline at EHAM, we may safely assume the real piers are available and used
+		$rg = new RealGates('testdata.txt');
+		$piers = $rg->getAllAirlinePiers();
+		$piers = $piers['HV'];
+
 		$this->assertNotEquals('D51', $gate['gate']);
 		$this->assertEquals('RL_HEAVY', $gate['match']);
 
 		$this->assertTrue($allGates[$gate['gate']] >= 7 || in_array($gate['gate'], $extraGates));
-		$this->assertTrue(array_key_exists(substr($gate['gate'], 0, 1), Gates_EHAM::resolveAirlineGate('TRA')));
+		$this->assertTrue(array_key_exists(substr($gate['gate'], 0, 1), $piers));
 		$this->assertTrue(array_key_exists($gate['gate'], Gates_EHAM::allSchengenGates()));
 	}
 
@@ -205,8 +210,13 @@ class GateFinderTest extends PHPUnit_Framework_TestCase {
 		$allGates = Gates_EHAM::allGates();
 		$extraGates = Gates_EHAM::getExtraGates('B738');
 
+		// As Transavia is a regular airline at EHAM, we may safely assume the real piers are available and used
+		$rg = new RealGates('testdata.txt');
+		$piers = $rg->getAllAirlinePiers();
+		$piers = $piers['HV'];
+
 		$this->assertTrue($allGates[$gate['gate']] >= 4 || in_array($gate['gate'], $extraGates));
-		$this->assertTrue(array_key_exists(substr($gate['gate'], 0, 1), Gates_EHAM::resolveAirlineGate('TRA')));
+		$this->assertTrue(array_key_exists(substr($gate['gate'], 0, 1), $piers));
 		$this->assertTrue(array_key_exists($gate['gate'], Gates_EHAM::allSchengenGates()));
 	}
 
